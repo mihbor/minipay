@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">MiniPay</string>
+    <string name="service_name">MiniPay-CardService</string>
+    <string name="card_title">MiniPay Card</string>
+</resources>
