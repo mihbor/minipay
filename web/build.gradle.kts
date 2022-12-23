@@ -15,7 +15,6 @@ kotlin {
         implementation(project(":common"))
         implementation(compose.web.core)
         implementation(compose.runtime)
-        implementation("dev.gitlive:firebase-firestore-js:1.6.2")
   
         implementation(npm("qrcode", "1.5.1"))
         implementation(npm("qr-scanner", "1.4.2"))

@@ -1,6 +1,5 @@
 package logic
 
-import Channel
 import androidx.compose.runtime.*
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
@@ -8,6 +7,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import ltd.mbor.minimak.*
+import ltd.mbor.minipay.common.*
 
 val channels = mutableStateListOf<Channel>()
 var multisigScriptAddress by mutableStateOf("")
@@ -128,7 +128,7 @@ suspend fun Channel.send(amount: BigDecimal) {
     append("txnexport id:$settleTxnId;")
   }
   val settleTxn = MDS.cmd(settletxncreator)!!.jsonArray.last()
-  
+
   publish(
     channelKey(their.keys, tokenId),
     listOf(

@@ -17,8 +17,6 @@ import androidx.compose.ui.unit.sp
 import com.example.testapp.*
 import com.example.testapp.logic.channels
 import com.example.testapp.logic.eltooScriptCoins
-import com.example.testapp.logic.getChannels
-import com.example.testapp.logic.updateChannelStatus
 import com.example.testapp.ui.preview.fakeBalances
 import com.example.testapp.ui.preview.fakeChannel
 import com.example.testapp.ui.theme.TestAppTheme
@@ -28,6 +26,9 @@ import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Coin
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.getCoins
+import ltd.mbor.minipay.common.Channel
+import ltd.mbor.minipay.common.getChannels
+import ltd.mbor.minipay.common.updateChannelStatus
 
 @Composable
 fun ChannelListing(activity: MainActivity?, setRequestSentOnChannel: (Channel) -> Unit) {

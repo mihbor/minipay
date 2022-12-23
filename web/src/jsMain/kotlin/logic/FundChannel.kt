@@ -1,15 +1,18 @@
 package logic
 
-import Channel
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
+import kotlinx.datetime.Clock
 import kotlinx.serialization.json.jsonArray
 import logic.FundChannelEvent.*
 import ltd.mbor.minimak.*
+import ltd.mbor.minipay.common.Channel
+import ltd.mbor.minipay.common.insertChannel
+import ltd.mbor.minipay.common.publish
+import ltd.mbor.minipay.common.subscribe
 import scope
-import kotlin.js.Date
 
 enum class FundChannelEvent{
   SCRIPTS_DEPLOYED, FUNDING_TX_CREATED, TRIGGER_TX_SIGNED, SETTLEMENT_TX_SIGNED, CHANNEL_PERSISTED, CHANNEL_PUBLISHED, SIGS_RECEIVED, CHANNEL_FUNDED, CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED
@@ -108,10 +111,10 @@ suspend fun prepareFundChannel(
     settlementTx = signedSettlementTx,
     timeLock = timeLock,
     eltooAddress = eltooScriptAddress,
-    updatedAt = Date.now().toLong()
+    updatedAt = Clock.System.now()
   )
   event(CHANNEL_PERSISTED, channel)
-  
+
   publish(
     channelKey(theirKeys, tokenId),
     listOf(timeLock, myKeys.trigger, myKeys.update, myKeys.settle, signedTriggerTx, signedSettlementTx, unsignedFundingTx).joinToString(";")
@@ -154,5 +157,5 @@ suspend fun Channel.commitFund(
       WHERE id = $id;
     """)
   }
-  return copy(triggerTx = triggerTx, settlementTx = settlementTx, updatedAt = Date.now().toLong())
+  return copy(triggerTx = triggerTx, settlementTx = settlementTx, updatedAt = Clock.System.now())
 }

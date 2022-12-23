@@ -13,6 +13,10 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
 import ltd.mbor.minimak.*
+import ltd.mbor.minipay.common.createDB
+import ltd.mbor.minipay.common.getChannels
+import ltd.mbor.minipay.common.setChannelOpen
+import ltd.mbor.minipay.common.subscribe
 import scope
 import kotlin.random.Random
 

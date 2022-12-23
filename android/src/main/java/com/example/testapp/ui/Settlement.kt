@@ -6,7 +6,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import com.example.testapp.Channel
 import com.example.testapp.TAG
 import com.example.testapp.logic.completeSettlement
 import com.example.testapp.logic.postUpdate
@@ -16,6 +15,7 @@ import com.example.testapp.ui.preview.fakeChannel
 import com.example.testapp.ui.theme.TestAppTheme
 import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Coin
+import ltd.mbor.minipay.common.Channel
 
 @Composable
 fun Settlement(channel: Channel, blockNumber: Int, eltooScriptCoins: List<Coin>, updateChannel: (Channel) -> Unit) {

@@ -1,6 +1,5 @@
 package ui
 
-import Channel
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
@@ -13,6 +12,7 @@ import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.Token
 import ltd.mbor.minimak.getAddress
+import ltd.mbor.minipay.common.Channel
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.display

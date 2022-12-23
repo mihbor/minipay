@@ -1,12 +1,12 @@
 package ui
 
-import Channel
 import androidx.compose.runtime.Composable
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import logic.balances
 import logic.blockNumber
 import logic.eltooScriptCoins
 import logic.multisigScriptBalances
+import ltd.mbor.minipay.common.Channel
 import org.jetbrains.compose.web.dom.Br
 import org.jetbrains.compose.web.dom.Text
 
@@ -22,7 +22,7 @@ fun ChannelView(
     Br()
   }
   if (multisigScriptBalances.any { it.unconfirmed > ZERO || it.confirmed > ZERO }) {
-    Text("Channel balance: me ${channel.my.balance.toPlainString()}, counterparty ${channel.their.balance.toPlainString()}")
+    Text("ltd.mbor.minipay.common.Channel balance: me ${channel.my.balance.toPlainString()}, counterparty ${channel.their.balance.toPlainString()}")
     ChannelTransfers(channel)
     Br()
   }

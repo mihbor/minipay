@@ -1,11 +1,11 @@
 package ui
 
-import Channel
 import androidx.compose.runtime.*
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.coroutines.launch
 import logic.request
 import logic.send
+import ltd.mbor.minipay.common.Channel
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.dom.Br
 import org.jetbrains.compose.web.dom.Button

@@ -9,7 +9,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
-import com.example.testapp.Channel
 import com.example.testapp.MainActivity
 import com.example.testapp.TAG
 import com.example.testapp.logic.FundChannelEvent.*
@@ -24,6 +23,7 @@ import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Token
 import ltd.mbor.minimak.log
+import ltd.mbor.minipay.common.Channel
 
 @Composable
 fun FundChannel(balances: Map<String, Balance>, tokens: Map<String, Token>, activity: MainActivity?, setRequestSentOnChannel: (Channel) -> Unit) {

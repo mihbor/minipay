@@ -1,6 +1,5 @@
 package ui
 
-import Channel
 import androidx.compose.runtime.*
 import kotlinx.coroutines.launch
 import logic.balances
@@ -8,6 +7,7 @@ import logic.completeSettlement
 import logic.postUpdate
 import logic.triggerSettlement
 import ltd.mbor.minimak.Coin
+import ltd.mbor.minipay.common.Channel
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.dom.Br
 import org.jetbrains.compose.web.dom.Button

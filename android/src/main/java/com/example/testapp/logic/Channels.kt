@@ -1,7 +1,6 @@
 package com.example.testapp.logic
 
 import androidx.compose.runtime.*
-import com.example.testapp.Channel
 import com.example.testapp.newTxId
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
@@ -9,6 +8,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import ltd.mbor.minimak.*
+import ltd.mbor.minipay.common.*
 
 val channels = mutableStateListOf<Channel>()
 var multisigScriptAddress by mutableStateOf("")

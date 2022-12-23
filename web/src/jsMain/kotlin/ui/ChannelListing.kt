@@ -1,12 +1,16 @@
 package ui
 
-import Channel
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import kotlinx.coroutines.launch
-import logic.*
+import logic.balances
+import logic.blockNumber
+import logic.eltooScriptCoins
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.getCoins
+import ltd.mbor.minipay.common.Channel
+import ltd.mbor.minipay.common.getChannels
+import ltd.mbor.minipay.common.updateChannelStatus
 import org.jetbrains.compose.web.dom.*
 import scope
 

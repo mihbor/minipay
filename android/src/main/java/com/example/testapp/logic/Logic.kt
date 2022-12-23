@@ -13,10 +13,12 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import ltd.mbor.minimak.*
+import ltd.mbor.minipay.common.createDB
+import ltd.mbor.minipay.common.getChannels
+import ltd.mbor.minipay.common.setChannelOpen
+import ltd.mbor.minipay.common.subscribe
 import java.security.SecureRandom
-import java.text.SimpleDateFormat
 
-val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
 var inited by mutableStateOf(false)
 val balances = mutableStateMapOf<String, Balance>()
 val tokens = mutableStateMapOf<String, Token>()

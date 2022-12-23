@@ -5,7 +5,6 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.testapp.Channel
 import com.example.testapp.MainActivity
 import com.example.testapp.logic.acceptRequest
 import com.example.testapp.scope
@@ -15,6 +14,7 @@ import com.example.testapp.ui.theme.TestAppTheme
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Transaction
+import ltd.mbor.minipay.common.Channel
 
 @Composable
 fun ChannelRequestReceived(channel: Channel, updateTx: Pair<Int, Transaction>, settleTx: Pair<Int, Transaction>, activity: MainActivity?, dismiss: () -> Unit) {

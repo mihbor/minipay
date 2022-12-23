@@ -1,4 +1,7 @@
+package ltd.mbor.minipay.common
+
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import kotlinx.datetime.Instant
 
 data class Channel(
   val id: Int,
@@ -12,7 +15,7 @@ data class Channel(
   val settlementTx: String,
   val timeLock: Int,
   val eltooAddress: String,
-  val updatedAt: Long
+  val updatedAt: Instant
 ) {
   data class Side(
     val address: String,

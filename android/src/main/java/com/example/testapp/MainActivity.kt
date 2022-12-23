@@ -18,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.example.testapp.logic.channelUpdateAck
-import com.example.testapp.logic.getChannel
 import com.example.testapp.logic.initFirebase
 import com.example.testapp.ui.ChannelRequestReceived
 import com.example.testapp.ui.ChannelRequestSent
@@ -34,6 +33,8 @@ import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.Transaction
 import ltd.mbor.minimak.getAddress
 import ltd.mbor.minimak.importTx
+import ltd.mbor.minipay.common.Channel
+import ltd.mbor.minipay.common.getChannel
 
 val READER_FLAGS = NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK
 

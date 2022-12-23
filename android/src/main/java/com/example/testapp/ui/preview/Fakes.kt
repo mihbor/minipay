@@ -1,11 +1,12 @@
 package com.example.testapp.ui.preview
 
-import com.example.testapp.Channel
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ONE
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
+import kotlinx.datetime.Instant
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import ltd.mbor.minimak.Balance
+import ltd.mbor.minipay.common.Channel
 
 val fakeChannel = Channel(
   id = 1,
@@ -35,7 +36,7 @@ val fakeChannel = Channel(
   settlementTx = "",
   timeLock = 10,
   eltooAddress = "Mx123",
-  updatedAt = 123
+  updatedAt = Instant.fromEpochMilliseconds(123)
 )
 
 val fakeBalances = mapOf(

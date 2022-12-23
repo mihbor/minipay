@@ -14,7 +14,6 @@ dependencies {
   implementation("androidx.activity:activity-compose:1.6.0")
   implementation("com.google.zxing:core:3.5.1")
   implementation("com.journeyapps:zxing-android-embedded:4.3.0")
-  implementation("dev.gitlive:firebase-firestore:1.6.2")
   implementation("com.google.firebase:firebase-common:20.1.0")
   implementation("com.google.firebase:firebase-firestore:24.1.0")
   implementation("io.coil-kt:coil-compose:$coilVersion")

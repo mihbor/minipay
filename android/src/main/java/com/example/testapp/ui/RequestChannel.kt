@@ -12,7 +12,6 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
-import com.example.testapp.Channel
 import com.example.testapp.MainActivity
 import com.example.testapp.logic.JoinChannelEvent.*
 import com.example.testapp.logic.channelKey
@@ -23,6 +22,7 @@ import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.Token
 import ltd.mbor.minimak.getAddress
+import ltd.mbor.minipay.common.Channel
 
 @Composable
 fun RequestChannel(

@@ -8,7 +8,6 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.testapp.Channel
 import com.example.testapp.MainActivity
 import com.example.testapp.ui.theme.TestAppTheme
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
@@ -17,6 +16,7 @@ import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonPrimitive
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Token
+import ltd.mbor.minipay.common.Channel
 
 @Composable
 fun MainView(

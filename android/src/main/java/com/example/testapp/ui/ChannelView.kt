@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.testapp.Channel
 import com.example.testapp.MainActivity
 import com.example.testapp.blockNumber
 import com.example.testapp.logic.eltooScriptCoins
@@ -17,6 +16,7 @@ import com.example.testapp.ui.preview.fakeBalances
 import com.example.testapp.ui.preview.fakeChannel
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import ltd.mbor.minimak.Balance
+import ltd.mbor.minipay.common.Channel
 import ui.TokenIcon
 
 @Composable
