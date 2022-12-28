@@ -3,10 +3,16 @@ plugins {
   kotlin("plugin.serialization") version "1.6.10"
   id("org.jetbrains.compose") version composeVersion
 }
-
+base {
+  archivesName.set("minipay")
+}
 kotlin {
   js(IR) {
-    browser()
+    browser{
+      webpackTask {
+        sourceMaps = true
+      }
+    }
     binaries.executable()
   }
   sourceSets {
@@ -21,4 +27,11 @@ kotlin {
       }
     }
   }
+}
+tasks.register<Zip>("minidappDistribution") {
+  dependsOn("jsBrowserDistribution")
+  archiveFileName.set("${rootProject.name}.mds.zip")
+  destinationDirectory.set(layout.buildDirectory.dir("minidapp"))
+  from(layout.buildDirectory.dir("distributions"))
+  exclude("*.LICENSE.txt")
 }

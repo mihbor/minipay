@@ -14,7 +14,7 @@ import com.example.testapp.R
 import ltd.mbor.minimak.Balance
 
 @Composable
-fun TokenIcon(url: String) {
+fun TokenIcon(url: String, size: Int = 24) {
   AsyncImage(
     model = url,
     contentDescription = url,
@@ -22,13 +22,13 @@ fun TokenIcon(url: String) {
       .components {
         add(SvgDecoder.Factory())
       }.build(),
-    modifier = Modifier.width(24.dp).height(24.dp),
+    modifier = Modifier.width(size.dp).height(size.dp),
     placeholder = painterResource(id = R.drawable.ic_tap_and_play)
   )
 }
 
 @Composable
-fun TokenIcon(tokenId: String, balances: Map<String, Balance>) {
+fun TokenIcon(tokenId: String, balances: Map<String, Balance>, size: Int = 24) {
   TokenIcon(balances[tokenId]?.tokenUrl?.takeIf { it.isNotBlank() }
-    ?: if (tokenId == "0x00") "minima.svg" else "coins.svg")
+    ?: if (tokenId == "0x00") "minima.svg" else "coins.svg", size)
 }

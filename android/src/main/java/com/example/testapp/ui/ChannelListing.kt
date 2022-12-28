@@ -29,6 +29,7 @@ import ltd.mbor.minimak.getCoins
 import ltd.mbor.minipay.common.Channel
 import ltd.mbor.minipay.common.getChannels
 import ltd.mbor.minipay.common.updateChannelStatus
+import ui.TokenIcon
 
 @Composable
 fun ChannelListing(activity: MainActivity?, setRequestSentOnChannel: (Channel) -> Unit) {
@@ -58,6 +59,7 @@ fun ChannelListing(activity: MainActivity?, setRequestSentOnChannel: (Channel) -
   }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChannelTable(
   channels: List<Channel>,
@@ -67,18 +69,16 @@ fun ChannelTable(
   setRequestSentOnChannel: (Channel) -> Unit,
   updateChannel: (Int, Channel) -> Unit
 ) {
-  ProvideTextStyle(value = TextStyle(fontSize = 10.sp)) {
+  ProvideTextStyle(value = TextStyle(fontSize = 10.sp, textAlign = TextAlign.Right)) {
     Row {
       Text("ID", Modifier.width(30.dp))
       Text("Status", Modifier.width(60.dp))
       Text("Seq\nnumber", Modifier.width(50.dp))
-      Text("Token", Modifier.width(50.dp))
+      Text("Token", Modifier.width(75.dp))
       Text("My\nbalance", Modifier.width(50.dp))
       Text("Their\nbalance", Modifier.width(50.dp))
-      Text("Actions")
+      Text("Actions", Modifier.width(40.dp))
     }
-  }
-  ProvideTextStyle(value = TextStyle(fontSize = 10.sp, textAlign = TextAlign.Right)) {
     channels.forEachIndexed { index, channel ->
       key(channel.id) {
         var showActions by remember { mutableStateOf(false) }
@@ -86,11 +86,18 @@ fun ChannelTable(
           Text(channel.id.toString(), Modifier.width(30.dp))
           Text(channel.status, Modifier.width(60.dp))
           Text(channel.sequenceNumber.toString(), Modifier.width(50.dp))
-          Text(balances[channel.tokenId]?.tokenName ?: "???", Modifier.width(50.dp))
+          Row(Modifier.width(75.dp)) {
+            Text(balances[channel.tokenId]?.tokenName ?: "???", Modifier.width(60.dp))
+            TokenIcon(channel.tokenId, balances, 15)
+          }
           Text(channel.my.balance.toPlainString(), Modifier.width(50.dp))
           Text(channel.their.balance.toPlainString(), Modifier.width(50.dp))
-          IconButton(onClick = { showActions = !showActions }) {
-            Icon(Icons.Filled.List, contentDescription = null)
+          CompositionLocalProvider(
+            LocalMinimumTouchTargetEnforcement provides false,
+          ) {
+            IconButton(onClick = { showActions = !showActions }, Modifier.width(40.dp)) {
+              Icon(Icons.Filled.List, contentDescription = null)
+            }
           }
         }
         if (showActions) Row {
@@ -118,14 +125,6 @@ suspend fun MutableList<Channel>.load() {
   }
   clear()
   addAll(newChannels)
-}
-
-@Composable
-@Preview
-fun PreviewChannelListing() {
-  TestAppTheme {
-    ChannelListing(null, {})
-  }
 }
 
 @Composable @Preview
