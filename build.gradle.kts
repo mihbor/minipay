@@ -22,3 +22,16 @@ plugins {
   id("com.android.library") apply false
   id("org.jetbrains.compose") apply false
 }
+
+tasks.register<Copy>("copyApk"){
+  val source = project(":android").tasks["packageDebug"]
+  dependsOn(source)
+  from(source)
+  include("**.apk")
+  into("web/src/jsMain/resources")
+  rename{ "minipay.apk" }
+}
+
+tasks.register("minidappWithApk"){
+  dependsOn("copyApk", ":web:minidappDistribution")
+}

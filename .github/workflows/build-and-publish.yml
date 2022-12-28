@@ -1,0 +1,33 @@
+name: Build and Publish
+on: [ push, pull_request ]
+jobs:
+  build:
+    name: Publish
+    runs-on: ubuntu-latest
+    steps:
+
+      # Setup Java 1.8 environment for the next steps
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      # Check out current repository
+      - name: Checkout
+        uses: actions/checkout@v2.3.1
+
+      # Build application
+      - name: Build
+        run: ./gradlew minidappWithApk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # If main branch update, deploy to gh-pages
+      - name: Deploy
+        if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+        uses: JamesIves/github-pages-deploy-action@4.1.7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages # The branch the action should deploy to.
+          folder: web/build/minidapp # The folder the action should deploy.
+          clean: true # Automatically remove deleted files from the deploy branch

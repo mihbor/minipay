@@ -10,8 +10,8 @@ import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
-import com.example.testapp.R
 import ltd.mbor.minimak.Balance
+import ltd.mbor.minipay.R
 
 @Composable
 fun TokenIcon(url: String, size: Int = 24) {

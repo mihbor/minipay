@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.archivesName
+
 plugins {
   id("org.jetbrains.compose")
   id("com.android.application")
@@ -21,12 +23,15 @@ dependencies {
   implementation("io.coil-kt:coil-svg:$coilVersion")
 }
 
+base {
+  archivesName.set("ltd.mbor.minipay")
+}
 android {
   compileSdk = 33
-  namespace = "com.example.testapp"
+  namespace = project.archivesName
   
   defaultConfig {
-    applicationId = "ltd.mbor.minipay"
+    applicationId = project.archivesName
     minSdk = 24
     targetSdk = 33
     versionCode = 1

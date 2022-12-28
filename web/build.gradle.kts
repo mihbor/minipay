@@ -28,6 +28,7 @@ kotlin {
     }
   }
 }
+
 tasks.register<Zip>("minidappDistribution") {
   dependsOn("jsBrowserDistribution")
   archiveFileName.set("${rootProject.name}.mds.zip")
