@@ -13,18 +13,12 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import ltd.mbor.minimak.*
-import ltd.mbor.minipay.common.createDB
-import ltd.mbor.minipay.common.getChannels
-import ltd.mbor.minipay.common.setChannelOpen
-import ltd.mbor.minipay.common.subscribe
-import java.security.SecureRandom
+import ltd.mbor.minipay.common.*
 
 var inited by mutableStateOf(false)
 val balances = mutableStateMapOf<String, Balance>()
 val tokens = mutableStateMapOf<String, Token>()
 var blockNumber by mutableStateOf(0)
-
-fun newTxId() = SecureRandom().nextInt(1_000_000_000)
 
 suspend fun initMDS(uid: String, host: String, port: Int) {
   inited = false

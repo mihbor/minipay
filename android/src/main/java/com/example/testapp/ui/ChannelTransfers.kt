@@ -15,8 +15,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.testapp.MainActivity
 import com.example.testapp.TAG
-import com.example.testapp.logic.request
-import com.example.testapp.logic.send
 import com.example.testapp.scope
 import com.example.testapp.sendDataToService
 import com.example.testapp.ui.preview.fakeChannel
@@ -24,6 +22,8 @@ import com.example.testapp.ui.theme.TestAppTheme
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.coroutines.launch
 import ltd.mbor.minipay.common.Channel
+import ltd.mbor.minipay.common.request
+import ltd.mbor.minipay.common.send
 
 @Composable
 fun ChannelTransfers(channel: Channel, activity: MainActivity?, setRequestSentOnChannel: (Channel) -> Unit) {

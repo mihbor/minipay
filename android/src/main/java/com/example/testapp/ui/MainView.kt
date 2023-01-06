@@ -82,8 +82,8 @@ fun MainView(
 }
 
 private val previewBalances = listOf(
-  Balance("0x00", JsonNull, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, "1"),
-  Balance("0x01234567890", JsonPrimitive("test"), BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, "1"),
+  Balance("0x00", JsonNull, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, "1"),
+  Balance("0x01234567890", JsonPrimitive("test"), BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, "1"),
 ).associateBy { it.tokenId }
 
 private val previewTokens = listOf(

@@ -64,4 +64,4 @@ fun PreviewChannelRequest() {
   }
 }
 
-val Transaction.Companion.empty get() = Transaction(emptyList(), emptyList(), emptyList(), "")
+val Transaction.Companion.empty get() = Transaction(emptyList(), emptyList(), emptyList(), "", Transaction.Header("1", "2"))

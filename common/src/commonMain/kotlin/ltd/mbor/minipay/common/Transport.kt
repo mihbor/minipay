@@ -1,6 +1,7 @@
 package ltd.mbor.minipay.common
 
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.firestore.firestore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
@@ -10,6 +11,8 @@ import kotlinx.datetime.Instant
 import ltd.mbor.minimak.log
 
 const val COLLECTION = "transactions"
+
+var firebaseApp: FirebaseApp? = null
 
 suspend fun fetch(id: String): String? = (
   Firebase.firestore.collection(COLLECTION).document(id).get()

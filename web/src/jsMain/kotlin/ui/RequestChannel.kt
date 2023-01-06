@@ -5,14 +5,14 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.browser.document
 import logic.JoinChannelEvent.*
-import logic.channelKey
 import logic.joinChannel
-import logic.newKeys
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.Token
 import ltd.mbor.minimak.getAddress
 import ltd.mbor.minipay.common.Channel
+import ltd.mbor.minipay.common.channelKey
+import ltd.mbor.minipay.common.newKeys
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.display

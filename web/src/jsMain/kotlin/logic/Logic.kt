@@ -13,18 +13,12 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
 import ltd.mbor.minimak.*
-import ltd.mbor.minipay.common.createDB
-import ltd.mbor.minipay.common.getChannels
-import ltd.mbor.minipay.common.setChannelOpen
-import ltd.mbor.minipay.common.subscribe
+import ltd.mbor.minipay.common.*
 import scope
-import kotlin.random.Random
 
 val balances = mutableStateMapOf<String, Balance>()
 val tokens = mutableStateMapOf<String, Token>()
 var blockNumber by mutableStateOf(0)
-
-fun newTxId() = Random.nextInt(1_000_000_000)
 
 external fun decodeURIComponent(encodedURI: String): String
 
@@ -69,7 +63,7 @@ suspend fun init(uid: String?) {
         tokens.putAll(newTokens)
       }
       "NEWBLOCK" -> {
-        blockNumber = msg.jsonObject["data"]!!.jsonObject["txpow"]!!.jsonObject["header"]!!.jsonString("block")!!.toInt()
+        blockNumber = msg.jsonObject["data"]!!.jsonObject["txpow"]!!.jsonObject["header"]!!.jsonString("block").toInt()
         if (multisigScriptAddress.isNotEmpty()) {
           scope.launch {
             val newBalances = MDS.getBalances(multisigScriptAddress, confirmations = 0)

@@ -14,6 +14,7 @@ external fun require(module: String): dynamic
 
 fun main() {
   scope.launch {
+    initFirebase()
     init(getParams("uid"))
   }
   renderComposableInBody {

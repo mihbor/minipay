@@ -7,15 +7,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.example.testapp.TAG
-import com.example.testapp.logic.completeSettlement
-import com.example.testapp.logic.postUpdate
-import com.example.testapp.logic.triggerSettlement
 import com.example.testapp.scope
 import com.example.testapp.ui.preview.fakeChannel
 import com.example.testapp.ui.theme.TestAppTheme
 import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Coin
 import ltd.mbor.minipay.common.Channel
+import ltd.mbor.minipay.common.completeSettlement
+import ltd.mbor.minipay.common.postUpdate
+import ltd.mbor.minipay.common.triggerSettlement
 
 @Composable
 fun Settlement(channel: Channel, blockNumber: Int, eltooScriptCoins: List<Coin>, updateChannel: (Channel) -> Unit) {
@@ -43,7 +43,7 @@ fun Settlement(channel: Channel, blockNumber: Int, eltooScriptCoins: List<Coin>,
     eltooScriptCoins.forEach {
 //      Br()
       Text("[${it.tokenId}] token eltoo coin: ${it.tokenAmount.toPlainString()} timelock ${
-        (it.created.toInt() + channel.timeLock - blockNumber).takeIf { it > 0 }?.let { "ends in $it blocks" } ?: "ended"}",
+        (it.created + channel.timeLock - blockNumber).takeIf { it > 0 }?.let { "ends in $it blocks" } ?: "ended"}",
         fontSize = 8.sp
       )
     }
@@ -64,7 +64,7 @@ fun Settlement(channel: Channel, blockNumber: Int, eltooScriptCoins: List<Coin>,
     }
     if (channel.status in listOf("TRIGGERED", "UPDATED")) {
       Button(
-        enabled = !settlementCompleting && !updatePosting && eltooScriptCoins.none { it.created.toInt() + channel.timeLock > blockNumber },
+        enabled = !settlementCompleting && !updatePosting && eltooScriptCoins.none { it.created + channel.timeLock > blockNumber },
         onClick = {
           settlementCompleting = true
           scope.launch {
@@ -81,8 +81,7 @@ fun Settlement(channel: Channel, blockNumber: Int, eltooScriptCoins: List<Coin>,
 
 @Composable
 @Preview
-fun previewSettlement() {
-
+fun PreviewSettlement() {
   TestAppTheme {
     Settlement(channel = fakeChannel, blockNumber = 5, eltooScriptCoins = emptyList(), updateChannel = {})
   }

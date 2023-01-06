@@ -35,6 +35,7 @@ import ltd.mbor.minimak.getAddress
 import ltd.mbor.minimak.importTx
 import ltd.mbor.minipay.common.Channel
 import ltd.mbor.minipay.common.getChannel
+import ltd.mbor.minipay.common.newTxId
 
 val READER_FLAGS = NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK
 

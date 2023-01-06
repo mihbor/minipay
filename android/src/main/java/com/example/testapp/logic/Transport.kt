@@ -5,8 +5,7 @@ import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.FirebaseApp
 import dev.gitlive.firebase.FirebaseOptions
 import dev.gitlive.firebase.initialize
-
-var firebaseApp: FirebaseApp? = null
+import ltd.mbor.minipay.common.firebaseApp
 
 fun initFirebase(context: Context): FirebaseApp {
   return firebaseApp ?: Firebase.initialize(

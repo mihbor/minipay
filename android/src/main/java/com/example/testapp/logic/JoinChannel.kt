@@ -1,7 +1,6 @@
 package com.example.testapp.logic
 
 import com.example.testapp.logic.JoinChannelEvent.*
-import com.example.testapp.newTxId
 import com.example.testapp.scope
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
@@ -10,10 +9,7 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.datetime.Clock
 import ltd.mbor.minimak.*
-import ltd.mbor.minipay.common.Channel
-import ltd.mbor.minipay.common.insertChannel
-import ltd.mbor.minipay.common.publish
-import ltd.mbor.minipay.common.subscribe
+import ltd.mbor.minipay.common.*
 
 enum class JoinChannelEvent{
   SCRIPTS_DEPLOYED, SIGS_RECEIVED, TRIGGER_TX_SIGNED, SETTLEMENT_TX_SIGNED, CHANNEL_PERSISTED, CHANNEL_PUBLISHED, CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED

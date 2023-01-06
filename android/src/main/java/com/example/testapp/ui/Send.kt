@@ -45,10 +45,10 @@ fun Send(
         onClick = {
           sending = true
           scope.launch {
-            val success = MDS.send(address, amount, tokenId)
+            val result = MDS.send(address, amount, tokenId)
             sending = false
-            Toast.makeText(context, "Sending result: $success", Toast.LENGTH_LONG).show()
-            if (success) {
+            Toast.makeText(context, "Sending result: $result", Toast.LENGTH_LONG).show()
+            if (result.isSuccessful) {
               setAmount(BigDecimal.ZERO)
             }
           }

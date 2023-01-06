@@ -40,5 +40,5 @@ val fakeChannel = Channel(
 )
 
 val fakeBalances = mapOf(
-  "0x00" to Balance("0x00", JsonObject(mapOf("name" to JsonPrimitive("Minima"))), ONE, ZERO, ONE, "1")
+  "0x00" to Balance("0x00", JsonObject(mapOf("name" to JsonPrimitive("Minima"))), ONE, ONE, ZERO, ONE, "1")
 )

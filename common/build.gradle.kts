@@ -22,7 +22,7 @@ kotlin {
         
         api("dev.gitlive:firebase-firestore:1.6.2")
 
-        api("ltd.mbor:minimak:0.2-SNAPSHOT")
+        api("ltd.mbor:minimak:0.2")
       }
     }
     val androidMain by getting

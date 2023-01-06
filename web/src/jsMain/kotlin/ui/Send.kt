@@ -7,10 +7,10 @@ import externals.QrScanner
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.launch
-import logic.isPaymentChannelAvailable
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.send
+import ltd.mbor.minipay.common.isPaymentChannelAvailable
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.*

@@ -8,10 +8,7 @@ import kotlinx.datetime.Clock
 import kotlinx.serialization.json.jsonArray
 import logic.FundChannelEvent.*
 import ltd.mbor.minimak.*
-import ltd.mbor.minipay.common.Channel
-import ltd.mbor.minipay.common.insertChannel
-import ltd.mbor.minipay.common.publish
-import ltd.mbor.minipay.common.subscribe
+import ltd.mbor.minipay.common.*
 import scope
 
 enum class FundChannelEvent{
@@ -74,8 +71,8 @@ suspend fun prepareFundChannel(
   event: (FundChannelEvent, Channel?) -> Unit = { _, _ -> }
 ): Channel {
   val myAddress = MDS.getAddress()
-  multisigScriptAddress = MDS.deployScript(triggerScript(myKeys.trigger, theirKeys.trigger))
-  eltooScriptAddress = MDS.deployScript(eltooScript(timeLock, myKeys.update, theirKeys.update, myKeys.settle, theirKeys.settle))
+  multisigScriptAddress = MDS.newScript(triggerScript(myKeys.trigger, theirKeys.trigger))
+  eltooScriptAddress = MDS.newScript(eltooScript(timeLock, myKeys.update, theirKeys.update, myKeys.settle, theirKeys.settle))
   event(SCRIPTS_DEPLOYED, null)
   
   val fundingTxId = fundingTx(myAmount, tokenId)
@@ -140,7 +137,7 @@ suspend fun Channel.commitFund(
   val theirBalance = MDS.importTx(fundingTxId, fundingTx).outputs
     .find { it.address == multisigScriptAddress && it.tokenId == tokenId }!!.tokenAmount - myAmount
   theirInputCoins.forEach { MDS.importCoin(it) }
-  theirInputScripts.forEach { MDS.deployScript(it) }
+  theirInputScripts.forEach { MDS.newScript(it) }
   val txncreator = """
     txnsign id:$fundingTxId publickey:$key;
     txnpost id:$fundingTxId auto:true;

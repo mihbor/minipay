@@ -8,10 +8,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.datetime.Clock
 import logic.JoinChannelEvent.*
 import ltd.mbor.minimak.*
-import ltd.mbor.minipay.common.Channel
-import ltd.mbor.minipay.common.insertChannel
-import ltd.mbor.minipay.common.publish
-import ltd.mbor.minipay.common.subscribe
+import ltd.mbor.minipay.common.*
 import scope
 
 enum class JoinChannelEvent{
@@ -60,8 +57,8 @@ suspend fun joinChannel(
   timeLock: Int,
   event: (JoinChannelEvent, Channel?) -> Unit = { _, _ -> }
 ): Channel {
-  multisigScriptAddress = MDS.deployScript(triggerScript(theirKeys.trigger, myKeys.trigger))
-  eltooScriptAddress = MDS.deployScript(eltooScript(timeLock, theirKeys.update, myKeys.update, theirKeys.settle, myKeys.settle))
+  multisigScriptAddress = MDS.newScript(triggerScript(theirKeys.trigger, myKeys.trigger))
+  eltooScriptAddress = MDS.newScript(eltooScript(timeLock, theirKeys.update, myKeys.update, theirKeys.settle, myKeys.settle))
   event(SCRIPTS_DEPLOYED, null)
   
   val triggerTxId = newTxId()

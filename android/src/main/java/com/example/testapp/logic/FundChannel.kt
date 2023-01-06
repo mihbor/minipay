@@ -1,7 +1,6 @@
 package com.example.testapp.logic
 
 import com.example.testapp.logic.FundChannelEvent.*
-import com.example.testapp.newTxId
 import com.example.testapp.scope
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.coroutines.flow.launchIn
@@ -10,10 +9,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.datetime.Clock
 import kotlinx.serialization.json.jsonArray
 import ltd.mbor.minimak.*
-import ltd.mbor.minipay.common.Channel
-import ltd.mbor.minipay.common.insertChannel
-import ltd.mbor.minipay.common.publish
-import ltd.mbor.minipay.common.subscribe
+import ltd.mbor.minipay.common.*
 
 enum class FundChannelEvent{
   SCRIPTS_DEPLOYED, FUNDING_TX_CREATED, TRIGGER_TX_SIGNED, SETTLEMENT_TX_SIGNED, CHANNEL_PERSISTED, CHANNEL_PUBLISHED, SIGS_RECEIVED, CHANNEL_FUNDED, CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED

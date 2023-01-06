@@ -40,4 +40,4 @@ fun Map<String, Token>.asBalances(balances: Map<String, Balance>) = mapValues{
   balances[it.key] ?: it.value.toEmptyBalance()
 }
 
-fun Token.toEmptyBalance() = Balance(tokenId, _name, ZERO, ZERO, ZERO, "0")
+fun Token.toEmptyBalance() = Balance(tokenId, _name, ZERO, ZERO, ZERO, ZERO, "0")

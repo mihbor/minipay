@@ -13,7 +13,6 @@ import com.example.testapp.MainActivity
 import com.example.testapp.TAG
 import com.example.testapp.logic.FundChannelEvent.*
 import com.example.testapp.logic.fundChannel
-import com.example.testapp.logic.newKeys
 import com.example.testapp.scope
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
@@ -24,6 +23,7 @@ import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Token
 import ltd.mbor.minimak.log
 import ltd.mbor.minipay.common.Channel
+import ltd.mbor.minipay.common.newKeys
 
 @Composable
 fun FundChannel(balances: Map<String, Balance>, tokens: Map<String, Token>, activity: MainActivity?, setRequestSentOnChannel: (Channel) -> Unit) {

@@ -3,11 +3,11 @@ package ui
 import androidx.compose.runtime.*
 import kotlinx.coroutines.launch
 import logic.balances
-import logic.completeSettlement
-import logic.postUpdate
-import logic.triggerSettlement
 import ltd.mbor.minimak.Coin
 import ltd.mbor.minipay.common.Channel
+import ltd.mbor.minipay.common.completeSettlement
+import ltd.mbor.minipay.common.postUpdate
+import ltd.mbor.minipay.common.triggerSettlement
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.dom.Br
 import org.jetbrains.compose.web.dom.Button
@@ -40,7 +40,7 @@ fun Settlement(channel: Channel, blockNumber: Int, eltooScriptCoins: List<Coin>,
       Br()
       TokenIcon(it.tokenId, balances)
       Text("${balances[it.tokenId]?.tokenName ?: "[${it.tokenId}]"} token eltoo coin: ${it.tokenAmount.toPlainString()} timelock ${
-        (it.created.toInt() + channel.timeLock - blockNumber).takeIf { it > 0 }?.let { "ends in $it blocks" } ?: "ended"}"
+        (it.created + channel.timeLock - blockNumber).takeIf { it > 0 }?.let { "ends in $it blocks" } ?: "ended"}"
       )
     }
     if (channel.status == "TRIGGERED" && channel.sequenceNumber > 0) {
@@ -60,7 +60,7 @@ fun Settlement(channel: Channel, blockNumber: Int, eltooScriptCoins: List<Coin>,
     }
     if (channel.status in listOf("TRIGGERED", "UPDATED")) {
       Button({
-        if (settlementCompleting || updatePosting || eltooScriptCoins.any { it.created.toInt() + channel.timeLock > blockNumber }) disabled()
+        if (settlementCompleting || updatePosting || eltooScriptCoins.any { it.created + channel.timeLock > blockNumber }) disabled()
         onClick {
           settlementCompleting = true
           scope.launch {
