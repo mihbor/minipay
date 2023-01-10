@@ -2,6 +2,7 @@ plugins {
   kotlin("multiplatform")
   id("org.jetbrains.compose")
   id("com.android.library")
+  kotlin("plugin.serialization") version "1.6.10"
 }
 
 kotlin {
@@ -22,7 +23,7 @@ kotlin {
         
         api("dev.gitlive:firebase-firestore:1.6.2")
 
-        api("ltd.mbor:minimak:0.2")
+        api("ltd.mbor:minimak:0.3-SNAPSHOT")
       }
     }
     val androidMain by getting
@@ -44,4 +45,8 @@ android {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
   }
+}
+
+configurations.all {
+  resolutionStrategy.cacheChangingModulesFor(1, "hours")
 }

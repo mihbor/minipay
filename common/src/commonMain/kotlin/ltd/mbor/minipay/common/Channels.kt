@@ -68,8 +68,6 @@ suspend fun signFloatingTx(
   return txnId
 }
 
-suspend fun Channel.request(amount: BigDecimal) = this.send(-amount)
-
 suspend fun Channel.send(amount: BigDecimal): Pair<String, String> {
   val currentSettlementTx = MDS.importTx(newTxId(), settlementTx)
   val input = currentSettlementTx.inputs.first()
@@ -102,10 +100,28 @@ suspend fun Channel.send(amount: BigDecimal): Pair<String, String> {
       if(amount > BigDecimal.ZERO) "TXN_UPDATE" else "TXN_REQUEST",
       updateTxn,
       settleTxn
-    ).joinToString(";")
+    ).joinToString(";").also {
+      log(it)
+    }
   )
   
   return updateTxn to settleTxn
+}
+
+suspend fun Channel.request(amount: BigDecimal) = this.send(-amount)
+
+suspend fun Channel.acceptRequest(updateTx: Pair<Int, Transaction>, settleTx: Pair<Int, Transaction>): Pair<String, String> {
+  val sequenceNumber = settleTx.second.state.find { it.port == 99 }?.data?.toInt()
+  
+  val outputs = settleTx.second.outputs
+  val channelBalance = outputs.find { it.address == my.address }!!.amount to outputs.find { it.address == their.address }!!.amount
+  
+  val signedUpdateTx = signAndExportTx(updateTx.first, my.keys.update)
+  val signedSettleTx = signAndExportTx(settleTx.first, my.keys.settle)
+  
+  updateChannel(this, channelBalance, sequenceNumber!!, signedUpdateTx, signedSettleTx)
+  
+  return signedUpdateTx to signedSettleTx
 }
 
 suspend fun Channel.postUpdate(): Channel {

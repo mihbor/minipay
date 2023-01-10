@@ -15,7 +15,7 @@ import org.jetbrains.compose.web.dom.*
 import scope
 
 @Composable
-fun ChannelListing(channels: MutableList<Channel>) {
+fun ChannelListing(channels: MutableList<Channel>, setRequestSentOnChannel: (Channel) -> Unit) {
   LaunchedEffect("channels") {
     channels.load()
   }
@@ -54,7 +54,7 @@ fun ChannelListing(channels: MutableList<Channel>) {
           Td { Text(channel.their.balance.toPlainString()) }
           Td {
             if (channel.status == "OPEN") {
-              ChannelTransfers(channel)
+              ChannelTransfers(channel, setRequestSentOnChannel)
               Br()
             }
             Settlement(channel, blockNumber, eltooScriptCoins[channel.eltooAddress] ?: emptyList()) {

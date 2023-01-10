@@ -17,8 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.example.testapp.logic.channelUpdateAck
-import com.example.testapp.logic.initFirebase
+import com.example.testapp.logic.*
 import com.example.testapp.ui.ChannelRequestReceived
 import com.example.testapp.ui.ChannelRequestSent
 import com.example.testapp.ui.MainView
@@ -30,10 +29,8 @@ import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import ltd.mbor.minimak.MDS
-import ltd.mbor.minimak.Transaction
 import ltd.mbor.minimak.getAddress
 import ltd.mbor.minimak.importTx
-import ltd.mbor.minipay.common.Channel
 import ltd.mbor.minipay.common.getChannel
 import ltd.mbor.minipay.common.newTxId
 
@@ -50,10 +47,6 @@ class MainActivity : ComponentActivity(), CardReader.DataCallback {
   var address by mutableStateOf("")
   var tokenId by mutableStateOf("0x00")
   var amount by mutableStateOf(ZERO)
-  var requestReceivedOnChannel by mutableStateOf<Channel?>(null)
-  var requestSentOnChannel by mutableStateOf<Channel?>(null)
-  var updateTx by mutableStateOf<Pair<Int, Transaction>?>(null)
-  var settleTx by mutableStateOf<Pair<Int, Transaction>?>(null)
 
   var cardReader: CardReader = CardReader(this)
 
@@ -152,7 +145,7 @@ class MainActivity : ComponentActivity(), CardReader.DataCallback {
   private fun emitReceive(address: String? = null) {
     disableReaderMode()
     scope.launch {
-      this@MainActivity.address = address ?: MDS.getAddress()
+      this@MainActivity.address = address ?: MDS.getAddress().address
       applicationContext.sendDataToService("$address;$tokenId;${amount.toPlainString()}")
     }
   }
@@ -179,10 +172,10 @@ class MainActivity : ComponentActivity(), CardReader.DataCallback {
       scope.launch {
         updateTx = newTxId().let{
           it to MDS.importTx(it, updateTxText).also { updateTx ->
-            settleTx = newTxId().let { it to MDS.importTx(it, settleTxText) }
             requestReceivedOnChannel = getChannel(updateTx.outputs.first().address)
           }
         }
+        settleTx = newTxId().let { it to MDS.importTx(it, settleTxText) }
       }
     } else if (splits[0] == "TXN_UPDATE_ACK") {
       val (_, updateTxText, settleTxText) = splits

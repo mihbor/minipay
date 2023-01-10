@@ -13,7 +13,7 @@ import org.jetbrains.compose.web.dom.Text
 import scope
 
 @Composable
-fun ChannelTransfers(channel: Channel) {
+fun ChannelTransfers(channel: Channel, setRequestSentOnChannel: (Channel) -> Unit) {
   var isSending by remember { mutableStateOf(false) }
   if (channel.my.balance > ZERO) {
     Br()
@@ -41,6 +41,7 @@ fun ChannelTransfers(channel: Channel) {
       onClick {
         scope.launch {
           channel.request(amount)
+          setRequestSentOnChannel(channel)
         }
       }
     }) {

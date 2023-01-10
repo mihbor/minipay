@@ -47,6 +47,11 @@ suspend fun init(uid: String?) {
               val splits = msg.split(";")
               if (splits[0].startsWith("TXN_UPDATE")) {
                 channels.first { it.id == channel.id }.update(splits[0].endsWith("_ACK"), updateTx = splits[1], settleTx = splits[2])
+              } else if (splits[0] == "TXN_REQUEST") {
+                val (_, updateTxText, settleTxText) = splits
+                updateTx = newTxId().let { it to MDS.importTx(it, updateTxText) }
+                settleTx = newTxId().let { it to MDS.importTx(it, settleTxText) }
+                requestReceivedOnChannel = channels.first { it.id == channel.id }
               }
             }.onCompletion {
               log("completed")

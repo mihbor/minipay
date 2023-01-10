@@ -25,7 +25,11 @@ import org.jetbrains.compose.web.dom.Text
 import org.w3c.dom.HTMLCanvasElement
 
 @Composable
-fun RequestChannel(balances: SnapshotStateMap<String, Balance>, tokens: SnapshotStateMap<String, Token>) {
+fun RequestChannel(
+  balances: SnapshotStateMap<String, Balance>,
+  tokens: SnapshotStateMap<String, Token>,
+  setRequestSentOnChannel: (Channel) -> Unit
+) {
   var myAddress by remember { mutableStateOf("") }
   var amount by remember { mutableStateOf(BigDecimal.ZERO) }
   var tokenId by remember { mutableStateOf("0x00") }
@@ -44,7 +48,7 @@ fun RequestChannel(balances: SnapshotStateMap<String, Balance>, tokens: Snapshot
     newKeys(3).apply {
       myKeys = Channel.Keys(this[0], this[1], this[2])
     }
-    myAddress = MDS.getAddress()
+    myAddress = MDS.getAddress().address
   }
   fun requestChannel() {
     triggerTxStatus = ""
@@ -137,7 +141,7 @@ fun RequestChannel(balances: SnapshotStateMap<String, Balance>, tokens: Snapshot
     Br()
   }
   channel?.let {
-    ChannelView(it) {
+    ChannelView(it, setRequestSentOnChannel) {
       channel = it
     }
   }

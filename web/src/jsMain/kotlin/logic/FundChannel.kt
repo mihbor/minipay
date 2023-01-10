@@ -70,9 +70,9 @@ suspend fun prepareFundChannel(
   timeLock: Int,
   event: (FundChannelEvent, Channel?) -> Unit = { _, _ -> }
 ): Channel {
-  val myAddress = MDS.getAddress()
-  multisigScriptAddress = MDS.newScript(triggerScript(myKeys.trigger, theirKeys.trigger))
-  eltooScriptAddress = MDS.newScript(eltooScript(timeLock, myKeys.update, theirKeys.update, myKeys.settle, theirKeys.settle))
+  val myAddress = MDS.getAddress().address
+  multisigScriptAddress = MDS.newScript(triggerScript(myKeys.trigger, theirKeys.trigger)).address
+  eltooScriptAddress = MDS.newScript(eltooScript(timeLock, myKeys.update, theirKeys.update, myKeys.settle, theirKeys.settle)).address
   event(SCRIPTS_DEPLOYED, null)
   
   val fundingTxId = fundingTx(myAmount, tokenId)
@@ -145,14 +145,8 @@ suspend fun Channel.commitFund(
   val result = MDS.cmd(txncreator)!!.jsonArray
   val status = result.find{ it.jsonString("command") == "txnpost" }!!.jsonString("status")
   log("txnpost status: $status")
-  
-  if (status.toBoolean()) {
-    MDS.sql("""UPDATE channel SET
-      trigger_tx = '$triggerTx',
-      settle_tx = '$settlementTx',
-      updated_at = NOW()
-      WHERE id = $id;
-    """)
-  }
-  return copy(triggerTx = triggerTx, settlementTx = settlementTx, updatedAt = Clock.System.now())
+
+  return if (status.toBoolean()) {
+    updateChannel(this, triggerTx, settlementTx)
+  } else this
 }

@@ -20,7 +20,11 @@ import org.w3c.dom.HTMLVideoElement
 import scope
 
 @Composable
-fun FundChannel(balances: SnapshotStateMap<String, Balance>, tokens: SnapshotStateMap<String, Token>) {
+fun FundChannel(
+  balances: SnapshotStateMap<String, Balance>,
+  tokens: SnapshotStateMap<String, Token>,
+  setRequestSentOnChannel: (Channel) -> Unit
+) {
   var myAmount by remember { mutableStateOf(ZERO) }
   var theirAmount by remember { mutableStateOf(ZERO) }
   var theirAddress by remember { mutableStateOf("") }
@@ -133,7 +137,7 @@ fun FundChannel(balances: SnapshotStateMap<String, Balance>, tokens: SnapshotSta
     Br()
   }
   channel?.let {
-    ChannelView(it) {
+    ChannelView(it, setRequestSentOnChannel) {
       channel = it
     }
   }

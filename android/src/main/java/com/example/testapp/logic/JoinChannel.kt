@@ -57,8 +57,8 @@ suspend fun joinChannel(
   timeLock: Int,
   event: (JoinChannelEvent, Channel?) -> Unit = { _, _ -> }
 ): Channel {
-  multisigScriptAddress = MDS.deployScript(triggerScript(theirKeys.trigger, myKeys.trigger))
-  eltooScriptAddress = MDS.deployScript(eltooScript(timeLock, theirKeys.update, myKeys.update, theirKeys.settle, myKeys.settle))
+  multisigScriptAddress = MDS.newScript(triggerScript(theirKeys.trigger, myKeys.trigger)).address
+  eltooScriptAddress = MDS.newScript(eltooScript(timeLock, theirKeys.update, myKeys.update, theirKeys.settle, myKeys.settle)).address
   event(SCRIPTS_DEPLOYED, null)
   
   val triggerTxId = newTxId()
@@ -68,7 +68,7 @@ suspend fun joinChannel(
   
   val settlementTxId = newTxId()
   val importedSettlementTx = MDS.importTx(settlementTxId, settlementTx)
-  val theirAddress = importedSettlementTx.outputs.first().miniAddress
+  val theirAddress = importedSettlementTx.outputs.first().address
   val signedSettlementTx = signAndExportTx(settlementTxId, myKeys.settle)
   event(SETTLEMENT_TX_SIGNED, null)
   
@@ -86,7 +86,7 @@ suspend fun joinChannel(
       append("txnoutput id:$fundingTxId amount:${(myAmount + theirAmount).toPlainString()} tokenid:$tokenId address:$multisigScriptAddress;")
     }
     MDS.cmd(txncreator)
-    val scripts = MDS.getScripts()
+    val scripts = MDS.getScripts().associate { it.address to it.script }
     signAndExportTx(fundingTxId, "auto") to inputs.map { MDS.exportCoin(it.coinId) to scripts[it.address] }
   } else {
     MDS.cmd("txnoutput id:$fundingTxId amount:${theirAmount.toPlainString()} tokenid:$tokenId address:$multisigScriptAddress;")

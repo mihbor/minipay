@@ -50,7 +50,7 @@ fun RequestChannel(
     newKeys(3).apply {
       myKeys = Channel.Keys(this[0], this[1], this[2])
     }
-    myAddress = MDS.getAddress()
+    myAddress = MDS.getAddress().address
   }
 
   fun requestChannel() {

@@ -6,7 +6,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.testapp.MainActivity
-import com.example.testapp.logic.acceptRequest
 import com.example.testapp.scope
 import com.example.testapp.sendDataToService
 import com.example.testapp.ui.preview.fakeChannel
@@ -15,14 +14,20 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Transaction
 import ltd.mbor.minipay.common.Channel
+import ltd.mbor.minipay.common.acceptRequest
 
 @Composable
-fun ChannelRequestReceived(channel: Channel, updateTx: Pair<Int, Transaction>, settleTx: Pair<Int, Transaction>, activity: MainActivity?, dismiss: () -> Unit) {
-
+fun ChannelRequestReceived(
+  channel: Channel,
+  updateTx: Pair<Int, Transaction>,
+  settleTx: Pair<Int, Transaction>,
+  activity: MainActivity?,
+  dismiss: () -> Unit
+) {
   var accepting by remember { mutableStateOf(false) }
   var preparingResponse by remember { mutableStateOf(false) }
   val outputs = settleTx.second.outputs
-  val myOutput = outputs.find { it.miniAddress == channel.my.address }
+  val myOutput = outputs.find { it.address == channel.my.address }
   val balanceChange = channel.my.balance - (myOutput?.amount ?: ZERO)
 
   Column {

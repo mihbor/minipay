@@ -10,6 +10,11 @@ var eltooScriptAddress by mutableStateOf("")
 val multisigScriptBalances = mutableStateListOf<Balance>()
 val eltooScriptCoins = mutableStateMapOf<String, List<Coin>>()
 
+var requestReceivedOnChannel by mutableStateOf<Channel?>(null)
+var requestSentOnChannel by mutableStateOf<Channel?>(null)
+var updateTx by mutableStateOf<Pair<Int, Transaction>?>(null)
+var settleTx by mutableStateOf<Pair<Int, Transaction>?>(null)
+
 suspend fun Channel.update(isAck: Boolean, updateTx: String, settleTx: String): Channel {
   log("Updating channel isAck:$isAck")
   val updateTxnId = newTxId()
@@ -23,8 +28,8 @@ suspend fun Channel.update(isAck: Boolean, updateTx: String, settleTx: String): 
     publish(channelKey(their.keys, tokenId), listOf("TXN_UPDATE_ACK", signedUpdateTx, signedSettleTx).joinToString(";"))
   }
   val outputs = importedSettleTx.outputs
-  val myBalance = outputs.find { it.miniAddress == my.address }?.tokenAmount
-  val theirBalance = outputs.find { it.miniAddress == their.address }?.tokenAmount
+  val myBalance = outputs.find { it.address == my.address }?.tokenAmount
+  val theirBalance = outputs.find { it.address == their.address }?.tokenAmount
   val sequenceNumber = importedSettleTx.state.find { it.port == 99 }?.data?.toInt()
   
   return if (myBalance == null || theirBalance == null) this.also {

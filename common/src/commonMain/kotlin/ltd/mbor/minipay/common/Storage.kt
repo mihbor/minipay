@@ -53,34 +53,34 @@ suspend fun getChannels(status: String? = null): List<Channel> {
 }
 
 private fun JsonObject.toChannel() = Channel(
-  id = jsonString("ID")!!.toInt(),
-  sequenceNumber = jsonString("SEQUENCE_NUMBER")!!.toInt(),
-  status = jsonString("STATUS")!!,
-  tokenId = jsonString("TOKEN_ID")!!,
+  id = jsonString("ID").toInt(),
+  sequenceNumber = jsonString("SEQUENCE_NUMBER").toInt(),
+  status = jsonString("STATUS"),
+  tokenId = jsonString("TOKEN_ID"),
   my = Channel.Side(
-    balance = jsonString("MY_BALANCE")!!.toBigDecimal(),
-    address = jsonString("MY_ADDRESS")!!,
+    balance = jsonString("MY_BALANCE").toBigDecimal(),
+    address = jsonString("MY_ADDRESS"),
     keys = Channel.Keys(
-      trigger = jsonString("MY_TRIGGER_KEY")!!,
-      update = jsonString("MY_UPDATE_KEY")!!,
-      settle = jsonString("MY_SETTLE_KEY")!!
+      trigger = jsonString("MY_TRIGGER_KEY"),
+      update = jsonString("MY_UPDATE_KEY"),
+      settle = jsonString("MY_SETTLE_KEY")
     )
   ),
   their = Channel.Side(
-    balance = jsonString("OTHER_BALANCE")!!.toBigDecimal(),
-    address = jsonString("OTHER_ADDRESS")!!,
+    balance = jsonString("OTHER_BALANCE").toBigDecimal(),
+    address = jsonString("OTHER_ADDRESS"),
     keys = Channel.Keys(
-      trigger = jsonString("OTHER_TRIGGER_KEY")!!,
-      update = jsonString("OTHER_UPDATE_KEY")!!,
-      settle = jsonString("OTHER_SETTLE_KEY")!!
+      trigger = jsonString("OTHER_TRIGGER_KEY"),
+      update = jsonString("OTHER_UPDATE_KEY"),
+      settle = jsonString("OTHER_SETTLE_KEY")
     )
   ),
-  triggerTx = jsonString("TRIGGER_TX")!!,
-  updateTx = jsonString("UPDATE_TX")!!,
-  settlementTx = jsonString("SETTLE_TX")!!,
-  timeLock = jsonString("TIME_LOCK")!!.toInt(),
-  eltooAddress = jsonString("ELTOO_ADDRESS")!!,
-  updatedAt = Instant.fromEpochMilliseconds(jsonString("UPDATED_AT")!!.toLong())
+  triggerTx = jsonString("TRIGGER_TX"),
+  updateTx = jsonString("UPDATE_TX"),
+  settlementTx = jsonString("SETTLE_TX"),
+  timeLock = jsonString("TIME_LOCK").toInt(),
+  eltooAddress = jsonString("ELTOO_ADDRESS"),
+  updatedAt = Instant.fromEpochMilliseconds(jsonString("UPDATED_AT").toLong())
 )
 
 suspend fun updateChannelStatus(channel: Channel, status: String): Channel {
@@ -136,7 +136,7 @@ suspend fun insertChannel(
   """)
   val sql = MDS.sql("SELECT IDENTITY() as ID;")
   val results = sql!!.jsonObject["rows"]!!.jsonArray
-  return results[0].jsonString("ID")!!.toInt()
+  return results[0].jsonString("ID").toInt()
 }
 
 suspend fun updateChannel(
@@ -161,6 +161,25 @@ suspend fun updateChannel(
     their = channel.their.copy(balance = channelBalance.second),
     sequenceNumber = sequenceNumber,
     updateTx = updateTx,
+    settlementTx = settlementTx,
+    updatedAt = now
+  )
+}
+
+suspend fun updateChannel(
+  channel: Channel,
+  triggerTx: String,
+  settlementTx: String
+): Channel {
+  val now = Clock.System.now()
+  MDS.sql("""UPDATE channel SET
+    trigger_tx = '$triggerTx',
+    settle_tx = '$settlementTx',
+    updated_at = ${now.toEpochMilliseconds()}
+    WHERE id = ${channel.id};
+  """)
+  return channel.copy(
+    triggerTx = triggerTx,
     settlementTx = settlementTx,
     updatedAt = now
   )

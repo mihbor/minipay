@@ -17,7 +17,7 @@ fun ChannelRequestSent(stopEmitting: () -> Unit, dismiss: () -> Unit) {
         stopEmitting()
         requestSent = true
       }) {
-        Text(text = "Request Sent")
+        Text("Request Sent")
       }
     } else {
       Text("When counter party accepts, use contactless again to complete transaction")
@@ -25,7 +25,7 @@ fun ChannelRequestSent(stopEmitting: () -> Unit, dismiss: () -> Unit) {
     Button(onClick = {
       dismiss()
     }) {
-      Text(text = "Cancel")
+      Text("Cancel")
     }
   }
 }

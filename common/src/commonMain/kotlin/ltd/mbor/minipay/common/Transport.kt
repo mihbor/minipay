@@ -32,5 +32,8 @@ fun subscribe(id: String, from: Instant? = null): Flow<String> {
 
 suspend fun publish(id: String, content: String) {
   log("publishing to: $id")
-  Firebase.firestore.collection(COLLECTION).document(id).set(mapOf("tx" to content, "timestamp" to Clock.System.now().toEpochMilliseconds()))
+  Firebase.firestore.collection(COLLECTION).document(id).set(mapOf(
+    "tx" to content,
+    "timestamp" to Clock.System.now().toEpochMilliseconds().toDouble()
+  ))
 }

@@ -32,7 +32,7 @@ fun Receive(balances: SnapshotStateMap<String, Balance>, tokens: SnapshotStateMa
   var amount by remember { mutableStateOf(BigDecimal.ZERO) }
   
   LaunchedEffect("receive") {
-    myAddress = MDS.getAddress()
+    myAddress = MDS.getAddress().address
     drawQR(myAddress, tokenId)
   }
   Br()
