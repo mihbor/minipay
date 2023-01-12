@@ -34,6 +34,11 @@ suspend fun fundChannel(
       val isAck = splits[0].endsWith("_ACK")
       channel = channel.update(isAck, updateTx = splits[1], settleTx = splits[2])
       event(if (isAck) CHANNEL_UPDATED_ACKED else CHANNEL_UPDATED, channel)
+    } else if (splits[0] == "TXN_REQUEST") {
+      val (_, updateTxText, settleTxText) = splits
+      updateTx = newTxId().let { it to MDS.importTx(it, updateTxText) }
+      settleTx = newTxId().let { it to MDS.importTx(it, settleTxText) }
+      requestReceivedOnChannel = channels.first { it.id == channel.id }
     } else {
       val (triggerTx, settlementTx, fundingTx) = splits
       val (theirInputCoins, theirInputScripts) = splits.subList(3, splits.size).let{ it.takeUnless { it.isEmpty() }?.chunked(it.size/2) ?: listOf(emptyList(), emptyList()) }

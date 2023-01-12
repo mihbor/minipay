@@ -35,6 +35,7 @@ suspend fun Channel.update(isAck: Boolean, updateTx: String, settleTx: String): 
   return if (myBalance == null || theirBalance == null) this.also {
     log("balance for my address ${my.address}: $myBalance, balance for their address ${their.address}: $theirBalance")
   } else updateChannel(this, myBalance to theirBalance, sequenceNumber!!, updateTx, settleTx).also {
-    channels[channels.indexOf(this)] = it
+    channels[channels.indexOf(channels.first{ it.id == this.id })] = it
+    if (isAck) requestSentOnChannel = null
   }
 }
