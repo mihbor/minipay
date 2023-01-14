@@ -84,7 +84,7 @@ class MainActivity : ComponentActivity(), CardReader.DataCallback {
         // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
           requestReceivedOnChannel?.let {
-            ChannelRequestReceived(it, updateTx!!, settleTx!!, this) {
+            ChannelRequestReceived(it, updateTx!!, settleTx!!, tokens, this) {
               requestReceivedOnChannel = null
               updateTx = null
               settleTx = null

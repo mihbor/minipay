@@ -1,6 +1,7 @@
 package ltd.mbor.minipay.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Button
 import androidx.compose.material.LinearProgressIndicator
@@ -11,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import ltd.mbor.minimak.Balance
@@ -23,6 +25,9 @@ import ltd.mbor.minipay.common.channelKey
 import ltd.mbor.minipay.common.newKeys
 import ltd.mbor.minipay.logic.JoinChannelEvent.*
 import ltd.mbor.minipay.logic.joinChannel
+import ltd.mbor.minipay.ui.preview.previewBalances
+import ltd.mbor.minipay.ui.preview.previewTokens
+import ltd.mbor.minipay.ui.theme.MiniPayTheme
 
 @Composable
 fun RequestChannel(
@@ -136,4 +141,13 @@ fun RequestChannel(
     }
   }
   if(showQR) bitmap?.let{ Image(bitmap = it, contentDescription = "Scan this QR code") }
+}
+
+@Composable @Preview(showBackground = true)
+fun PreviewRequestChannel() {
+  MiniPayTheme {
+    Column {
+      RequestChannel(previewBalances, previewTokens, null) {}
+    }
+  }
 }

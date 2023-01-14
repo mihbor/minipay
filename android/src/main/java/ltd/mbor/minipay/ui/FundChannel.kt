@@ -2,12 +2,14 @@ package ltd.mbor.minipay.ui
 
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
@@ -24,6 +26,9 @@ import ltd.mbor.minipay.common.newKeys
 import ltd.mbor.minipay.logic.FundChannelEvent.*
 import ltd.mbor.minipay.logic.fundChannel
 import ltd.mbor.minipay.scope
+import ltd.mbor.minipay.ui.preview.previewBalances
+import ltd.mbor.minipay.ui.preview.previewTokens
+import ltd.mbor.minipay.ui.theme.MiniPayTheme
 
 @Composable
 fun FundChannel(balances: Map<String, Balance>, tokens: Map<String, Token>, activity: MainActivity?, setRequestSentOnChannel: (Channel) -> Unit) {
@@ -94,7 +99,7 @@ fun FundChannel(balances: Map<String, Balance>, tokens: Map<String, Token>, acti
       )
       Text("Counterparty contribution to channel:")
       Row {
-        DecimalNumberField(theirAmount, min = ZERO) {
+        DecimalNumberField(theirAmount, min = ZERO, modifier = Modifier.fillMaxWidth(0.5f)) {
           it?.let { theirAmount = it }
         }
         TokenSelect(tokenId = tokenId, balances = balances, tokens = tokens) {
@@ -124,7 +129,7 @@ fun FundChannel(balances: Map<String, Balance>, tokens: Map<String, Token>, acti
     ) {
       Text("My contribution to channel:")
       Row {
-        DecimalNumberField(myAmount, min = ZERO) {
+        DecimalNumberField(myAmount, min = ZERO, modifier = Modifier.fillMaxWidth(0.5f)) {
           it?.let { myAmount = it }
         }
         TokenSelect(tokenId, balances, enabled = false) {
@@ -198,6 +203,15 @@ fun FundChannel(balances: Map<String, Balance>, tokens: Map<String, Token>, acti
       })
     }) {
       Text(text = "Scan QR")
+    }
+  }
+}
+
+@Composable @Preview(showBackground = true)
+fun PreviewFundChannel() {
+  MiniPayTheme {
+    Column {
+      FundChannel(previewBalances, previewTokens, null) {}
     }
   }
 }

@@ -35,3 +35,7 @@ tasks.register<Copy>("copyApk"){
 tasks.register("minidappWithApk"){
   dependsOn("copyApk", ":web:minidappDistribution")
 }
+
+configurations.all {
+  resolutionStrategy.cacheChangingModulesFor(1, "hours")
+}

@@ -10,12 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonPrimitive
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Token
 import ltd.mbor.minipay.MainActivity
 import ltd.mbor.minipay.common.Channel
+import ltd.mbor.minipay.logic.channels
+import ltd.mbor.minipay.logic.eltooScriptCoins
+import ltd.mbor.minipay.ui.preview.previewBalances
+import ltd.mbor.minipay.ui.preview.previewTokens
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
 
 @Composable
@@ -63,13 +65,13 @@ fun MainView(
         Settings(uid, setUid)
       }
       "receive" -> Column(modifier = Modifier.padding(it)) {
-        Receive(inited, balances, tokens, address, setAddress, tokenId, setTokenId, amount, setAmount)
+        Receive(balances, tokens, address, setAddress, tokenId, setTokenId, amount, setAmount)
       }
       "send" -> Column(modifier = Modifier.padding(it)) {
-        Send(inited, balances, address, setAddress, tokenId, setTokenId, amount, setAmount)
+        Send(balances, address, setAddress, tokenId, setTokenId, amount, setAmount)
       }
       "channels" -> Column(modifier = Modifier.padding(it)) {
-        ChannelListing(activity, setRequestSentOnChannel)
+        ChannelListing(channels, balances, eltooScriptCoins, activity, setRequestSentOnChannel)
       }
       "request-channel" -> Column(modifier = Modifier.padding(it)) {
         RequestChannel(balances, tokens, activity, setRequestSentOnChannel)
@@ -81,28 +83,15 @@ fun MainView(
   }
 }
 
-private val previewBalances = listOf(
-  Balance("0x00", JsonNull, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, "1"),
-  Balance("0x01234567890", JsonPrimitive("test"), BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, "1"),
-).associateBy { it.tokenId }
-
-private val previewTokens = listOf(
-  Token("0x00", JsonNull, BigDecimal.ONE, 1, null, null, null, JsonNull),
-  Token("0x01234567890", JsonPrimitive("test"), BigDecimal.ONE, 1, null, null, null, JsonNull),
-  Token("0x0999", JsonPrimitive("test2"), BigDecimal.ONE, 1, null, null, null, JsonNull),
-).associateBy { it.tokenId }
-
-@Preview(showBackground = true)
-@Composable
-fun ViewSend() {
+@Composable @Preview(showBackground = true)
+fun PreviewMainViewSend() {
   MiniPayTheme {
     MainView(true, "uid123", {}, previewBalances, previewTokens, "", {}, ZERO, {}, "0x00", {}, {}, {}, {}, null, "send", {})
   }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun ViewRecieve() {
+@Composable @Preview(showBackground = true)
+fun PreviewMainViewReceive() {
   MiniPayTheme {
     MainView(true, "uid456", {}, previewBalances, previewTokens, "address", {}, BigDecimal.ONE, {}, "0x01234567890", {}, {}, {}, {}, null, "receive", {})
   }

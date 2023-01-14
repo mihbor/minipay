@@ -1,5 +1,6 @@
 package ltd.mbor.minipay.ui
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Button
@@ -7,6 +8,8 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import ltd.mbor.minipay.ui.theme.MiniPayTheme
 
 @Composable
 fun Settings(uid: String, setUid: (String) -> Unit) {
@@ -26,6 +29,16 @@ fun Settings(uid: String, setUid: (String) -> Unit) {
       setUid(uidInput)
     }){
       Text("Update")
+    }
+  }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewSettings() {
+  MiniPayTheme {
+    Column {
+      Settings("") {}
     }
   }
 }
