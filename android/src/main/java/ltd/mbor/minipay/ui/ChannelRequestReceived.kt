@@ -5,6 +5,8 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ONE
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Token
@@ -19,19 +21,19 @@ import ltd.mbor.minipay.ui.preview.previewTokens
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
 
 @Composable
-fun ChannelRequestReceived(
+fun ChannelRequestReceivedNfc(
   channel: Channel,
-  updateTx: Pair<Int, Transaction>,
-  settleTx: Pair<Int, Transaction>,
+  updateTxId: Int,
+  settleTxId: Int,
+  sequenceNumber: Int,
+  channelBalance: Pair<BigDecimal, BigDecimal>,
   tokens: Map<String, Token>,
   activity: MainActivity?,
   dismiss: () -> Unit
 ) {
   var accepting by remember { mutableStateOf(false) }
   var preparingResponse by remember { mutableStateOf(false) }
-  val outputs = settleTx.second.outputs
-  val myOutput = outputs.find { it.address == channel.my.address }
-  val balanceChange = channel.my.balance - (myOutput?.amount ?: ZERO)
+  val balanceChange = channel.my.balance - channelBalance.first
 
   Column {
     Text("Request received to send ${balanceChange.toPlainString()} ${tokens[channel.tokenId]?.name ?: "[${channel.tokenId}]"} over channel ${channel.id}")
@@ -47,7 +49,7 @@ fun ChannelRequestReceived(
       onClick = {
         preparingResponse = true
         scope.launch {
-          channel.acceptRequest(updateTx, settleTx).let { (updateTx, settleTx) ->
+          channel.acceptRequest(updateTxId, settleTxId, sequenceNumber, channelBalance).let { (updateTx, settleTx) ->
             activity?.apply {
               disableReaderMode()
               sendDataToService("TXN_UPDATE_ACK;$updateTx;$settleTx")
@@ -65,9 +67,9 @@ fun ChannelRequestReceived(
 }
 
 @Composable @Preview
-fun PreviewChannelRequest() {
+fun PreviewChannelRequestNfc() {
   MiniPayTheme {
-    ChannelRequestReceived(channel = fakeMinimaChannel, updateTx = 1 to Transaction.empty, settleTx = 2 to Transaction.empty, previewTokens, null) { }
+    ChannelRequestReceivedNfc(channel = fakeMinimaChannel, updateTxId = 1, settleTxId = 2, 5, ZERO to ONE, previewTokens, null) { }
   }
 }
 

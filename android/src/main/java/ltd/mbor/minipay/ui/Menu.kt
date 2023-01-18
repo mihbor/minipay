@@ -54,6 +54,12 @@ fun Menu(inited: Boolean, showNavMenu: Boolean, setView: (String) -> Unit, start
         }, enabled = inited) {
           Text("Channel Listing")
         }
+        DropdownMenuItem(onClick = {
+          setView("events")
+          setShowNavMenu(false)
+        }, enabled = inited) {
+          Text("Channel Events")
+        }
         Divider()
         DropdownMenuItem(onClick = {
           setView("settings")

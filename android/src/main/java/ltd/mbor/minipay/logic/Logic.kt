@@ -36,7 +36,7 @@ suspend fun initMDS(uid: String, host: String, port: Int) {
             log("tx msg: $msg")
             val splits = msg.split(";")
             if (splits[0].startsWith("TXN_UPDATE")) {
-              channels.first { it.id == channel.id }.update(splits[0].endsWith("_ACK"), updateTx = splits[1], settleTx = splits[2])
+              channels.first { it.id == channel.id }.update(splits[0].endsWith("_ACK"), updateTxText = splits[1], settleTxText = splits[2])
             }
           }.onCompletion {
             log("completed")

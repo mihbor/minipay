@@ -29,7 +29,7 @@ fun joinChannel(
     val splits = msg.split(";")
     if (splits[0].startsWith("TXN_UPDATE")) {
       val isAck = splits[0].endsWith("_ACK")
-      channel = channel?.update(isAck, updateTx = splits[1], settleTx = splits[2])
+      channel = channel?.update(isAck, updateTxText = splits[1], settleTxText = splits[2])
       event(if (isAck) CHANNEL_UPDATED_ACKED else CHANNEL_UPDATED, channel)
     } else {
       val timeLock = splits[0].toInt()

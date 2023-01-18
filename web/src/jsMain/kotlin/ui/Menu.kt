@@ -117,6 +117,16 @@ fun Menu(view: String, setView: (String) -> Unit) {
       Div({
         classes(StyleSheets.clickable)
         onClick {
+          setView("Channel events")
+          showMenu = false
+        }
+      }) {
+        Text("Channel events")
+      }
+      Hr()
+      Div({
+        classes(StyleSheets.clickable)
+        onClick {
           setView("Settings")
           showMenu = false
         }

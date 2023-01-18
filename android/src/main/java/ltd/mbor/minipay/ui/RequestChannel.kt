@@ -34,7 +34,6 @@ fun RequestChannel(
   balances: Map<String, Balance>,
   tokens: Map<String, Token>,
   activity: MainActivity?,
-  setRequestSentOnChannel: (Channel) -> Unit
 ) {
   var myAddress by remember { mutableStateOf("") }
   var amount by remember { mutableStateOf(ZERO) }
@@ -136,7 +135,7 @@ fun RequestChannel(
     Text(it)
   }
   channel?.let {
-    ChannelView(it, balances, activity, setRequestSentOnChannel) {
+    ChannelView(it, balances, activity) {
       channel = it
     }
   }
@@ -147,7 +146,7 @@ fun RequestChannel(
 fun PreviewRequestChannel() {
   MiniPayTheme {
     Column {
-      RequestChannel(previewBalances, previewTokens, null) {}
+      RequestChannel(previewBalances, previewTokens, null)
     }
   }
 }

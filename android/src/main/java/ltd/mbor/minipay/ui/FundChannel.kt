@@ -31,7 +31,7 @@ import ltd.mbor.minipay.ui.preview.previewTokens
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
 
 @Composable
-fun FundChannel(balances: Map<String, Balance>, tokens: Map<String, Token>, activity: MainActivity?, setRequestSentOnChannel: (Channel) -> Unit) {
+fun FundChannel(balances: Map<String, Balance>, tokens: Map<String, Token>, activity: MainActivity?) {
 
   var myAmount by remember { mutableStateOf(ZERO) }
   var theirAmount by remember { mutableStateOf(ZERO) }
@@ -120,7 +120,7 @@ fun FundChannel(balances: Map<String, Balance>, tokens: Map<String, Token>, acti
       Text(it)
     }
     channel?.let {
-      ChannelView(it, balances, activity, setRequestSentOnChannel) {
+      ChannelView(it, balances, activity) {
         channel = it
       }
     }
@@ -211,7 +211,7 @@ fun FundChannel(balances: Map<String, Balance>, tokens: Map<String, Token>, acti
 fun PreviewFundChannel() {
   MiniPayTheme {
     Column {
-      FundChannel(previewBalances, previewTokens, null) {}
+      FundChannel(previewBalances, previewTokens, null)
     }
   }
 }

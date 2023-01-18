@@ -18,7 +18,6 @@ import ltd.mbor.minipay.MainActivity
 import ltd.mbor.minipay.common.Channel
 import ltd.mbor.minipay.common.getChannels
 import ltd.mbor.minipay.common.updateChannelStatus
-import ltd.mbor.minipay.inited
 import ltd.mbor.minipay.logic.eltooScriptCoins
 import ltd.mbor.minipay.scope
 import ltd.mbor.minipay.ui.preview.fakeBalances
@@ -31,30 +30,24 @@ fun ChannelListing(
   balances: Map<String, Balance>,
   eltooScriptCoins: Map<String, List<Coin>>,
   activity: MainActivity?,
-  setRequestSentOnChannel: (Channel) -> Unit
 ) {
   LaunchedEffect("channels") {
     channels.load()
   }
-
-  if (inited) {
-    LazyColumn {
-      item {
-        Row {
-          Button(onClick = {
-            scope.launch {
-              channels.load()
-            }
-          }) {
-            Text("Refresh")
+  LazyColumn {
+    item {
+      Row {
+        Button(onClick = {
+          scope.launch {
+            channels.load()
           }
+        }) {
+          Text("Refresh")
         }
       }
-      item {
-        ChannelTable(channels, balances, eltooScriptCoins, activity, setRequestSentOnChannel) { index, channel ->
-          channels[index] = channel
-        }
-      }
+    }
+    item {
+      ChannelTable(channels, balances, eltooScriptCoins, activity)
     }
   }
 }
@@ -80,7 +73,7 @@ fun PreviewChannelListing() {
         fakeBalances,
         mapOf("Mx999" to listOf(Coin(address = "", miniAddress = "", amount = BigDecimal.ONE, coinId = "", storeState = true, tokenId = "0x00", _created = "100", token = null, state = emptyList()))),
         null
-      ) {}
+      )
     }
   }
 }

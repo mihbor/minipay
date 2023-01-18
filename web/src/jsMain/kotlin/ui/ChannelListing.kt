@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import kotlinx.coroutines.launch
 import logic.balances
-import logic.blockNumber
 import logic.eltooScriptCoins
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.getCoins
@@ -15,7 +14,7 @@ import org.jetbrains.compose.web.dom.*
 import scope
 
 @Composable
-fun ChannelListing(channels: MutableList<Channel>, setRequestSentOnChannel: (Channel) -> Unit) {
+fun ChannelListing(channels: MutableList<Channel>) {
   LaunchedEffect("channels") {
     channels.load()
   }
@@ -28,7 +27,9 @@ fun ChannelListing(channels: MutableList<Channel>, setRequestSentOnChannel: (Cha
   }) {
     Text("Refresh")
   }
-  Table {
+  Table({
+    style { property("border-collapse", "collapse") }
+  }) {
     Thead {
       Tr {
         Th { Text("ID") }
@@ -42,7 +43,9 @@ fun ChannelListing(channels: MutableList<Channel>, setRequestSentOnChannel: (Cha
     }
     Tbody {
       channels.forEachIndexed { index, channel ->
-        Tr {
+        Tr({
+          style { property("border-top", "1px solid black") }
+        })  {
           Td { Text(channel.id.toString()) }
           Td { Text(channel.status) }
           Td { Text(channel.sequenceNumber.toString()) }
@@ -53,12 +56,8 @@ fun ChannelListing(channels: MutableList<Channel>, setRequestSentOnChannel: (Cha
           Td { Text(channel.my.balance.toPlainString()) }
           Td { Text(channel.their.balance.toPlainString()) }
           Td {
-            if (channel.status == "OPEN") {
-              ChannelTransfers(channel, setRequestSentOnChannel)
-              Br()
-            }
-            Settlement(channel, blockNumber, eltooScriptCoins[channel.eltooAddress] ?: emptyList()) {
-              channels[index] = it
+            ChannelActions(channel) { channel ->
+              channels[index] = channel
             }
           }
         }

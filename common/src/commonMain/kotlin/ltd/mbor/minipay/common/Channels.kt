@@ -68,15 +68,14 @@ suspend fun signFloatingTx(
   return txnId
 }
 
-suspend fun Channel.send(amount: BigDecimal): Pair<String, String> {
+suspend fun Channel.send(amount: BigDecimal): Pair<Pair<String, Int>, Pair<String, Int>> {
   val currentSettlementTx = MDS.importTx(newTxId(), settlementTx)
   val input = currentSettlementTx.inputs.first()
-  val state = currentSettlementTx.state.find{ it.port == 99 }!!.data
   val updateTxnId = newTxId()
   val updatetxncreator = buildString {
     appendLine("txncreate id:$updateTxnId;")
     appendLine("txninput id:$updateTxnId address:${input.address} amount:${input.amount} tokenid:${input.tokenId} floating:true;")
-    appendLine("txnstate id:$updateTxnId port:99 value:${state.toInt() + 1};")
+    appendLine("txnstate id:$updateTxnId port:99 value:${sequenceNumber + 1};")
     appendLine("txnoutput id:$updateTxnId amount:${input.amount} tokenid:${input.tokenId} address:${input.address};")
     appendLine("txnsign id:$updateTxnId publickey:${my.keys.update};")
     append("txnexport id:$updateTxnId;")
@@ -86,7 +85,7 @@ suspend fun Channel.send(amount: BigDecimal): Pair<String, String> {
   val settletxncreator = buildString {
     appendLine("txncreate id:$settleTxnId;")
     appendLine("txninput id:$settleTxnId address:${input.address} amount:${input.amount} tokenid:${input.tokenId} floating:true;")
-    appendLine("txnstate id:$settleTxnId port:99 value:${state.toInt() + 1};")
+    appendLine("txnstate id:$settleTxnId port:99 value:${sequenceNumber + 1};")
     if(my.balance - amount > BigDecimal.ZERO) appendLine("txnoutput id:$settleTxnId amount:${(my.balance - amount).toPlainString()} tokenid:${input.tokenId} address:${my.address};")
     if(their.balance + amount > BigDecimal.ZERO) appendLine("txnoutput id:$settleTxnId amount:${(their.balance + amount).toPlainString()} tokenid:${input.tokenId} address:${their.address};")
     appendLine("txnsign id:$settleTxnId publickey:${my.keys.settle};")
@@ -105,23 +104,37 @@ suspend fun Channel.send(amount: BigDecimal): Pair<String, String> {
     }
   )
   
-  return updateTxn to settleTxn
+  return (updateTxn to updateTxnId) to (settleTxn to settleTxnId)
 }
 
 suspend fun Channel.request(amount: BigDecimal) = this.send(-amount)
 
-suspend fun Channel.acceptRequest(updateTx: Pair<Int, Transaction>, settleTx: Pair<Int, Transaction>): Pair<String, String> {
-  val sequenceNumber = settleTx.second.state.find { it.port == 99 }?.data?.toInt()
+suspend fun Channel.acceptRequest(updateTxId: Int, settleTxId: Int, sequenceNumber: Int, channelBalance: Pair<BigDecimal, BigDecimal>): Pair<String, String> {
+//  val sequenceNumber = settleTxId.first.state.find { it.port == 99 }?.data?.toInt()
+//
+//  val outputs = settleTxId.first.outputs
+//  val channelBalance = outputs.find { it.address == my.address }!!.amount to outputs.find { it.address == their.address }!!.amount
   
-  val outputs = settleTx.second.outputs
-  val channelBalance = outputs.find { it.address == my.address }!!.amount to outputs.find { it.address == their.address }!!.amount
+  val signedUpdateTx = signAndExportTx(updateTxId, my.keys.update)
+  val signedSettleTx = signAndExportTx(settleTxId, my.keys.settle)
   
-  val signedUpdateTx = signAndExportTx(updateTx.first, my.keys.update)
-  val signedSettleTx = signAndExportTx(settleTx.first, my.keys.settle)
-  
-  updateChannel(this, channelBalance, sequenceNumber!!, signedUpdateTx, signedSettleTx)
+  updateChannel(this, channelBalance, sequenceNumber, signedUpdateTx, signedSettleTx)
   
   return signedUpdateTx to signedSettleTx
+}
+
+suspend fun Channel.update(updateTxText: String, settleTxText: String, settleTx: Transaction, onSuccess: (Channel) -> Unit): Channel {
+  val sequenceNumber = settleTx.state.find { it.port == 99 }?.data?.toInt()!!
+  val outputs = settleTx.outputs
+  val myBalance = outputs.find { it.address == my.address }?.tokenAmount
+  val theirBalance = outputs.find { it.address == their.address }?.tokenAmount
+  
+  return if (myBalance == null || theirBalance == null) {
+    log("balance for my address ${my.address}: $myBalance, balance for their address ${their.address}: $theirBalance")
+    this
+  } else updateChannel(this, myBalance to theirBalance, sequenceNumber, updateTxText, settleTxText).also{
+    onSuccess(it)
+  }
 }
 
 suspend fun Channel.postUpdate(): Channel {

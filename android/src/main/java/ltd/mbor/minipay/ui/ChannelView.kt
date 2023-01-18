@@ -23,20 +23,10 @@ fun ChannelView(
   channel: Channel,
   balances: Map<String, Balance>,
   activity: MainActivity?,
-  setRequestSentOnChannel: (Channel) -> Unit,
   updateChannel: (Channel) -> Unit
 ) {
-//  multisigScriptBalances.firstOrNull{ it.tokenId == channel.tokenId }?.let{
-//    TokenIcon(it.tokenId, balances)
-//    Text("${it.tokenName} token funding balance: ${it.confirmed.toPlainString()}")
-//  }
-//  if (multisigScriptBalances.any { it.unconfirmed > ZERO || it.confirmed > ZERO }) {
-//    Text("Channel balance: me ${channel.my.balance.toPlainString()}, counterparty ${channel.their.balance.toPlainString()}")
-//    ChannelTransfers(channel, activity, setRequestSentOnChannel)
-//  }
   Column{
     Row{
-//      Text("Status: ${channel.status}", Modifier.width(140.dp))
       TokenIcon(channel.tokenId, balances)
       Text(balances[channel.tokenId]?.tokenName ?: "[${channel.tokenId}]")
     }
@@ -52,11 +42,11 @@ fun ChannelView(
       eltooScriptCoins[channel.eltooAddress] ?: emptyList(),
       updateChannel
     )
-    ChannelTransfers(channel, activity, setRequestSentOnChannel)
+    ChannelTransfers(channel, activity)
   }
 }
 
 @Composable @Preview
 fun PreviewChannelView() {
-  ChannelView(channel = fakeChannel, balances = fakeBalances, activity = null, setRequestSentOnChannel = {}, updateChannel = {})
+  ChannelView(channel = fakeChannel, balances = fakeBalances, activity = null, updateChannel = {})
 }

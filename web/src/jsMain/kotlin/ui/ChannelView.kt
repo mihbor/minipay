@@ -13,7 +13,6 @@ import org.jetbrains.compose.web.dom.Text
 @Composable
 fun ChannelView(
   channel: Channel,
-  setRequestSentOnChannel: (Channel) -> Unit,
   updateChannel: (Channel) -> Unit
 ) {
   Br()
@@ -24,7 +23,7 @@ fun ChannelView(
   }
   if (multisigScriptBalances.any { it.unconfirmed > ZERO || it.confirmed > ZERO }) {
     Text("ltd.mbor.minipay.common.Channel balance: me ${channel.my.balance.toPlainString()}, counterparty ${channel.their.balance.toPlainString()}")
-    ChannelTransfers(channel, setRequestSentOnChannel)
+    ChannelTransfers(channel)
     Br()
   }
   Settlement(

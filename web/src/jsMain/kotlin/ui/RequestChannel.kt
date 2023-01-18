@@ -28,7 +28,6 @@ import org.w3c.dom.HTMLCanvasElement
 fun RequestChannel(
   balances: SnapshotStateMap<String, Balance>,
   tokens: SnapshotStateMap<String, Token>,
-  setRequestSentOnChannel: (Channel) -> Unit
 ) {
   var myAddress by remember { mutableStateOf("") }
   var amount by remember { mutableStateOf(BigDecimal.ZERO) }
@@ -141,7 +140,7 @@ fun RequestChannel(
     Br()
   }
   channel?.let {
-    ChannelView(it, setRequestSentOnChannel) {
+    ChannelView(it) {
       channel = it
     }
   }

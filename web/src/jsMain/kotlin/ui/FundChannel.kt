@@ -23,7 +23,6 @@ import scope
 fun FundChannel(
   balances: SnapshotStateMap<String, Balance>,
   tokens: SnapshotStateMap<String, Token>,
-  setRequestSentOnChannel: (Channel) -> Unit
 ) {
   var myAmount by remember { mutableStateOf(ZERO) }
   var theirAmount by remember { mutableStateOf(ZERO) }
@@ -137,7 +136,7 @@ fun FundChannel(
     Br()
   }
   channel?.let {
-    ChannelView(it, setRequestSentOnChannel) {
+    ChannelView(it) {
       channel = it
     }
   }

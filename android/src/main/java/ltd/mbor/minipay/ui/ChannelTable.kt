@@ -17,7 +17,6 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Coin
 import ltd.mbor.minipay.MainActivity
-import ltd.mbor.minipay.blockNumber
 import ltd.mbor.minipay.common.Channel
 import ltd.mbor.minipay.ui.preview.fakeBalances
 import ltd.mbor.minipay.ui.preview.fakeChannel
@@ -26,12 +25,10 @@ import ltd.mbor.minipay.ui.theme.MiniPayTheme
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChannelTable(
-  channels: List<Channel>,
+  channels: MutableList<Channel>,
   balances: Map<String, Balance>,
   eltooScriptCoins: Map<String, List<Coin>>,
   activity: MainActivity?,
-  setRequestSentOnChannel: (Channel) -> Unit,
-  updateChannel: (Int, Channel) -> Unit
 ) {
   ProvideTextStyle(value = TextStyle(fontSize = 10.sp, textAlign = TextAlign.Right)) {
     Row {
@@ -64,14 +61,9 @@ fun ChannelTable(
             }
           }
         }
-        if (showActions) Row {
-          Column(Modifier.width(250.dp)) {
-            if (channel.status == "OPEN") {
-              ChannelTransfers(channel, activity, setRequestSentOnChannel)
-            }
-            Settlement(channel, blockNumber, eltooScriptCoins[channel.eltooAddress] ?: emptyList()) {
-              updateChannel(index, it)
-            }
+        if (showActions) {
+          ChannelActions(channel, eltooScriptCoins, activity) { channel ->
+            channels[index] = channel
           }
         }
       }
@@ -84,12 +76,11 @@ fun PreviewChannelTable() {
   MiniPayTheme {
     Column {
       ChannelTable(
-        listOf(fakeChannel, fakeChannel.copy(status = "TRIGGERED", eltooAddress = "Mx999", sequenceNumber = 3, updateTx = "abc")),
+        mutableListOf(fakeChannel, fakeChannel.copy(status = "TRIGGERED", eltooAddress = "Mx999", sequenceNumber = 3, updateTx = "abc")),
         fakeBalances,
         mapOf("Mx999" to listOf(Coin(address = "", miniAddress = "", amount = BigDecimal.ONE, coinId = "", storeState = true, tokenId = "0x00", _created = "100", token = null, state = emptyList()))),
-        null,
-        {}
-      ) { _, _ -> }
+        null
+      )
     }
   }
 }

@@ -15,6 +15,7 @@ import kotlinx.serialization.json.jsonObject
 import ltd.mbor.minimak.*
 import ltd.mbor.minipay.common.*
 import scope
+import view
 
 val balances = mutableStateMapOf<String, Balance>()
 val tokens = mutableStateMapOf<String, Token>()
@@ -46,12 +47,27 @@ suspend fun init(uid: String?) {
               log("tx msg: $msg")
               val splits = msg.split(";")
               if (splits[0].startsWith("TXN_UPDATE")) {
-                channels.first { it.id == channel.id }.update(splits[0].endsWith("_ACK"), updateTx = splits[1], settleTx = splits[2])
+                channels.first { it.id == channel.id }.update(splits[0].endsWith("_ACK"), updateTxText = splits[1], settleTxText = splits[2])
               } else if (splits[0] == "TXN_REQUEST") {
                 val (_, updateTxText, settleTxText) = splits
-                updateTx = newTxId().let { it to MDS.importTx(it, updateTxText) }
-                settleTx = newTxId().let { it to MDS.importTx(it, settleTxText) }
-                requestReceivedOnChannel = channels.first { it.id == channel.id }
+                val updateTxId = newTxId()
+                MDS.importTx(updateTxId, updateTxText)
+                val settleTxId = newTxId()
+                val settleTx = MDS.importTx(settleTxId, settleTxText)
+                log("TXN_REQUEST for channel: ${channel.id}")
+                with(channels.first { it.id == channel.id }) {
+                  val channelBalance = settleTx.outputs.first{ it.address == my.address }.tokenAmount to settleTx.outputs.first{ it.address == their.address }.tokenAmount
+                  val newSequenceNumber = settleTx.state.first { it.port == 99 }.data.toInt()
+                  check(newSequenceNumber == sequenceNumber + 1)
+                  events += PaymentRequestReceived(
+                    this,
+                    updateTxId,
+                    settleTxId,
+                    newSequenceNumber,
+                    channelBalance,
+                  )
+                }
+                view = "Channel events"
               }
             }.onCompletion {
               log("completed")

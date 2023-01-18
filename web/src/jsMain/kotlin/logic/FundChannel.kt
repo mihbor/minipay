@@ -1,6 +1,7 @@
 package logic
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import kotlinx.browser.window
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
@@ -10,6 +11,7 @@ import logic.FundChannelEvent.*
 import ltd.mbor.minimak.*
 import ltd.mbor.minipay.common.*
 import scope
+import view
 
 enum class FundChannelEvent{
   SCRIPTS_DEPLOYED, FUNDING_TX_CREATED, TRIGGER_TX_SIGNED, SETTLEMENT_TX_SIGNED, CHANNEL_PERSISTED, CHANNEL_PUBLISHED, SIGS_RECEIVED, CHANNEL_FUNDED, CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED
@@ -32,13 +34,25 @@ suspend fun fundChannel(
     val splits = msg.split(";")
     if (splits[0].startsWith("TXN_UPDATE")) {
       val isAck = splits[0].endsWith("_ACK")
-      channel = channel.update(isAck, updateTx = splits[1], settleTx = splits[2])
+      channel = channel.update(isAck, updateTxText = splits[1], settleTxText = splits[2])
       event(if (isAck) CHANNEL_UPDATED_ACKED else CHANNEL_UPDATED, channel)
     } else if (splits[0] == "TXN_REQUEST") {
       val (_, updateTxText, settleTxText) = splits
-      updateTx = newTxId().let { it to MDS.importTx(it, updateTxText) }
-      settleTx = newTxId().let { it to MDS.importTx(it, settleTxText) }
-      requestReceivedOnChannel = channels.first { it.id == channel.id }
+      val updateTxId = newTxId()
+      MDS.importTx(updateTxId, updateTxText)
+      val settleTxId = newTxId()
+      val settleTx = MDS.importTx(settleTxId, settleTxText)
+      val channelBalance = settleTx.outputs.first{ it.address == channel.my.address }.tokenAmount to settleTx.outputs.first{ it.address == channel.their.address }.tokenAmount
+      val newSequenceNumber = settleTx.state.first { it.port == 99 }.data.toInt()
+      check(newSequenceNumber == channel.sequenceNumber + 1)
+      events += PaymentRequestSent(
+        channel,
+        updateTxId,
+        settleTxId,
+        newSequenceNumber,
+        channelBalance,
+      )
+      view = "Channel events"
     } else {
       val (triggerTx, settlementTx, fundingTx) = splits
       val (theirInputCoins, theirInputScripts) = splits.subList(3, splits.size).let{ it.takeUnless { it.isEmpty() }?.chunked(it.size/2) ?: listOf(emptyList(), emptyList()) }
@@ -136,22 +150,27 @@ suspend fun Channel.commitFund(
   theirInputCoins: List<String>,
   theirInputScripts: List<String>
 ): Channel {
-  MDS.importTx(newTxId(), triggerTx)
-  MDS.importTx(newTxId(), settlementTx)
-  val fundingTxId = newTxId()
-  val theirBalance = MDS.importTx(fundingTxId, fundingTx).outputs
-    .find { it.address == multisigScriptAddress && it.tokenId == tokenId }!!.tokenAmount - myAmount
-  theirInputCoins.forEach { MDS.importCoin(it) }
-  theirInputScripts.forEach { MDS.newScript(it) }
-  val txncreator = """
+  return try {
+    MDS.importTx(newTxId(), triggerTx)
+    MDS.importTx(newTxId(), settlementTx)
+    val fundingTxId = newTxId()
+    val theirBalance = MDS.importTx(fundingTxId, fundingTx).outputs
+      .find { it.address == multisigScriptAddress && it.tokenId == tokenId }!!.tokenAmount - myAmount
+    theirInputCoins.forEach { MDS.importCoin(it) }
+    theirInputScripts.forEach { MDS.newScript(it) }
+    val txncreator = """
     txnsign id:$fundingTxId publickey:$key;
     txnpost id:$fundingTxId auto:true;
     txndelete id:$fundingTxId;""".trimIndent()
-  val result = MDS.cmd(txncreator)!!.jsonArray
-  val status = result.find{ it.jsonString("command") == "txnpost" }!!.jsonString("status")
-  log("txnpost status: $status")
-
-  return if (status.toBoolean()) {
-    updateChannel(this, triggerTx, settlementTx)
-  } else this
+    val result = MDS.cmd(txncreator)!!.jsonArray
+    val status = result.find { it.jsonString("command") == "txnpost" }!!.jsonString("status")
+    log("txnpost status: $status")
+  
+    if (status.toBoolean()) {
+      updateChannel(this, triggerTx, settlementTx)
+    } else this
+  } catch (e: MinimaException) {
+    window.alert("MinimaException: ${e.message}")
+    return this
+  }
 }

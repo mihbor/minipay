@@ -14,7 +14,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
@@ -27,9 +26,10 @@ import ltd.mbor.minimak.getAddress
 import ltd.mbor.minimak.importTx
 import ltd.mbor.minipay.common.getChannel
 import ltd.mbor.minipay.common.newTxId
-import ltd.mbor.minipay.logic.*
-import ltd.mbor.minipay.ui.ChannelRequestReceived
-import ltd.mbor.minipay.ui.ChannelRequestSent
+import ltd.mbor.minipay.logic.PaymentRequestReceived
+import ltd.mbor.minipay.logic.channelUpdateAck
+import ltd.mbor.minipay.logic.events
+import ltd.mbor.minipay.logic.initFirebase
 import ltd.mbor.minipay.ui.MainView
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
 import ltd.mbor.minipay.ui.toBigDecimalOrNull
@@ -39,6 +39,8 @@ val READER_FLAGS = NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_SKIP_N
 const val TAG = "MainActivity"
 
 val scope = MainScope()
+
+var view by mutableStateOf("settings")
 
 class MainActivity : ComponentActivity(), CardReader.DataCallback {
   var isReaderModeOn by mutableStateOf(true)
@@ -73,47 +75,33 @@ class MainActivity : ComponentActivity(), CardReader.DataCallback {
       uri.getQueryParameter("token")?.let { tokenId = it }
       uri.getQueryParameter("amount")?.toBigDecimalOrNull()?.let{ amount = it }
     } ?: enableReaderMode()
-    val action = when(intent?.data?.path) {
+    view = when(intent?.data?.path) {
       "/send" -> "send"
       "/emit" -> "receive"
       else -> "settings"
     }
     setContent {
       MiniPayTheme {
-        var view by remember{ mutableStateOf(action) }
         // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
-          requestReceivedOnChannel?.let {
-            ChannelRequestReceived(it, updateTx!!, settleTx!!, tokens, this) {
-              requestReceivedOnChannel = null
-              updateTx = null
-              settleTx = null
-            }
-          }
-          requestSentOnChannel?.let {
-            ChannelRequestSent(::enableReaderMode){ requestSentOnChannel = null }
-          }
-          if (requestReceivedOnChannel == null && requestSentOnChannel == null) {
-            MainView(
-              inited = inited,
-              uid = uid,
-              setUid = this::init,
-              balances = balances,
-              tokens = tokens,
-              address = address,
-              setAddress = { address = it},
-              amount = amount,
-              setAmount = ::updateAmount,
-              tokenId = tokenId,
-              setTokenId = { tokenId = it },
-              startEmitting = ::emitReceive,
-              stopEmitting = ::enableReaderMode,
-              setRequestSentOnChannel = { requestSentOnChannel = it },
-              activity = this,
-              view = view,
-              setView = { view = it }
-            )
-          }
+          MainView(
+            inited = inited,
+            uid = uid,
+            setUid = this::init,
+            balances = balances,
+            tokens = tokens,
+            address = address,
+            setAddress = { address = it},
+            amount = amount,
+            setAmount = ::updateAmount,
+            tokenId = tokenId,
+            setTokenId = { tokenId = it },
+            startEmitting = ::emitReceive,
+            stopEmitting = ::enableReaderMode,
+            activity = this,
+            view = view,
+            setView = { view = it }
+          )
         }
       }
     }
@@ -170,18 +158,21 @@ class MainActivity : ComponentActivity(), CardReader.DataCallback {
       val (_, updateTxText, settleTxText) = splits
       Log.i(TAG, "TXN_REQUEST received, updateTxLength: ${updateTxText.length}, settleTxLength: ${settleTxText.length}")
       scope.launch {
-        updateTx = newTxId().let{
-          it to MDS.importTx(it, updateTxText).also { updateTx ->
-            requestReceivedOnChannel = getChannel(updateTx.outputs.first().address)
-          }
-        }
-        settleTx = newTxId().let { it to MDS.importTx(it, settleTxText) }
+        val updateTxId = newTxId()
+        val updateTx = MDS.importTx(updateTxId, updateTxText)
+        val settleTxId = newTxId()
+        val settleTx = MDS.importTx(settleTxId, settleTxText)
+        val channel = getChannel(updateTx.outputs.first().address)!!
+        val sequenceNumber = settleTx.state.first{ it.port == 99 }.data.toInt()
+        check(sequenceNumber == channel.sequenceNumber + 1)
+        val channelBalance = settleTx.outputs.first{ it.address == channel.my.address }.tokenAmount to settleTx.outputs.first{ it.address == channel.their.address }.tokenAmount
+        events.add(PaymentRequestReceived(channel, updateTxId, settleTxId,sequenceNumber, channelBalance, isNfc = true))
+        view = "events"
       }
     } else if (splits[0] == "TXN_UPDATE_ACK") {
       val (_, updateTxText, settleTxText) = splits
       scope.launch {
         channelUpdateAck(updateTxText, settleTxText)
-        requestSentOnChannel = null
       }
     } else {
       this.address = splits[0]

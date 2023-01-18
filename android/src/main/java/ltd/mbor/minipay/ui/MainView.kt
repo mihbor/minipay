@@ -13,7 +13,6 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Token
 import ltd.mbor.minipay.MainActivity
-import ltd.mbor.minipay.common.Channel
 import ltd.mbor.minipay.logic.channels
 import ltd.mbor.minipay.logic.eltooScriptCoins
 import ltd.mbor.minipay.ui.preview.previewBalances
@@ -35,7 +34,6 @@ fun MainView(
   setTokenId: (String) -> Unit,
   startEmitting: () -> Unit,
   stopEmitting: () -> Unit,
-  setRequestSentOnChannel: (Channel) -> Unit,
   activity: MainActivity?,
   view: String,
   setView: (String) -> Unit
@@ -60,24 +58,15 @@ fun MainView(
     }
   ) {
     Menu(inited, showNavMenu, setView, startEmitting, stopEmitting) { showNavMenu = it }
-    when (view) {
-      "settings" -> Column(modifier = Modifier.padding(it)) {
-        Settings(uid, setUid)
-      }
-      "receive" -> Column(modifier = Modifier.padding(it)) {
-        Receive(balances, tokens, address, setAddress, tokenId, setTokenId, amount, setAmount)
-      }
-      "send" -> Column(modifier = Modifier.padding(it)) {
-        Send(balances, address, setAddress, tokenId, setTokenId, amount, setAmount)
-      }
-      "channels" -> Column(modifier = Modifier.padding(it)) {
-        ChannelListing(channels, balances, eltooScriptCoins, activity, setRequestSentOnChannel)
-      }
-      "request-channel" -> Column(modifier = Modifier.padding(it)) {
-        RequestChannel(balances, tokens, activity, setRequestSentOnChannel)
-      }
-      "fund-channel" -> Column(modifier = Modifier.padding(it)) {
-        FundChannel(balances, tokens, activity, setRequestSentOnChannel)
+    Column(Modifier.padding(it)) {
+      when (view) {
+        "settings" -> Settings(uid, setUid)
+        "receive" -> Receive(balances, tokens, address, setAddress, tokenId, setTokenId, amount, setAmount)
+        "send" -> Send(balances, address, setAddress, tokenId, setTokenId, amount, setAmount)
+        "channels" -> ChannelListing(channels, balances, eltooScriptCoins, activity)
+        "request-channel" -> RequestChannel(balances, tokens, activity)
+        "fund-channel" -> FundChannel(balances, tokens, activity)
+        "events" -> ChannelEvents(tokens, activity)
       }
     }
   }
@@ -86,13 +75,13 @@ fun MainView(
 @Composable @Preview(showBackground = true)
 fun PreviewMainViewSend() {
   MiniPayTheme {
-    MainView(true, "uid123", {}, previewBalances, previewTokens, "", {}, ZERO, {}, "0x00", {}, {}, {}, {}, null, "send", {})
+    MainView(true, "uid123", {}, previewBalances, previewTokens, "", {}, ZERO, {}, "0x00", {}, {}, {}, null, "send", {})
   }
 }
 
 @Composable @Preview(showBackground = true)
 fun PreviewMainViewReceive() {
   MiniPayTheme {
-    MainView(true, "uid456", {}, previewBalances, previewTokens, "address", {}, BigDecimal.ONE, {}, "0x01234567890", {}, {}, {}, {}, null, "receive", {})
+    MainView(true, "uid456", {}, previewBalances, previewTokens, "address", {}, BigDecimal.ONE, {}, "0x01234567890", {}, {}, {}, null, "receive", {})
   }
 }
