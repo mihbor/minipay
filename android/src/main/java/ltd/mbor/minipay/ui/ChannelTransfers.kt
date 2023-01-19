@@ -75,7 +75,7 @@ fun ChannelTransfers(channel: Channel, activity: MainActivity?) {
             isNfc = false
           ))
           preparingRequest = false
-          view = "events"
+          view = "Channel events"
         }
       },
       enabled = !preparingRequest
@@ -99,7 +99,7 @@ fun ChannelTransfers(channel: Channel, activity: MainActivity?) {
               isNfc = false
             ))
             preparingRequest = false
-            view = "events"
+            view = "Channel events"
           }
         }
       },
@@ -115,7 +115,7 @@ fun ChannelTransfers(channel: Channel, activity: MainActivity?) {
 @Preview
 fun PreviewTransfers() {
   MiniPayTheme {
-    Column {
+    Column(Modifier.width(350.dp)) {
       ChannelTransfers(fakeChannel, null)
     }
   }

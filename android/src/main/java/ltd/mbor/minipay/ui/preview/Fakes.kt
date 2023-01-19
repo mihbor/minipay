@@ -9,6 +9,8 @@ import kotlinx.serialization.json.JsonPrimitive
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Token
 import ltd.mbor.minipay.common.Channel
+import ltd.mbor.minipay.logic.PaymentRequestReceived
+import ltd.mbor.minipay.logic.PaymentRequestSent
 
 val fakeChannel = Channel(
   id = 1,
@@ -86,3 +88,10 @@ val previewTokens = listOf(
   Token("0x01234567890", JsonPrimitive("test token"), ONE, 1, null, null, null, JsonNull),
   Token("0x0999", JsonPrimitive("test2"), ONE, 1, null, null, null, JsonNull),
 ).associateBy { it.tokenId }
+
+val previewEvents = mutableListOf(
+  PaymentRequestSent(fakeChannel, 1, 2, 3, ZERO to ONE, true),
+  PaymentRequestSent(fakeChannel, 1, 2, 3, ZERO to ONE, false),
+  PaymentRequestReceived(fakeChannel, 1, 2, 3, ZERO to ONE, true),
+  PaymentRequestReceived(fakeChannel, 1, 2, 3, ZERO to ONE, false),
+)

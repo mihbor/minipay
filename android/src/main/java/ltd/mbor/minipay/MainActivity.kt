@@ -40,7 +40,7 @@ const val TAG = "MainActivity"
 
 val scope = MainScope()
 
-var view by mutableStateOf("settings")
+var view by mutableStateOf("Settings")
 
 class MainActivity : ComponentActivity(), CardReader.DataCallback {
   var isReaderModeOn by mutableStateOf(true)
@@ -76,9 +76,9 @@ class MainActivity : ComponentActivity(), CardReader.DataCallback {
       uri.getQueryParameter("amount")?.toBigDecimalOrNull()?.let{ amount = it }
     } ?: enableReaderMode()
     view = when(intent?.data?.path) {
-      "/send" -> "send"
-      "/emit" -> "receive"
-      else -> "settings"
+      "/send" -> "Send"
+      "/emit" -> "Receive"
+      else -> "Settings"
     }
     setContent {
       MiniPayTheme {

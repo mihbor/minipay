@@ -21,7 +21,7 @@ fun ChannelActions(
   updateChannel: (Channel) -> Unit
 ) {
   Row {
-    Column(Modifier.width(250.dp)) {
+    Column(Modifier.width(350.dp)) {
       if (channel.status == "OPEN") {
         ChannelTransfers(channel, activity)
       }

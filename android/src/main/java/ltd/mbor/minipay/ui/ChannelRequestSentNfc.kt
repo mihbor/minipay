@@ -30,8 +30,7 @@ fun ChannelRequestSentNfc(stopEmitting: () -> Unit, dismiss: () -> Unit) {
   }
 }
 
-@Composable
-@Preview
+@Composable @Preview
 fun PreviewChannelRequestSentNfc() {
   MiniPayTheme {
     ChannelRequestSentNfc({}) {}

@@ -37,6 +37,28 @@ suspend fun initMDS(uid: String, host: String, port: Int) {
             val splits = msg.split(";")
             if (splits[0].startsWith("TXN_UPDATE")) {
               channels.first { it.id == channel.id }.update(splits[0].endsWith("_ACK"), updateTxText = splits[1], settleTxText = splits[2])
+            } else if (splits[0] == "TXN_REQUEST") {
+              val (_, updateTxText, settleTxText) = splits
+              val updateTxId = newTxId()
+              MDS.importTx(updateTxId, updateTxText)
+              val settleTxId = newTxId()
+              val settleTx = MDS.importTx(settleTxId, settleTxText)
+              log("TXN_REQUEST for channel: ${channel.id}")
+              with(channels.first { it.id == channel.id }) {
+                val channelBalance = settleTx.outputs.first{ it.address == my.address }.tokenAmount to settleTx.outputs.first{ it.address == their.address }.tokenAmount
+                val newSequenceNumber = settleTx.state.first { it.port == 99 }.data.toInt()
+                if(newSequenceNumber > sequenceNumber) {
+                  events += PaymentRequestReceived(
+                    this,
+                    updateTxId,
+                    settleTxId,
+                    newSequenceNumber,
+                    channelBalance,
+                    false
+                  )
+                  view = "Channel events"
+                } else log("Stale update $newSequenceNumber received for channel $id at $sequenceNumber")
+              }
             }
           }.onCompletion {
             log("completed")

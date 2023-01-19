@@ -22,14 +22,14 @@ fun Menu(inited: Boolean, showNavMenu: Boolean, setView: (String) -> Unit, start
         onDismissRequest = { setShowNavMenu(false) }
       ) {
         DropdownMenuItem(onClick = {
-          setView("receive")
+          setView("Receive")
           startEmitting()
           setShowNavMenu(false)
         }, enabled = inited) {
           Text("Receive")
         }
         DropdownMenuItem(onClick = {
-          setView("send")
+          setView("Send")
           stopEmitting()
           setShowNavMenu(false)
         }, enabled = inited) {
@@ -37,32 +37,32 @@ fun Menu(inited: Boolean, showNavMenu: Boolean, setView: (String) -> Unit, start
         }
         Divider()
         DropdownMenuItem(onClick = {
-          setView("request-channel")
+          setView("Request channel")
           setShowNavMenu(false)
         }, enabled = inited) {
           Text("Request Channel")
         }
         DropdownMenuItem(onClick = {
-          setView("fund-channel")
+          setView("Fund channel")
           setShowNavMenu(false)
         }, enabled = inited) {
           Text("Fund Channel")
         }
         DropdownMenuItem(onClick = {
-          setView("channels")
+          setView("Channels")
           setShowNavMenu(false)
         }, enabled = inited) {
           Text("Channel Listing")
         }
         DropdownMenuItem(onClick = {
-          setView("events")
+          setView("Channel events")
           setShowNavMenu(false)
         }, enabled = inited) {
           Text("Channel Events")
         }
         Divider()
         DropdownMenuItem(onClick = {
-          setView("settings")
+          setView("Settings")
           setShowNavMenu(false)
         }) {
           Text("Settings")

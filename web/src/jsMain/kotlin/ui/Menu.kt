@@ -91,7 +91,7 @@ fun Menu(view: String, setView: (String) -> Unit) {
           showMenu = false
         }
       }) {
-        Text("Request channel")
+        Text("Request Channel")
       }
       Hr()
       Div({
@@ -101,7 +101,7 @@ fun Menu(view: String, setView: (String) -> Unit) {
           showMenu = false
         }
       }) {
-        Text("Fund channel")
+        Text("Fund Channel")
       }
       Hr()
       Div({
@@ -111,7 +111,7 @@ fun Menu(view: String, setView: (String) -> Unit) {
           showMenu = false
         }
       }) {
-        Text("List channels")
+        Text("Channel Listing")
       }
       Hr()
       Div({
@@ -121,7 +121,7 @@ fun Menu(view: String, setView: (String) -> Unit) {
           showMenu = false
         }
       }) {
-        Text("Channel events")
+        Text("Channel Events")
       }
       Hr()
       Div({

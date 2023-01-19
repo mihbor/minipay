@@ -10,6 +10,7 @@ import ltd.mbor.minimak.*
 import ltd.mbor.minipay.common.*
 import ltd.mbor.minipay.logic.FundChannelEvent.*
 import ltd.mbor.minipay.scope
+import ltd.mbor.minipay.view
 
 enum class FundChannelEvent{
   SCRIPTS_DEPLOYED, FUNDING_TX_CREATED, TRIGGER_TX_SIGNED, SETTLEMENT_TX_SIGNED, CHANNEL_PERSISTED, CHANNEL_PUBLISHED, SIGS_RECEIVED, CHANNEL_FUNDED, CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED
@@ -34,6 +35,25 @@ suspend fun fundChannel(
       val isAck = splits[0].endsWith("_ACK")
       channel = channel.update(isAck, updateTxText = splits[1], settleTxText = splits[2])
       event(if (isAck) CHANNEL_UPDATED_ACKED else CHANNEL_UPDATED, channel)
+    } else if (splits[0] == "TXN_REQUEST") {
+      val (_, updateTxText, settleTxText) = splits
+      val updateTxId = newTxId()
+      MDS.importTx(updateTxId, updateTxText)
+      val settleTxId = newTxId()
+      val settleTx = MDS.importTx(settleTxId, settleTxText)
+      val channelBalance = settleTx.outputs.first{ it.address == channel.my.address }.tokenAmount to settleTx.outputs.first{ it.address == channel.their.address }.tokenAmount
+      val newSequenceNumber = settleTx.state.first { it.port == 99 }.data.toInt()
+      if (newSequenceNumber > channel.sequenceNumber) {
+        events += PaymentRequestSent(
+          channel,
+          updateTxId,
+          settleTxId,
+          newSequenceNumber,
+          channelBalance,
+          false
+        )
+        view = "Channel events"
+      } else log("Stale update $newSequenceNumber received for channel ${channel.id} at ${channel.sequenceNumber}")
     } else {
       val (triggerTx, settlementTx, fundingTx) = splits
       val (theirInputCoins, theirInputScripts) = splits.subList(3, splits.size).let{ it.chunked(it.size/2) }

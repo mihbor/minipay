@@ -40,15 +40,16 @@ fun joinChannel(
       val settleTx = MDS.importTx(settleTxId, settleTxText)
       val channelBalance = settleTx.outputs.first{ it.address == channel!!.my.address }.tokenAmount to settleTx.outputs.first{ it.address == channel!!.their.address }.tokenAmount
       val newSequenceNumber = settleTx.state.first { it.port == 99 }.data.toInt()
-      check(newSequenceNumber == channel!!.sequenceNumber + 1)
-      events += PaymentRequestSent(
-        channel!!,
-        updateTxId,
-        settleTxId,
-        newSequenceNumber,
-        channelBalance,
-      )
-      view = "Channel events"
+      if (newSequenceNumber > channel!!.sequenceNumber) {
+        events += PaymentRequestSent(
+          channel!!,
+          updateTxId,
+          settleTxId,
+          newSequenceNumber,
+          channelBalance,
+        )
+        view = "Channel events"
+      } else log("Stale update $newSequenceNumber received for channel ${channel?.id} at ${channel?.sequenceNumber}")
     } else {
       val timeLock = splits[0].toInt()
       val theirKeys = Channel.Keys(splits[1], splits[2], splits[3])

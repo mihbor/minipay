@@ -46,7 +46,5 @@ fun ChannelRequestReceived(
     if (preparingResponse) disabled()
   }) {
     Text(if (preparingResponse) "Preparing response..." else "Accept")
-    
-    
   }
 }

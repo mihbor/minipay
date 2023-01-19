@@ -58,16 +58,17 @@ suspend fun init(uid: String?) {
                 with(channels.first { it.id == channel.id }) {
                   val channelBalance = settleTx.outputs.first{ it.address == my.address }.tokenAmount to settleTx.outputs.first{ it.address == their.address }.tokenAmount
                   val newSequenceNumber = settleTx.state.first { it.port == 99 }.data.toInt()
-                  check(newSequenceNumber == sequenceNumber + 1)
-                  events += PaymentRequestReceived(
-                    this,
-                    updateTxId,
-                    settleTxId,
-                    newSequenceNumber,
-                    channelBalance,
-                  )
+                  if (newSequenceNumber > sequenceNumber){
+                    events += PaymentRequestReceived(
+                      this,
+                      updateTxId,
+                      settleTxId,
+                      newSequenceNumber,
+                      channelBalance,
+                    )
+                    view = "Channel events"
+                  } else log("Stale update $newSequenceNumber received for channel $id at $sequenceNumber")
                 }
-                view = "Channel events"
               }
             }.onCompletion {
               log("completed")
