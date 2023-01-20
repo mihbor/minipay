@@ -57,7 +57,7 @@ suspend fun MutableList<Channel>.load() {
     val eltooCoins = MDS.getCoins(address = channel.eltooAddress)
     eltooScriptCoins[channel.eltooAddress] = eltooCoins
     if (channel.status == "OPEN" && eltooCoins.isNotEmpty()) updateChannelStatus(channel, "TRIGGERED")
-    else if (channel.status in listOf("TRIGGERED", "UPDATED") && eltooCoins.isEmpty()) updateChannelStatus(channel, "SETTLED")
+//    else if (channel.status in listOf("TRIGGERED", "UPDATED") && eltooCoins.isEmpty()) updateChannelStatus(channel, "SETTLED")
     else channel
   }
   clear()

@@ -7,6 +7,7 @@ import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import ltd.mbor.minimak.Balance
+import ltd.mbor.minimak.Coin
 import ltd.mbor.minimak.Token
 import ltd.mbor.minipay.common.Channel
 import ltd.mbor.minipay.logic.PaymentRequestReceived
@@ -43,6 +44,8 @@ val fakeChannel = Channel(
   updatedAt = Instant.fromEpochMilliseconds(123)
 )
 
+val fakeTriggeredChannel = fakeChannel.copy(status = "TRIGGERED")
+
 val fakeMinimaChannel = Channel(
   id = 1,
   sequenceNumber = 0,
@@ -72,6 +75,19 @@ val fakeMinimaChannel = Channel(
   timeLock = 10,
   eltooAddress = "Mx123",
   updatedAt = Instant.fromEpochMilliseconds(123)
+)
+
+val fakeCoin = Coin(
+  address = "0x01234",
+  miniAddress = "MxABCD",
+  amount = ONE,
+  tokenAmount = ONE,
+  coinId = "0x012345",
+  storeState = false,
+  tokenId = "0x00",
+  token = null,
+  _created = "123",
+  state = emptyList()
 )
 
 val fakeBalances = mapOf(

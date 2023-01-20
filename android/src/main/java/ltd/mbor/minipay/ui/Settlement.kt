@@ -1,6 +1,7 @@
 package ltd.mbor.minipay.ui
 
 import android.util.Log
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -15,6 +16,8 @@ import ltd.mbor.minipay.common.postUpdate
 import ltd.mbor.minipay.common.triggerSettlement
 import ltd.mbor.minipay.scope
 import ltd.mbor.minipay.ui.preview.fakeChannel
+import ltd.mbor.minipay.ui.preview.fakeCoin
+import ltd.mbor.minipay.ui.preview.fakeTriggeredChannel
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
 
 @Composable
@@ -41,14 +44,12 @@ fun Settlement(channel: Channel, blockNumber: Int, eltooScriptCoins: List<Coin>,
   }
   if (eltooScriptCoins.isNotEmpty()) {
     eltooScriptCoins.forEach {
-//      Br()
       Text("[${it.tokenId}] token eltoo coin: ${it.tokenAmount.toPlainString()} timelock ${
         (it.created + channel.timeLock - blockNumber).takeIf { it > 0 }?.let { "ends in $it blocks" } ?: "ended"}",
         fontSize = 8.sp
       )
     }
     if (channel.status == "TRIGGERED" && channel.sequenceNumber > 0) {
-//      Br()
       if (channel.updateTx.isNotEmpty()) Button(
         onClick = {
           updatePosting = true
@@ -83,6 +84,18 @@ fun Settlement(channel: Channel, blockNumber: Int, eltooScriptCoins: List<Coin>,
 @Preview
 fun PreviewSettlement() {
   MiniPayTheme {
-    Settlement(channel = fakeChannel, blockNumber = 5, eltooScriptCoins = emptyList(), updateChannel = {})
+    Column {
+      Settlement(channel = fakeChannel, blockNumber = 5, eltooScriptCoins = emptyList(), updateChannel = {})
+    }
+  }
+}
+
+@Composable
+@Preview
+fun PreviewTriggeredSettlement() {
+  MiniPayTheme {
+    Column {
+      Settlement(channel = fakeTriggeredChannel, blockNumber = 5, eltooScriptCoins = listOf(fakeCoin), updateChannel = {})
+    }
   }
 }

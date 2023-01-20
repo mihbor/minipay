@@ -10,6 +10,7 @@ import ltd.mbor.minimak.getCoins
 import ltd.mbor.minipay.common.Channel
 import ltd.mbor.minipay.common.getChannels
 import ltd.mbor.minipay.common.updateChannelStatus
+import org.jetbrains.compose.web.css.textAlign
 import org.jetbrains.compose.web.dom.*
 import scope
 
@@ -28,7 +29,10 @@ fun ChannelListing(channels: MutableList<Channel>) {
     Text("Refresh")
   }
   Table({
-    style { property("border-collapse", "collapse") }
+    style {
+      textAlign("right")
+      property("border-collapse", "collapse")
+    }
   }) {
     Thead {
       Tr {
@@ -46,16 +50,20 @@ fun ChannelListing(channels: MutableList<Channel>) {
         Tr({
           style { property("border-top", "1px solid black") }
         })  {
-          Td { Text(channel.id.toString()) }
-          Td { Text(channel.status) }
-          Td { Text(channel.sequenceNumber.toString()) }
-          Td {
+          Td{ Text(channel.id.toString()) }
+          Td{ Text(channel.status) }
+          Td{ Text(channel.sequenceNumber.toString()) }
+          Td{
             TokenIcon(channel.tokenId, balances)
             Text(balances[channel.tokenId]?.tokenName ?: "[${channel.tokenId}]")
           }
-          Td { Text(channel.my.balance.toPlainString()) }
-          Td { Text(channel.their.balance.toPlainString()) }
-          Td {
+          Td{ Text(channel.my.balance.toPlainString()) }
+          Td{ Text(channel.their.balance.toPlainString()) }
+          Td({
+            style {
+              textAlign("left")
+            }
+          }) {
             ChannelActions(channel) { channel ->
               channels[index] = channel
             }
@@ -71,7 +79,7 @@ suspend fun MutableList<Channel>.load() {
     val eltooCoins = MDS.getCoins(address = channel.eltooAddress)
     eltooScriptCoins.put(channel.eltooAddress, eltooCoins)
     if (channel.status == "OPEN" && eltooCoins.isNotEmpty()) updateChannelStatus(channel, "TRIGGERED")
-    else if (channel.status in listOf("TRIGGERED", "UPDATED") && eltooCoins.isEmpty()) updateChannelStatus(channel, "SETTLED")
+//    else if (channel.status in listOf("TRIGGERED", "UPDATED") && eltooCoins.isEmpty()) updateChannelStatus(channel, "SETTLED")
     else channel
   }
   clear()
