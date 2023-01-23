@@ -33,6 +33,12 @@ pages:
     - mkdir .public
     - cp -r web/build/minidapp/*.zip .public
     - cp -r android/build/outputs/apk/debug/*.apk .public
+    - cd .public/
+    - echo "<html><body><h1>MiniPay</h1>" > ./index.html
+    - find *.zip -exec echo "minidapp:<a href='{}'>{}</a><br/>" \; >> ./index.html
+    - find *.apk -exec echo "android:<a href='{}'>{}</a><br/>" \; >> ./index.html
+    - echo "</body></html>" >> ./index.html
+    - cd ..
     - rm -rf public
     - mv .public public
   artifacts:
