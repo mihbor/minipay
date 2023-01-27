@@ -38,7 +38,7 @@ suspend fun init(uid: String?) {
         if (MDS.logging) console.log("Connected to Minima.")
         scope.launch {
           blockNumber = MDS.getBlockNumber()
-          balances.putAll(MDS.getBalances().associateBy { it.tokenId })
+          balances.putAll(MDS.getBalances(confirmations = 0).associateBy { it.tokenId })
           tokens.putAll(MDS.getTokens().associateBy { it.tokenId })
           createDB()
           channels.addAll(getChannels(status = "OPEN"))
@@ -56,9 +56,10 @@ suspend fun init(uid: String?) {
                 val settleTx = MDS.importTx(settleTxId, settleTxText)
                 log("TXN_REQUEST for channel: ${channel.id}")
                 with(channels.first { it.id == channel.id }) {
-                  val channelBalance = settleTx.outputs.first{ it.address == my.address }.tokenAmount to settleTx.outputs.first{ it.address == their.address }.tokenAmount
+                  val channelBalance = (settleTx.outputs.firstOrNull{ it.address == my.address }?.tokenAmount ?: ZERO) to
+                    (settleTx.outputs.firstOrNull{ it.address == their.address }?.tokenAmount ?: ZERO)
                   val newSequenceNumber = settleTx.state.first { it.port == 99 }.data.toInt()
-                  if (newSequenceNumber > sequenceNumber){
+                  if (newSequenceNumber > sequenceNumber) {
                     events += PaymentRequestReceived(
                       this,
                       updateTxId,
@@ -77,7 +78,7 @@ suspend fun init(uid: String?) {
         }
       }
       "NEWBALANCE" -> {
-        val newBalances = MDS.getBalances().associateBy { it.tokenId }
+        val newBalances = MDS.getBalances(confirmations = 0).associateBy { it.tokenId }
         balances.clear()
         balances.putAll(newBalances)
         val newTokens = MDS.getTokens().associateBy { it.tokenId }

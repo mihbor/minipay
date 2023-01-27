@@ -1,11 +1,14 @@
 package ltd.mbor.minipay.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import coil.compose.AsyncImage
@@ -28,7 +31,26 @@ fun TokenIcon(url: String, size: Int = 24) {
 }
 
 @Composable
+fun TokenIcon(painter: Painter, size: Int = 24) {
+  Image(
+    painter,
+    "token logo",
+    modifier = Modifier.width(size.dp).height(size.dp),
+  )
+}
+
+@Composable
 fun TokenIcon(tokenId: String, balances: Map<String, Balance>, size: Int = 24) {
-  TokenIcon(balances[tokenId]?.tokenUrl?.takeIf { it.isNotBlank() }
-    ?: if (tokenId == "0x00") "minima.svg" else "coins.svg", size)
+  balances[tokenId]?.tokenUrl?.takeIf { it.isNotBlank() }?.let{ TokenIcon(it, size) }
+  ?: TokenIcon(painterResource(if (tokenId == "0x00") R.drawable.minima else R.drawable.coins), size)
+}
+
+@Composable @Preview
+fun PreviewMinimaTokenIcon() {
+  TokenIcon("0x00", emptyMap())
+}
+
+@Composable @Preview
+fun PreviewUnknownTokenIcon() {
+  TokenIcon("0x0123", emptyMap())
 }

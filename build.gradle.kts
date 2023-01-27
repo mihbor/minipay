@@ -1,6 +1,6 @@
 allprojects {
   group = "ltd.mbor"
-  version = "0.2-SNAPSHOT"
+  version = "0.2.1"
 
   repositories {
     google()
@@ -23,15 +23,16 @@ plugins {
   id("org.jetbrains.compose") apply false
 }
 
-tasks.register<Copy>("copyApk"){
-  val source = project(":android").tasks["packageDebug"]
-  dependsOn(source)
-  from(source)
+tasks.register<Copy>("copyApk") {
+  val androidPackage = project(":android").tasks["packageDebug"]
+  val webDistribution = project(":web").tasks["jsBrowserDistribution"]
+  dependsOn(androidPackage, webDistribution)
+  from(androidPackage)
   include("**.apk")
-  into("web/src/jsMain/resources")
+  into(project(":web").layout.buildDirectory.dir("processedResources/js/main/"))
   rename{ "minipay.apk" }
 }
 
-tasks.register("minidappWithApk"){
+tasks.register("minidappWithApk") {
   dependsOn("copyApk", ":web:minidappDistribution")
 }

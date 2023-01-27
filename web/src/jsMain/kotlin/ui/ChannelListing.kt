@@ -4,12 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import kotlinx.coroutines.launch
 import logic.balances
-import logic.eltooScriptCoins
-import ltd.mbor.minimak.MDS
-import ltd.mbor.minimak.getCoins
+import logic.reload
 import ltd.mbor.minipay.common.Channel
-import ltd.mbor.minipay.common.getChannels
-import ltd.mbor.minipay.common.updateChannelStatus
 import org.jetbrains.compose.web.css.textAlign
 import org.jetbrains.compose.web.dom.*
 import scope
@@ -17,12 +13,12 @@ import scope
 @Composable
 fun ChannelListing(channels: MutableList<Channel>) {
   LaunchedEffect("channels") {
-    channels.load()
+    channels.reload()
   }
   Button({
     onClick {
       scope.launch {
-        channels.load()
+        channels.reload()
       }
     }
   }) {
@@ -46,7 +42,7 @@ fun ChannelListing(channels: MutableList<Channel>) {
       }
     }
     Tbody {
-      channels.forEachIndexed { index, channel ->
+      channels.forEach { channel ->
         Tr({
           style { property("border-top", "1px solid black") }
         })  {
@@ -64,24 +60,12 @@ fun ChannelListing(channels: MutableList<Channel>) {
               textAlign("left")
             }
           }) {
-            ChannelActions(channel) { channel ->
-              channels[index] = channel
+            ChannelActions(channel) {
+              scope.launch { channels.reload() }
             }
           }
         }
       }
     }
   }
-}
-
-suspend fun MutableList<Channel>.load() {
-  val newChannels = getChannels().map { channel ->
-    val eltooCoins = MDS.getCoins(address = channel.eltooAddress)
-    eltooScriptCoins.put(channel.eltooAddress, eltooCoins)
-    if (channel.status == "OPEN" && eltooCoins.isNotEmpty()) updateChannelStatus(channel, "TRIGGERED")
-//    else if (channel.status in listOf("TRIGGERED", "UPDATED") && eltooCoins.isEmpty()) updateChannelStatus(channel, "SETTLED")
-    else channel
-  }
-  clear()
-  addAll(newChannels)
 }

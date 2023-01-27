@@ -19,12 +19,12 @@ suspend fun Channel.update(isAck: Boolean, updateTxText: String, settleTxText: S
   val settleTxnId = newTxId()
   val settleTx = MDS.importTx(settleTxnId, settleTxText)
   
+  val signedUpdateTx = if (isAck) updateTxText else signAndExportTx(updateTxnId, my.keys.update)
+  val signedSettleTx = if (isAck) settleTxText else signAndExportTx(settleTxnId, my.keys.settle)
   if (!isAck) {
-    val signedUpdateTx = signAndExportTx(updateTxnId, my.keys.update)
-    val signedSettleTx = signAndExportTx(settleTxnId, my.keys.settle)
     publish(channelKey(their.keys, tokenId), listOf("TXN_UPDATE_ACK", signedUpdateTx, signedSettleTx).joinToString(";"))
   }
-  return update(updateTxText, settleTxText, settleTx) {
+  return update(signedUpdateTx, signedSettleTx, settleTx) {
     channels[channels.indexOf(channels.first{ it.id == id })] = it
     if (isAck) events.removeIf { it.channel.id == id && it is PaymentRequestSent }
   }
@@ -32,4 +32,21 @@ suspend fun Channel.update(isAck: Boolean, updateTxText: String, settleTxText: S
 
 fun <T> MutableList<T>.removeIf(predicate: (T) -> Boolean) {
   removeAll(filter(predicate))
+}
+
+suspend fun MutableList<Channel>.reload() {
+  val newChannels = getChannels().map { channel ->
+    val eltooCoins = MDS.getCoins(address = channel.eltooAddress)
+    eltooScriptCoins[channel.eltooAddress] = eltooCoins
+    if (channel.status == "OPEN" && eltooCoins.isNotEmpty()) updateChannelStatus(channel, "TRIGGERED")
+    else if (channel.status in listOf("TRIGGERED", "UPDATED") && eltooCoins.isEmpty()) {
+      val anyTransactionsFromEltoo = MDS.getTransactions(channel.eltooAddress)
+        ?.any{ it.inputs.any { it.address == channel.eltooAddress } } ?: false
+      if (anyTransactionsFromEltoo) updateChannelStatus(channel, "SETTLED")
+      else channel
+    }
+    else channel
+  }
+  clear()
+  addAll(newChannels)
 }

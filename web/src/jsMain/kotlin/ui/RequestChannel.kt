@@ -5,7 +5,10 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.browser.document
 import logic.JoinChannelEvent.*
+import logic.eltooScriptAddress
 import logic.joinChannel
+import logic.multisigScriptAddress
+import logic.multisigScriptBalances
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.Token
@@ -44,14 +47,17 @@ fun RequestChannel(
   var channel by remember { mutableStateOf<Channel?>(null) }
   
   LaunchedEffect("requestChannel") {
-    newKeys(3).apply {
+    MDS.newKeys(3).apply {
       myKeys = Channel.Keys(this[0], this[1], this[2])
     }
     myAddress = MDS.getAddress().address
-  }
-  fun requestChannel() {
     triggerTxStatus = ""
     settlementTxStatus = ""
+    multisigScriptAddress = ""
+    eltooScriptAddress = ""
+    multisigScriptBalances.clear()
+  }
+  fun requestChannel() {
     val canvas = document.getElementById("joinChannelQR") as HTMLCanvasElement
     QRCode.toCanvas(
       canvas, channelKey(myKeys, tokenId) + ";" + amount.toPlainString() + ";" + myAddress
@@ -64,6 +70,7 @@ fun RequestChannel(
             SIGS_RECEIVED -> {
               triggerTxStatus = "Trigger transaction received"
               settlementTxStatus = "Settlement transaction received"
+              showQR = false
             }
             TRIGGER_TX_SIGNED -> triggerTxStatus += " and signed"
             SETTLEMENT_TX_SIGNED -> settlementTxStatus += " and signed"
@@ -99,10 +106,16 @@ fun RequestChannel(
   }
   if (triggerTxStatus.isEmpty()) {
     Text("Trigger key: ${myKeys.trigger}")
+    CopyToClipboard(myKeys.trigger)
     Br()
     Text("Update key: ${myKeys.update}")
+    CopyToClipboard(myKeys.update)
     Br()
     Text("Settlement key: ${myKeys.settle}")
+    CopyToClipboard(myKeys.settle)
+    Br()
+    Text("Address: $myAddress")
+    CopyToClipboard(myAddress)
     Br()
     DecimalNumberInput(amount, min = BigDecimal.ZERO, disabled = showQR) {
       it?.let { amount = it }

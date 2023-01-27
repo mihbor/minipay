@@ -12,13 +12,9 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Coin
-import ltd.mbor.minimak.MDS
-import ltd.mbor.minimak.getCoins
 import ltd.mbor.minipay.MainActivity
 import ltd.mbor.minipay.common.Channel
-import ltd.mbor.minipay.common.getChannels
-import ltd.mbor.minipay.common.updateChannelStatus
-import ltd.mbor.minipay.logic.eltooScriptCoins
+import ltd.mbor.minipay.logic.reload
 import ltd.mbor.minipay.scope
 import ltd.mbor.minipay.ui.preview.fakeBalances
 import ltd.mbor.minipay.ui.preview.fakeChannel
@@ -32,14 +28,14 @@ fun ChannelListing(
   activity: MainActivity?,
 ) {
   LaunchedEffect("channels") {
-    channels.load()
+    channels.reload()
   }
   LazyColumn {
     item {
       Row {
         Button(onClick = {
           scope.launch {
-            channels.load()
+            channels.reload()
           }
         }) {
           Text("Refresh")
@@ -50,18 +46,6 @@ fun ChannelListing(
       ChannelTable(channels, balances, eltooScriptCoins, activity)
     }
   }
-}
-
-suspend fun MutableList<Channel>.load() {
-  val newChannels = getChannels().map { channel ->
-    val eltooCoins = MDS.getCoins(address = channel.eltooAddress)
-    eltooScriptCoins[channel.eltooAddress] = eltooCoins
-    if (channel.status == "OPEN" && eltooCoins.isNotEmpty()) updateChannelStatus(channel, "TRIGGERED")
-//    else if (channel.status in listOf("TRIGGERED", "UPDATED") && eltooCoins.isEmpty()) updateChannelStatus(channel, "SETTLED")
-    else channel
-  }
-  clear()
-  addAll(newChannels)
 }
 
 @Composable @Preview

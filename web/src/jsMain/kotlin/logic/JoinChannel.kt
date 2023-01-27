@@ -38,10 +38,11 @@ fun joinChannel(
       MDS.importTx(updateTxId, updateTxText)
       val settleTxId = newTxId()
       val settleTx = MDS.importTx(settleTxId, settleTxText)
-      val channelBalance = settleTx.outputs.first{ it.address == channel!!.my.address }.tokenAmount to settleTx.outputs.first{ it.address == channel!!.their.address }.tokenAmount
+      val channelBalance = (settleTx.outputs.firstOrNull{ it.address == channel!!.my.address }?.tokenAmount ?: ZERO) to
+        (settleTx.outputs.firstOrNull{ it.address == channel!!.their.address }?.tokenAmount ?: ZERO)
       val newSequenceNumber = settleTx.state.first { it.port == 99 }.data.toInt()
       if (newSequenceNumber > channel!!.sequenceNumber) {
-        events += PaymentRequestSent(
+        events += PaymentRequestReceived(
           channel!!,
           updateTxId,
           settleTxId,

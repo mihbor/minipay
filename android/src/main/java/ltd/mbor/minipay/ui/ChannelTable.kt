@@ -14,10 +14,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Coin
 import ltd.mbor.minipay.MainActivity
 import ltd.mbor.minipay.common.Channel
+import ltd.mbor.minipay.logic.reload
+import ltd.mbor.minipay.scope
 import ltd.mbor.minipay.ui.preview.fakeBalances
 import ltd.mbor.minipay.ui.preview.fakeChannel
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
@@ -40,7 +43,7 @@ fun ChannelTable(
       Text("Their\nbalance", Modifier.width(50.dp))
       Text("Actions", Modifier.width(40.dp))
     }
-    channels.forEachIndexed { index, channel ->
+    channels.forEach { channel ->
       key(channel.id) {
         var showActions by remember { mutableStateOf(false) }
         Row {
@@ -62,8 +65,8 @@ fun ChannelTable(
           }
         }
         if (showActions) {
-          ChannelActions(channel, eltooScriptCoins, activity) { channel ->
-            channels[index] = channel
+          ChannelActions(channel, eltooScriptCoins, activity) {
+            scope.launch { channels.reload() }
           }
         }
       }

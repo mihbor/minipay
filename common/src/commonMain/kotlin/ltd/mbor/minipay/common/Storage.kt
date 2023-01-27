@@ -46,10 +46,10 @@ suspend fun getChannel(eltooAddress: String): Channel? {
 }
 
 suspend fun getChannels(status: String? = null): List<Channel> {
-  val sql = MDS.sql("SELECT * FROM channel${status?.let { " WHERE status = '$it'" } ?: ""} ORDER BY id DESC;")!!
+  val sql = MDS.sql("SELECT * FROM channel WHERE status ${status?.let { " = '$it'" } ?: " <> 'DELETED'"} ORDER BY id DESC;")!!
   val rows = sql.jsonObject["rows"]?.jsonArray ?: emptyList()
 
-  return rows.map{it.jsonObject}.map(JsonObject::toChannel)
+  return rows.map{ it.jsonObject }.map(JsonObject::toChannel)
 }
 
 private fun JsonObject.toChannel() = Channel(

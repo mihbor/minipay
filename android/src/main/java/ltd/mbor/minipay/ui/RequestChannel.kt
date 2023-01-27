@@ -2,6 +2,7 @@ package ltd.mbor.minipay.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Button
 import androidx.compose.material.LinearProgressIndicator
@@ -24,7 +25,10 @@ import ltd.mbor.minipay.common.Channel
 import ltd.mbor.minipay.common.channelKey
 import ltd.mbor.minipay.common.newKeys
 import ltd.mbor.minipay.logic.JoinChannelEvent.*
+import ltd.mbor.minipay.logic.eltooScriptAddress
 import ltd.mbor.minipay.logic.joinChannel
+import ltd.mbor.minipay.logic.multisigScriptAddress
+import ltd.mbor.minipay.logic.multisigScriptBalances
 import ltd.mbor.minipay.ui.preview.previewBalances
 import ltd.mbor.minipay.ui.preview.previewTokens
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
@@ -51,15 +55,18 @@ fun RequestChannel(
   var channel by remember { mutableStateOf<Channel?>(null) }
 
   LaunchedEffect("requestChannel") {
-    newKeys(3).apply {
+    MDS.newKeys(3).apply {
       myKeys = Channel.Keys(this[0], this[1], this[2])
     }
     myAddress = MDS.getAddress().address
+    triggerTxStatus = ""
+    settlementTxStatus = ""
+    multisigScriptAddress = ""
+    eltooScriptAddress = ""
+    multisigScriptBalances.clear()
   }
 
   fun requestChannel() {
-    triggerTxStatus = ""
-    settlementTxStatus = ""
     bitmap = encodeAsBitmap(channelKey(myKeys, tokenId) + ";" + amount.toPlainString() + ";" + myAddress).asImageBitmap()
 
     joinChannel(myAddress, myKeys, tokenId, amount) { event, newChannel ->
@@ -99,9 +106,22 @@ fun RequestChannel(
   }
   if (triggerTxStatus.isEmpty()) {
     ProvideTextStyle(value = TextStyle(fontSize = 12.sp)) {
-      Text("Trigger key: ${myKeys.trigger}")
-      Text("Update key: ${myKeys.update}")
-      Text("Settlement key: ${myKeys.settle}")
+      Row {
+        Text("Trigger key: ${myKeys.trigger}", Modifier.fillMaxWidth(0.8f))
+        CopyToClipboard(myKeys.trigger)
+      }
+      Row {
+        Text("Update key: ${myKeys.update}", Modifier.fillMaxWidth(0.8f))
+        CopyToClipboard(myKeys.update)
+      }
+      Row {
+        Text("Settlement key: ${myKeys.settle}", Modifier.fillMaxWidth(0.8f))
+        CopyToClipboard(myKeys.settle)
+      }
+      Row {
+        Text("Address: $myAddress", Modifier.fillMaxWidth(0.8f))
+        CopyToClipboard(myAddress)
+      }
     }
     DecimalNumberField(amount, min = ZERO, enabled = !showQR) {
       it?.let { amount = it }

@@ -21,13 +21,13 @@ fun ChannelView(
     Text("${it.tokenName} token funding balance: ${it.confirmed.toPlainString()}")
     Br()
   }
-  if (multisigScriptBalances.any { it.unconfirmed > ZERO || it.confirmed > ZERO }) {
-    Text("ltd.mbor.minipay.common.Channel balance: me ${channel.my.balance.toPlainString()}, counterparty ${channel.their.balance.toPlainString()}")
+  if (multisigScriptBalances.any { it.confirmed > ZERO }) {
+    Text("channel balance: me ${channel.my.balance.toPlainString()}, counterparty ${channel.their.balance.toPlainString()}")
     ChannelTransfers(channel)
     Br()
   }
   Settlement(
-    channel.copy(status = if (multisigScriptBalances.any { it.unconfirmed > ZERO || it.confirmed > ZERO }) "OPEN" else channel.status),
+    if (multisigScriptBalances.any { it.confirmed > ZERO }) channel.copy(status = "OPEN") else channel,
     blockNumber,
     eltooScriptCoins[channel.eltooAddress] ?: emptyList(),
     updateChannel

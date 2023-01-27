@@ -37,7 +37,7 @@ fun ChannelView(
       Text(channel.their.balance.toPlainString(), Modifier.width(60.dp))
     }
     Settlement(
-      channel.copy(status = if (multisigScriptBalances.any { it.unconfirmed > ZERO || it.confirmed > ZERO }) "OPEN" else channel.status),
+      if (multisigScriptBalances.any { it.confirmed > ZERO }) channel.copy(status = "OPEN") else channel,
       blockNumber,
       eltooScriptCoins[channel.eltooAddress] ?: emptyList(),
       updateChannel

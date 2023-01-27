@@ -26,6 +26,12 @@ kotlin {
         api("ltd.mbor:minimak:0.3-SNAPSHOT")
       }
     }
+    val commonTest by getting {
+      dependencies {
+        implementation(kotlin("test"))
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+      }
+    }
     val androidMain by getting
     val jsMain by getting
 

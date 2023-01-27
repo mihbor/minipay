@@ -1,6 +1,7 @@
 package ltd.mbor.minipay.common
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -21,9 +22,9 @@ ENDIF
 
 fun channelKey(keys: Channel.Keys, tokenId: String) = listOf(keys.trigger, keys.update, keys.settle, tokenId).joinToString(";")
 
-suspend fun newKeys(count: Int): List<String> {
+suspend fun MDSInterface.newKeys(count: Int): List<String> {
   val command = List(count) { "keys action:new;" }.joinToString("\n")
-  return MDS.cmd(command)!!.jsonArray.map { it.jsonObject["response"]!!.jsonString("publickey") }
+  return cmd(command)!!.jsonArray.map { it.jsonObject["response"]!!.jsonString("publickey") }
 }
 
 suspend fun isPaymentChannelAvailable(toAddress: String, tokenId: String, amount: BigDecimal): Boolean {
@@ -44,13 +45,13 @@ suspend fun importAndPost(tx: String): JsonElement? {
   return MDS.post(txId)
 }
 
-private fun <T> Array<T>.sumOf(function: (T) -> BigDecimal) = fold(BigDecimal.ZERO) { acc, it -> acc + function(it) }
+private fun <T> Array<T>.sumOf(function: (T) -> BigDecimal) = fold(ZERO) { acc, it -> acc + function(it) }
 
-suspend fun signFloatingTx(
+suspend fun MDSInterface.signFloatingTx(
   myKey: String,
   sourceScriptAddress: String,
-  states: Map<Int, String> = emptyMap(),
   tokenId: String,
+  states: Map<Int, String> = emptyMap(),
   vararg amountToAddress: Pair<BigDecimal, String>
 ): Int {
   
@@ -60,11 +61,12 @@ suspend fun signFloatingTx(
     appendLine("txncreate id:$txnId;")
     appendLine("txninput id:$txnId address:${sourceScriptAddress} amount:${total.toPlainString()} tokenid:$tokenId floating:true;")
     states.mapNotNull { (index, value) -> value.takeUnless{ it.isEmpty() }?.let{ appendLine("txnstate id:$txnId port:$index value:$value;") } }
-    amountToAddress.forEach { (amount, address) -> appendLine("txnoutput id:$txnId amount:${amount.toPlainString()} tokenid:$tokenId address:$address;") }
+    amountToAddress.filter { it.first > ZERO }
+      .forEach { (amount, address) -> appendLine("txnoutput id:$txnId amount:${amount.toPlainString()} tokenid:$tokenId address:$address;") }
     append("txnsign id:$txnId publickey:$myKey;")
   }
   
-  MDS.cmd(txncreator)!!.jsonArray
+  cmd(txncreator)!!.jsonArray
   return txnId
 }
 
@@ -86,8 +88,8 @@ suspend fun Channel.send(amount: BigDecimal): Pair<Pair<String, Int>, Pair<Strin
     appendLine("txncreate id:$settleTxnId;")
     appendLine("txninput id:$settleTxnId address:${input.address} amount:${input.amount} tokenid:${input.tokenId} floating:true;")
     appendLine("txnstate id:$settleTxnId port:99 value:${sequenceNumber + 1};")
-    if(my.balance - amount > BigDecimal.ZERO) appendLine("txnoutput id:$settleTxnId amount:${(my.balance - amount).toPlainString()} tokenid:${input.tokenId} address:${my.address};")
-    if(their.balance + amount > BigDecimal.ZERO) appendLine("txnoutput id:$settleTxnId amount:${(their.balance + amount).toPlainString()} tokenid:${input.tokenId} address:${their.address};")
+    if(my.balance - amount > ZERO) appendLine("txnoutput id:$settleTxnId amount:${(my.balance - amount).toPlainString()} tokenid:${input.tokenId} address:${my.address};")
+    if(their.balance + amount > ZERO) appendLine("txnoutput id:$settleTxnId amount:${(their.balance + amount).toPlainString()} tokenid:${input.tokenId} address:${their.address};")
     appendLine("txnsign id:$settleTxnId publickey:${my.keys.settle};")
     append("txnexport id:$settleTxnId;")
   }
@@ -96,7 +98,7 @@ suspend fun Channel.send(amount: BigDecimal): Pair<Pair<String, Int>, Pair<Strin
   publish(
     channelKey(their.keys, tokenId),
     listOf(
-      if(amount > BigDecimal.ZERO) "TXN_UPDATE" else "TXN_REQUEST",
+      if(amount > ZERO) "TXN_UPDATE" else "TXN_REQUEST",
       updateTxn,
       settleTxn
     ).joinToString(";").also {
@@ -126,13 +128,10 @@ suspend fun Channel.acceptRequest(updateTxId: Int, settleTxId: Int, sequenceNumb
 suspend fun Channel.update(updateTxText: String, settleTxText: String, settleTx: Transaction, onSuccess: (Channel) -> Unit): Channel {
   val sequenceNumber = settleTx.state.find { it.port == 99 }?.data?.toInt()!!
   val outputs = settleTx.outputs
-  val myBalance = outputs.find { it.address == my.address }?.tokenAmount
-  val theirBalance = outputs.find { it.address == their.address }?.tokenAmount
+  val myBalance = outputs.find { it.address == my.address }?.tokenAmount ?: ZERO
+  val theirBalance = outputs.find { it.address == their.address }?.tokenAmount ?: ZERO
   
-  return if (myBalance == null || theirBalance == null) {
-    log("balance for my address ${my.address}: $myBalance, balance for their address ${their.address}: $theirBalance")
-    this
-  } else updateChannel(this, myBalance to theirBalance, sequenceNumber, updateTxText, settleTxText).also{
+  return updateChannel(this, myBalance to theirBalance, sequenceNumber, updateTxText, settleTxText).also{
     onSuccess(it)
   }
 }
@@ -153,4 +152,8 @@ suspend fun Channel.completeSettlement(): Channel {
   val response = importAndPost(settlementTx)
   return if (response == null) this
   else updateChannelStatus(this, "SETTLED")
+}
+
+suspend fun Channel.delete(): Channel {
+  return updateChannelStatus(this, "DELETED")
 }

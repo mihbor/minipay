@@ -8,8 +8,12 @@ import externals.QrScanner
 import kotlinx.browser.document
 import kotlinx.coroutines.launch
 import logic.FundChannelEvent.*
+import logic.eltooScriptAddress
 import logic.fundChannel
+import logic.multisigScriptAddress
+import logic.multisigScriptBalances
 import ltd.mbor.minimak.Balance
+import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.Token
 import ltd.mbor.minipay.common.Channel
 import ltd.mbor.minipay.common.newKeys
@@ -45,12 +49,17 @@ fun FundChannel(
   var channel by remember { mutableStateOf<Channel?>(null) }
   
   LaunchedEffect("fundChannel") {
-    newKeys(3).apply {
+    MDS.newKeys(3).apply {
       myKeys = Channel.Keys(this[0], this[1], this[2])
+      multisigScriptAddress = ""
+      eltooScriptAddress = ""
     }
     fundingTxStatus = ""
     triggerTxStatus = ""
     settlementTxStatus = ""
+    multisigScriptAddress = ""
+    eltooScriptAddress = ""
+    multisigScriptBalances.clear()
   }
   Br()
   if (progressStep > 0) {
@@ -195,16 +204,18 @@ fun FundChannel(
       Text("Initiate!")
     }
   }
-  Br()
-  Button({
-    onClick {
-      showFundScanner = !showFundScanner
+  if (progressStep == 0) {
+    Br()
+    Button({
+      onClick {
+        showFundScanner = !showFundScanner
+      }
+      style {
+        if (showFundScanner) border(style = LineStyle.Inset)
+      }
+    }) {
+      Text("Scan QR code")
     }
-    style {
-      if (showFundScanner) border(style = LineStyle.Inset)
-    }
-  }) {
-    Text("Scan QR code")
   }
   Br()
   if (showFundScanner) {

@@ -1,6 +1,7 @@
 package logic
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.browser.window
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
@@ -42,10 +43,11 @@ suspend fun fundChannel(
       MDS.importTx(updateTxId, updateTxText)
       val settleTxId = newTxId()
       val settleTx = MDS.importTx(settleTxId, settleTxText)
-      val channelBalance = settleTx.outputs.first{ it.address == channel.my.address }.tokenAmount to settleTx.outputs.first{ it.address == channel.their.address }.tokenAmount
+      val channelBalance = (settleTx.outputs.firstOrNull{ it.address == channel.my.address }?.tokenAmount ?: ZERO) to
+        (settleTx.outputs.firstOrNull{ it.address == channel.their.address }?.tokenAmount ?: ZERO)
       val newSequenceNumber = settleTx.state.first { it.port == 99 }.data.toInt()
       if (newSequenceNumber > channel.sequenceNumber) {
-        events += PaymentRequestSent(
+        events += PaymentRequestReceived(
           channel,
           updateTxId,
           settleTxId,
@@ -56,7 +58,8 @@ suspend fun fundChannel(
       } else log("Stale update $newSequenceNumber received for channel ${channel.id} at ${channel.sequenceNumber}")
     } else {
       val (triggerTx, settlementTx, fundingTx) = splits
-      val (theirInputCoins, theirInputScripts) = splits.subList(3, splits.size).let{ it.takeUnless { it.isEmpty() }?.chunked(it.size/2) ?: listOf(emptyList(), emptyList()) }
+      val (theirInputCoins, theirInputScripts) = splits.subList(3, splits.size)
+        .let{ it.takeUnless { it.isEmpty() }?.chunked(it.size/2) ?: listOf(emptyList(), emptyList()) }
       event(SIGS_RECEIVED, channel)
       channel = channel.commitFund("auto", tokenId, myAmount, triggerTx, settlementTx, fundingTx, theirInputCoins, theirInputScripts)
       event(CHANNEL_FUNDED, channel)
@@ -98,10 +101,10 @@ suspend fun prepareFundChannel(
   val fundingTxId = fundingTx(myAmount, tokenId)
   event(FUNDING_TX_CREATED, null)
   
-  val triggerTxId = signFloatingTx(myKeys.trigger, multisigScriptAddress, mapOf(99 to "0"), tokenId, myAmount+theirAmount to eltooScriptAddress)
+  val triggerTxId = MDS.signFloatingTx(myKeys.trigger, multisigScriptAddress, tokenId, mapOf(99 to "0"), myAmount+theirAmount to eltooScriptAddress)
   event(TRIGGER_TX_SIGNED, null)
   
-  val settlementTxId = signFloatingTx(myKeys.settle, eltooScriptAddress, mapOf(99 to "0"), tokenId, myAmount to myAddress, theirAmount to theirAddress)
+  val settlementTxId = MDS.signFloatingTx(myKeys.settle, eltooScriptAddress, tokenId, mapOf(99 to "0"), myAmount to myAddress, theirAmount to theirAddress)
   event(SETTLEMENT_TX_SIGNED, null)
   
   val signedTriggerTx = MDS.exportTx(triggerTxId)
