@@ -22,7 +22,7 @@ ENDIF
 
 fun channelKey(keys: Channel.Keys, tokenId: String) = listOf(keys.trigger, keys.update, keys.settle, tokenId).joinToString(";")
 
-suspend fun MDSInterface.newKeys(count: Int): List<String> {
+suspend fun MdsApi.newKeys(count: Int): List<String> {
   val command = List(count) { "keys action:new;" }.joinToString("\n")
   return cmd(command)!!.jsonArray.map { it.jsonObject["response"]!!.jsonString("publickey") }
 }
@@ -47,7 +47,7 @@ suspend fun importAndPost(tx: String): JsonElement? {
 
 private fun <T> Array<T>.sumOf(function: (T) -> BigDecimal) = fold(ZERO) { acc, it -> acc + function(it) }
 
-suspend fun MDSInterface.signFloatingTx(
+suspend fun MdsApi.signFloatingTx(
   myKey: String,
   sourceScriptAddress: String,
   tokenId: String,

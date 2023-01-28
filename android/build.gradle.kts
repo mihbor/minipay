@@ -47,4 +47,13 @@ android {
   composeOptions {
     kotlinCompilerExtensionVersion = "1.3.2"
   }
+  
+  buildTypes {
+    getByName("debug") {
+      compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+      }
+    }
+  }
 }

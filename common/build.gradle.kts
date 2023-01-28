@@ -1,8 +1,8 @@
 plugins {
   kotlin("multiplatform")
+  kotlin("plugin.serialization")
   id("org.jetbrains.compose")
   id("com.android.library")
-  kotlin("plugin.serialization") version "1.6.10"
 }
 
 kotlin {
@@ -23,7 +23,7 @@ kotlin {
         
         api("dev.gitlive:firebase-firestore:1.6.2")
 
-        api("ltd.mbor:minimak:0.3-SNAPSHOT")
+        api("ltd.mbor:minimak:0.3")
       }
     }
     val commonTest by getting {

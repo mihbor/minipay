@@ -22,7 +22,7 @@ var blockNumber by mutableStateOf(0)
 
 suspend fun initMDS(uid: String, host: String, port: Int) {
   inited = false
-  MDS.init(uid, host, port) { msg ->
+  MDS.init(uid, host, port, logging = true) { msg ->
     when(msg.jsonObject["event"]?.jsonPrimitive?.content) {
       "inited" -> {
         if (MDS.logging) Log.i(TAG, "Connected to Minima.")

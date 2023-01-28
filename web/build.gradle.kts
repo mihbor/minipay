@@ -1,7 +1,7 @@
 plugins {
   kotlin("multiplatform")
-  kotlin("plugin.serialization") version "1.6.10"
-  id("org.jetbrains.compose") version composeVersion
+  kotlin("plugin.serialization")
+  id("org.jetbrains.compose")
 }
 base {
   archivesName.set("minipay")

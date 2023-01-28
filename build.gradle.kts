@@ -1,6 +1,6 @@
 allprojects {
   group = "ltd.mbor"
-  version = "0.2.2"
+  version = "0.2.3"
 
   repositories {
     google()
@@ -16,11 +16,12 @@ allprojects {
 }
 
 plugins {
-  kotlin("multiplatform") apply false
-  kotlin("android") apply false
-  id("com.android.application") apply false
-  id("com.android.library") apply false
-  id("org.jetbrains.compose") apply false
+  kotlin("multiplatform") version kotlinVersion apply false
+  kotlin("plugin.serialization") version kotlinVersion apply false
+  kotlin("android") version kotlinVersion apply false
+  id("com.android.application") version agpVversion apply false
+  id("com.android.library") version agpVversion apply false
+  id("org.jetbrains.compose") version composeVersion apply false
 }
 
 tasks.register<Copy>("copyApk") {
