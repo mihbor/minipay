@@ -3,10 +3,9 @@ package ltd.mbor.minipay.common
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ONE
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.coroutines.test.runTest
+import ltd.mbor.minipay.common.resources.importAndPostError
 import ltd.mbor.minipay.common.resources.three_new_keys
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
+import kotlin.test.*
 
 class ChannelsTest {
   @Test
@@ -49,5 +48,20 @@ class ChannelsTest {
     mds.signFloatingTx(myKey, sourceAddress, tokenId, states = emptyMap(), amountToAddress1, amountToAddress2)
     //then
     assertFalse(mds.capturedCommands.first().contains("nothing"))
+  }
+
+  @Test
+  fun importAndPost_throws_on_error() = runTest {
+    //given
+    val mds = SimulatedMDS().willReturn(importAndPostError)
+    //when
+    val (result, thrown) = try {
+      mds.importAndPost("tx data") to null
+    } catch (e: Throwable) {
+      null to e
+    }
+    //then
+    assertNull(result)
+    assertNotNull(thrown)
   }
 }

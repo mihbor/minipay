@@ -42,10 +42,24 @@ suspend fun signAndExportTx(id: Int, key: String): String {
   return MDS.exportTx(id)
 }
 
-suspend fun importAndPost(tx: String): JsonElement? {
+suspend fun MdsApi.importAndPost(tx: String): JsonElement {
   val txId = newTxId()
-  MDS.importTx(txId, tx)
-  return MDS.post(txId)
+  val txncreator = buildString{
+    appendLine("txncreate id:$txId;")
+    appendLine("txnimport id:$txId data:$tx;")
+    append("txnpost id:$txId auto:true;")
+  }
+  val lastCmd = cmd(txncreator)!!.jsonArray.last()
+  if (logging) log("importAndPost: ${lastCmd.jsonString("command")} ${lastCmd.jsonBoolean("status")}")
+  return lastCmd.throwOnError()
+}
+
+fun JsonElement.throwOnError(): JsonElement {
+  if (jsonBooleanOrNull("status") != true && !jsonStringOrNull("error").isNullOrBlank()) {
+    log(jsonString("error"))
+    throw MinimaException(jsonString("error"))
+  }
+  return this
 }
 
 private fun <T> Array<T>.sumOf(function: (T) -> BigDecimal) = fold(ZERO) { acc, it -> acc + function(it) }
@@ -140,23 +154,21 @@ suspend fun Channel.update(updateTxText: String, settleTxText: String, settleTx:
 }
 
 suspend fun Channel.postUpdate(): Channel {
-  val response = importAndPost(updateTx)
-  return if (response == null) this
-  else updateChannelStatus(this, "UPDATED")
+  MDS.importAndPost(updateTx)
+  return updateChannelStatus(this, "UPDATED")
 }
 
 suspend fun Channel.triggerSettlement(): Channel {
-  val response = importAndPost(triggerTx)
-  return if (response == null) this
-  else updateChannelStatus(this, "TRIGGERED")
+  MDS.importAndPost(triggerTx)
+  return updateChannelStatus(this, "TRIGGERED")
 }
 
 suspend fun Channel.completeSettlement(): Channel {
-  val response = importAndPost(settlementTx)
-  return if (response == null) this
-  else updateChannelStatus(this, "SETTLED")
+  MDS.importAndPost(settlementTx)
+  return updateChannelStatus(this, "SETTLED")
 }
 
 suspend fun Channel.delete(): Channel {
   return updateChannelStatus(this, "DELETED")
 }
+

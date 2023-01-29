@@ -1,9 +1,11 @@
 package ui
 
 import androidx.compose.runtime.*
+import kotlinx.browser.window
 import kotlinx.coroutines.launch
 import logic.balances
 import ltd.mbor.minimak.Coin
+import ltd.mbor.minimak.MinimaException
 import ltd.mbor.minipay.common.Channel
 import ltd.mbor.minipay.common.completeSettlement
 import ltd.mbor.minipay.common.postUpdate
@@ -26,7 +28,11 @@ fun Settlement(channel: Channel, blockNumber: Int, eltooScriptCoins: List<Coin>,
       onClick {
         settlementTriggering = true
         scope.launch {
-          updateChannel(channel.triggerSettlement())
+          try {
+            updateChannel(channel.triggerSettlement())
+          } catch(e: MinimaException) {
+            e.message?.let(window::alert)
+          }
           settlementTriggering = false
         }
       }
@@ -49,7 +55,11 @@ fun Settlement(channel: Channel, blockNumber: Int, eltooScriptCoins: List<Coin>,
         onClick {
           updatePosting = true
           scope.launch {
-            updateChannel(channel.postUpdate())
+            try {
+              updateChannel(channel.postUpdate())
+            } catch(e: MinimaException) {
+              e.message?.let(window::alert)
+            }
             updatePosting = false
           }
         }
@@ -64,7 +74,11 @@ fun Settlement(channel: Channel, blockNumber: Int, eltooScriptCoins: List<Coin>,
         onClick {
           settlementCompleting = true
           scope.launch {
+            try {
             updateChannel(channel.completeSettlement())
+            } catch(e: MinimaException) {
+              e.message?.let(window::alert)
+            }
             settlementCompleting = false
           }
         }

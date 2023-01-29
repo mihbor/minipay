@@ -1,14 +1,18 @@
 package ltd.mbor.minipay.ui
 
 import android.util.Log
+import android.widget.Toast
+import android.widget.Toast.LENGTH_LONG
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Coin
+import ltd.mbor.minimak.MinimaException
 import ltd.mbor.minipay.TAG
 import ltd.mbor.minipay.common.Channel
 import ltd.mbor.minipay.common.completeSettlement
@@ -22,7 +26,8 @@ import ltd.mbor.minipay.ui.theme.MiniPayTheme
 
 @Composable
 fun Settlement(channel: Channel, blockNumber: Int, eltooScriptCoins: List<Coin>, updateChannel: (Channel) -> Unit) {
-
+  
+  val context = LocalContext.current
   var settlementTriggering by remember { mutableStateOf(false) }
   var updatePosting by remember { mutableStateOf(false) }
   var settlementCompleting by remember { mutableStateOf(false) }
@@ -33,7 +38,11 @@ fun Settlement(channel: Channel, blockNumber: Int, eltooScriptCoins: List<Coin>,
       onClick = {
         settlementTriggering = true
         scope.launch {
-          updateChannel(channel.triggerSettlement())
+          try {
+            updateChannel(channel.triggerSettlement())
+          } catch(e: MinimaException) {
+            e.message?.let{ Toast.makeText(context, it, LENGTH_LONG).show() }
+          }
           settlementTriggering = false
         }
       },
@@ -54,7 +63,11 @@ fun Settlement(channel: Channel, blockNumber: Int, eltooScriptCoins: List<Coin>,
         onClick = {
           updatePosting = true
           scope.launch {
-            updateChannel(channel.postUpdate())
+            try {
+              updateChannel(channel.postUpdate())
+            } catch(e: MinimaException) {
+              e.message?.let{ Toast.makeText(context, it, LENGTH_LONG).show() }
+            }
             updatePosting = false
           }
         },
@@ -69,7 +82,11 @@ fun Settlement(channel: Channel, blockNumber: Int, eltooScriptCoins: List<Coin>,
         onClick = {
           settlementCompleting = true
           scope.launch {
-            updateChannel(channel.completeSettlement())
+            try {
+              updateChannel(channel.completeSettlement())
+            } catch(e: MinimaException) {
+              e.message?.let{ Toast.makeText(context, it, LENGTH_LONG).show() }
+            }
             settlementCompleting = false
           }
         }
