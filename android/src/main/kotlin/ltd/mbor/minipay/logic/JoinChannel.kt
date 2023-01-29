@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.datetime.Clock
 import ltd.mbor.minimak.*
 import ltd.mbor.minipay.common.*
+import ltd.mbor.minipay.common.storage.insertChannel
 import ltd.mbor.minipay.logic.JoinChannelEvent.*
 import ltd.mbor.minipay.scope
 import ltd.mbor.minipay.view
@@ -81,18 +82,18 @@ suspend fun joinChannel(
   multisigScriptAddress = MDS.newScript(triggerScript(theirKeys.trigger, myKeys.trigger)).address
   eltooScriptAddress = MDS.newScript(eltooScript(timeLock, theirKeys.update, myKeys.update, theirKeys.settle, myKeys.settle)).address
   event(SCRIPTS_DEPLOYED, null)
-  
+
   val triggerTxId = newTxId()
   MDS.importTx(triggerTxId, triggerTx)
   val signedTriggerTx = signAndExportTx(triggerTxId, myKeys.trigger)
   event(TRIGGER_TX_SIGNED, null)
-  
+
   val settlementTxId = newTxId()
   val importedSettlementTx = MDS.importTx(settlementTxId, settlementTx)
   val theirAddress = importedSettlementTx.outputs.first().address
   val signedSettlementTx = signAndExportTx(settlementTxId, myKeys.settle)
   event(SETTLEMENT_TX_SIGNED, null)
-  
+
   val fundingTxId = newTxId()
   val importedFundingTx = MDS.importTx(fundingTxId, fundingTx)
   val theirAmount = importedFundingTx.inputs.filter { it.tokenId == tokenId }.sumOf { it.tokenAmount } -
@@ -113,7 +114,7 @@ suspend fun joinChannel(
     MDS.cmd("txnoutput id:$fundingTxId amount:${theirAmount.toPlainString()} tokenid:$tokenId address:$multisigScriptAddress;")
     Pair(signAndExportTx(fundingTxId, "auto"), emptyList())
   }
-  
+
   val channelId = insertChannel(tokenId, myAmount, theirAmount, myKeys, theirKeys, signedTriggerTx, signedSettlementTx, timeLock, multisigScriptAddress, eltooScriptAddress, myAddress, theirAddress)
   val channel = Channel(
     id = channelId,
@@ -134,6 +135,7 @@ suspend fun joinChannel(
     settlementTx = signedSettlementTx,
     timeLock = timeLock,
     eltooAddress = eltooScriptAddress,
+    multiSigAddress = multisigScriptAddress,
     updatedAt = Clock.System.now()
   )
   event(CHANNEL_PERSISTED, channel)

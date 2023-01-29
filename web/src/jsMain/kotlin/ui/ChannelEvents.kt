@@ -1,13 +1,17 @@
 package ui
 
 import androidx.compose.runtime.Composable
+import logic.ChannelEvent
 import logic.PaymentRequestReceived
 import logic.PaymentRequestSent
-import logic.events
+import ltd.mbor.minimak.Token
 import org.jetbrains.compose.web.dom.Div
 
 @Composable
-fun ChannelEvents() {
+fun ChannelEvents(
+  events: MutableList<ChannelEvent>,
+  tokens: Map<String, Token>,
+) {
   events.reversed().forEach {
     Div({ classes(StyleSheets.container) }) {
       when (it) {
@@ -16,7 +20,8 @@ fun ChannelEvents() {
           it.updateTxId,
           it.settleTxId,
           it.sequenceNumber,
-          it.channelBalance
+          it.channelBalance,
+          tokens
         ) {
           events -= it
         }

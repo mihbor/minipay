@@ -24,8 +24,8 @@ import kotlinx.coroutines.launch
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.getAddress
 import ltd.mbor.minimak.importTx
-import ltd.mbor.minipay.common.getChannel
 import ltd.mbor.minipay.common.newTxId
+import ltd.mbor.minipay.common.storage.getChannel
 import ltd.mbor.minipay.logic.PaymentRequestReceived
 import ltd.mbor.minipay.logic.channelUpdateAck
 import ltd.mbor.minipay.logic.events

@@ -6,6 +6,9 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import ltd.mbor.minimak.*
+import ltd.mbor.minipay.common.storage.getChannels
+import ltd.mbor.minipay.common.storage.updateChannel
+import ltd.mbor.minipay.common.storage.updateChannelStatus
 
 fun triggerScript(triggerSig1: String, triggerSig2: String) =
   "RETURN MULTISIG(2 $triggerSig1 $triggerSig2)"
@@ -116,12 +119,12 @@ suspend fun Channel.acceptRequest(updateTxId: Int, settleTxId: Int, sequenceNumb
 //
 //  val outputs = settleTxId.first.outputs
 //  val channelBalance = outputs.find { it.address == my.address }!!.amount to outputs.find { it.address == their.address }!!.amount
-  
+
   val signedUpdateTx = signAndExportTx(updateTxId, my.keys.update)
   val signedSettleTx = signAndExportTx(settleTxId, my.keys.settle)
-  
+
   updateChannel(this, channelBalance, sequenceNumber, signedUpdateTx, signedSettleTx)
-  
+
   return signedUpdateTx to signedSettleTx
 }
 
@@ -130,7 +133,7 @@ suspend fun Channel.update(updateTxText: String, settleTxText: String, settleTx:
   val outputs = settleTx.outputs
   val myBalance = outputs.find { it.address == my.address }?.tokenAmount ?: ZERO
   val theirBalance = outputs.find { it.address == their.address }?.tokenAmount ?: ZERO
-  
+
   return updateChannel(this, myBalance to theirBalance, sequenceNumber, updateTxText, settleTxText).also{
     onSuccess(it)
   }

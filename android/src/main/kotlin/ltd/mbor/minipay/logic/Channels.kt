@@ -3,6 +3,7 @@ package ltd.mbor.minipay.logic
 import androidx.compose.runtime.*
 import ltd.mbor.minimak.*
 import ltd.mbor.minipay.common.*
+import ltd.mbor.minipay.common.storage.getChannel
 
 val channels = mutableStateListOf<Channel>()
 var multisigScriptAddress by mutableStateOf("")
@@ -40,19 +41,6 @@ suspend fun channelUpdateAck(updateTxText: String, settleTxText: String) {
   }
 }
 
-suspend fun MutableList<Channel>.reload() {
-  val newChannels = getChannels().map { channel ->
-    val eltooCoins = MDS.getCoins(address = channel.eltooAddress)
-    eltooScriptCoins[channel.eltooAddress] = eltooCoins
-    if (channel.status == "OPEN" && eltooCoins.isNotEmpty()) updateChannelStatus(channel, "TRIGGERED")
-    else if (channel.status in listOf("TRIGGERED", "UPDATED") && eltooCoins.isEmpty()) {
-      val anyTransactionsFromEltoo = MDS.getTransactions(channel.eltooAddress)
-        ?.any{ it.inputs.any { it.address == channel.eltooAddress } } ?: false
-      if (anyTransactionsFromEltoo) updateChannelStatus(channel, "SETTLED")
-      else channel
-    }
-    else channel
-  }
-  clear()
-  addAll(newChannels)
+suspend fun MutableList<Channel>.reload(eltooScriptCoins: MutableMap<String, List<Coin>>) {
+  channelService.reloadChannels(this, eltooScriptCoins)
 }

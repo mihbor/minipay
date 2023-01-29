@@ -9,6 +9,7 @@ import kotlinx.datetime.Clock
 import logic.JoinChannelEvent.*
 import ltd.mbor.minimak.*
 import ltd.mbor.minipay.common.*
+import ltd.mbor.minipay.common.storage.insertChannel
 import scope
 import view
 
@@ -134,6 +135,7 @@ suspend fun joinChannel(
     settlementTx = signedSettlementTx,
     timeLock = timeLock,
     eltooAddress = eltooScriptAddress,
+    multiSigAddress = multisigScriptAddress,
     updatedAt = Clock.System.now()
   )
   event(CHANNEL_PERSISTED, channel)

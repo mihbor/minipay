@@ -9,6 +9,8 @@ import kotlinx.datetime.Clock
 import kotlinx.serialization.json.jsonArray
 import ltd.mbor.minimak.*
 import ltd.mbor.minipay.common.*
+import ltd.mbor.minipay.common.storage.insertChannel
+import ltd.mbor.minipay.common.storage.updateChannel
 import ltd.mbor.minipay.logic.FundChannelEvent.*
 import ltd.mbor.minipay.scope
 import ltd.mbor.minipay.view
@@ -61,7 +63,7 @@ suspend fun fundChannel(
       val (theirInputCoins, theirInputScripts) = splits.subList(3, splits.size)
         .let{ it.takeUnless { it.isEmpty() }?.chunked(it.size/2) ?: listOf(emptyList(), emptyList()) }
       event(SIGS_RECEIVED, channel)
-      channel = channel.commitFund("auto", tokenId, myAmount, triggerTx, settlementTx, fundingTx, theirInputCoins, theirInputScripts)
+      channel = channel.commitFund("auto", triggerTx, settlementTx, fundingTx, theirInputCoins, theirInputScripts)
       event(CHANNEL_FUNDED, channel)
     }
   }.onCompletion {
@@ -97,20 +99,20 @@ suspend fun prepareFundChannel(
   multisigScriptAddress = MDS.newScript(triggerScript(myKeys.trigger, theirKeys.trigger)).address
   eltooScriptAddress = MDS.newScript(eltooScript(timeLock, myKeys.update, theirKeys.update, myKeys.settle, theirKeys.settle)).address
   event(SCRIPTS_DEPLOYED, null)
-  
+
   val fundingTxId = fundingTx(myAmount, tokenId)
   event(FUNDING_TX_CREATED, null)
-  
+
   val triggerTxId = MDS.signFloatingTx(myKeys.trigger, multisigScriptAddress, tokenId, mapOf(99 to "0"), myAmount+theirAmount to eltooScriptAddress)
   event(TRIGGER_TX_SIGNED, null)
-  
+
   val settlementTxId = MDS.signFloatingTx(myKeys.settle, eltooScriptAddress, tokenId, mapOf(99 to "0"), myAmount to myAddress, theirAmount to theirAddress)
   event(SETTLEMENT_TX_SIGNED, null)
-  
+
   val signedTriggerTx = MDS.exportTx(triggerTxId)
   val signedSettlementTx = MDS.exportTx(settlementTxId)
   val unsignedFundingTx = MDS.exportTx(fundingTxId)
-  
+
   val channelId = insertChannel(tokenId, myAmount, theirAmount, myKeys, theirKeys, signedTriggerTx, signedSettlementTx, timeLock, multisigScriptAddress, eltooScriptAddress, myAddress, theirAddress)
   val channel = Channel(
     id = channelId,
@@ -131,6 +133,7 @@ suspend fun prepareFundChannel(
     settlementTx = signedSettlementTx,
     timeLock = timeLock,
     eltooAddress = eltooScriptAddress,
+    multiSigAddress = multisigScriptAddress,
     updatedAt = Clock.System.now()
   )
   event(CHANNEL_PERSISTED, channel)
@@ -146,8 +149,6 @@ suspend fun prepareFundChannel(
 
 suspend fun Channel.commitFund(
   key: String,
-  tokenId: String,
-  myAmount: BigDecimal,
   triggerTx: String,
   settlementTx: String,
   fundingTx: String,
@@ -157,8 +158,7 @@ suspend fun Channel.commitFund(
   MDS.importTx(newTxId(), triggerTx)
   MDS.importTx(newTxId(), settlementTx)
   val fundingTxId = newTxId()
-  val theirBalance = MDS.importTx(fundingTxId, fundingTx).outputs
-    .find { it.address == multisigScriptAddress && it.tokenId == tokenId }!!.tokenAmount - myAmount
+  MDS.importTx(fundingTxId, fundingTx).outputs
   theirInputCoins.forEach { MDS.importCoin(it) }
   theirInputScripts.forEach { MDS.newScript(it) }
   MDS.logging=true
@@ -170,7 +170,7 @@ suspend fun Channel.commitFund(
   val result = MDS.cmd(txncreator)!!.jsonArray
   val status = result.find{ it.jsonString("command") == "txnpost" }!!.jsonString("status")
   log("txnpost status: $status")
-  
+
   return if (status.toBoolean()) {
     updateChannel(this, triggerTx, settlementTx)
   } else this

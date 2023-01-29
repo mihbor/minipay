@@ -26,8 +26,8 @@ fun main() {
       "Send" -> Send(balances)
       "Fund channel" -> FundChannel(balances, tokens)
       "Request channel" -> RequestChannel(balances, tokens)
-      "Channels" -> ChannelListing(channels)
-      "Channel events" -> ChannelEvents()
+      "Channels" -> ChannelListing(channels, eltooScriptCoins)
+      "Channel events" -> ChannelEvents(events, tokens)
       "Settings" -> Settings()
     }
   }

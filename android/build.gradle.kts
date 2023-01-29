@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
   id("org.jetbrains.compose")
   id("com.android.application")
@@ -38,22 +40,16 @@ android {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
   }
-  kotlinOptions {
-    jvmTarget = "11"
-  }
   buildFeatures {
     compose = true
   }
   composeOptions {
     kotlinCompilerExtensionVersion = "1.3.2"
   }
-  
-  buildTypes {
-    getByName("debug") {
-      compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-      }
-    }
+}
+
+tasks.withType<KotlinCompile>().configureEach {
+  kotlinOptions {
+    jvmTarget = "11"
   }
 }

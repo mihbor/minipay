@@ -1,5 +1,6 @@
 package ltd.mbor.minipay.ui.preview
 
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ONE
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.datetime.Instant
@@ -40,7 +41,8 @@ val fakeChannel = Channel(
   updateTx = "",
   settlementTx = "",
   timeLock = 10,
-  eltooAddress = "Mx123",
+  eltooAddress = "0x0123",
+  multiSigAddress = "0x2345",
   updatedAt = Instant.fromEpochMilliseconds(123)
 )
 
@@ -73,7 +75,8 @@ val fakeMinimaChannel = Channel(
   updateTx = "",
   settlementTx = "",
   timeLock = 10,
-  eltooAddress = "Mx123",
+  eltooAddress = "0x0123",
+  multiSigAddress = "0x2345",
   updatedAt = Instant.fromEpochMilliseconds(123)
 )
 
@@ -93,6 +96,8 @@ val fakeCoin = Coin(
 val fakeBalances = mapOf(
   "0x00" to Balance("0x00", JsonObject(mapOf("name" to JsonPrimitive("Minima"))), ONE, ONE, ZERO, ONE, "1")
 )
+
+val fakeEltooCoins = mutableMapOf("Mx999" to listOf(Coin(address = "", miniAddress = "", amount = BigDecimal.ONE, coinId = "", storeState = true, tokenId = "0x00", _created = "100", token = null, state = emptyList())))
 
 val previewBalances = listOf(
   Balance("0x00", JsonNull, ONE, ONE, ONE, ONE, "1"),

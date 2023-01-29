@@ -11,6 +11,8 @@ import kotlinx.serialization.json.jsonArray
 import logic.FundChannelEvent.*
 import ltd.mbor.minimak.*
 import ltd.mbor.minipay.common.*
+import ltd.mbor.minipay.common.storage.insertChannel
+import ltd.mbor.minipay.common.storage.updateChannel
 import scope
 import view
 
@@ -61,7 +63,7 @@ suspend fun fundChannel(
       val (theirInputCoins, theirInputScripts) = splits.subList(3, splits.size)
         .let{ it.takeUnless { it.isEmpty() }?.chunked(it.size/2) ?: listOf(emptyList(), emptyList()) }
       event(SIGS_RECEIVED, channel)
-      channel = channel.commitFund("auto", tokenId, myAmount, triggerTx, settlementTx, fundingTx, theirInputCoins, theirInputScripts)
+      channel = channel.commitFund("auto", triggerTx, settlementTx, fundingTx, theirInputCoins, theirInputScripts)
       event(CHANNEL_FUNDED, channel)
     }
   }.onCompletion {
@@ -131,6 +133,7 @@ suspend fun prepareFundChannel(
     settlementTx = signedSettlementTx,
     timeLock = timeLock,
     eltooAddress = eltooScriptAddress,
+    multiSigAddress = multisigScriptAddress,
     updatedAt = Clock.System.now()
   )
   event(CHANNEL_PERSISTED, channel)
@@ -146,8 +149,6 @@ suspend fun prepareFundChannel(
 
 suspend fun Channel.commitFund(
   key: String,
-  tokenId: String,
-  myAmount: BigDecimal,
   triggerTx: String,
   settlementTx: String,
   fundingTx: String,
@@ -158,8 +159,7 @@ suspend fun Channel.commitFund(
     MDS.importTx(newTxId(), triggerTx)
     MDS.importTx(newTxId(), settlementTx)
     val fundingTxId = newTxId()
-    val theirBalance = MDS.importTx(fundingTxId, fundingTx).outputs
-      .find { it.address == multisigScriptAddress && it.tokenId == tokenId }!!.tokenAmount - myAmount
+    MDS.importTx(fundingTxId, fundingTx).outputs
     theirInputCoins.forEach { MDS.importCoin(it) }
     theirInputScripts.forEach { MDS.newScript(it) }
     val txncreator = """

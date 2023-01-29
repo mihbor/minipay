@@ -3,7 +3,7 @@ package ltd.mbor.minipay.common
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ONE
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.coroutines.test.runTest
-import ltd.mbor.minipay.common.resources.keys
+import ltd.mbor.minipay.common.resources.three_new_keys
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -27,7 +27,7 @@ class ChannelsTest {
   @Test
   fun newKeys() = runTest {
     //given
-    val mds = SimulatedMDS.willReturn(keys.three_new_keys)
+    val mds = SimulatedMDS().willReturn(three_new_keys)
     //when
     val (first, second, third) = mds.newKeys(3)
     //then
@@ -44,7 +44,7 @@ class ChannelsTest {
     val tokenId = "0x00"
     val amountToAddress1 = ONE to "something"
     val amountToAddress2 = ZERO to "nothing"
-    val mds = SimulatedMDS.willReturn("[]")
+    val mds = SimulatedMDS().willReturn("[]")
     //when
     mds.signFloatingTx(myKey, sourceAddress, tokenId, states = emptyMap(), amountToAddress1, amountToAddress2)
     //then

@@ -15,6 +15,7 @@ data class Channel(
   val settlementTx: String,
   val timeLock: Int,
   val eltooAddress: String,
+  val multiSigAddress: String,
   val updatedAt: Instant
 ) {
   data class Side(

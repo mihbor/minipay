@@ -15,7 +15,11 @@ import ltd.mbor.minipay.ui.preview.previewTokens
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
 
 @Composable
-fun ChannelEvents(events: MutableList<ChannelEvent>, tokens: Map<String, Token>, activity: MainActivity?) {
+fun ChannelEvents(
+  events: MutableList<ChannelEvent>,
+  tokens: Map<String, Token>,
+  activity: MainActivity?
+) {
   LazyColumn {
     items(events) {
       when {

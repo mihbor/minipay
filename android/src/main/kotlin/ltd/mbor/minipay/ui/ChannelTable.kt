@@ -13,7 +13,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Coin
@@ -23,6 +22,7 @@ import ltd.mbor.minipay.logic.reload
 import ltd.mbor.minipay.scope
 import ltd.mbor.minipay.ui.preview.fakeBalances
 import ltd.mbor.minipay.ui.preview.fakeChannel
+import ltd.mbor.minipay.ui.preview.fakeEltooCoins
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -30,7 +30,7 @@ import ltd.mbor.minipay.ui.theme.MiniPayTheme
 fun ChannelTable(
   channels: MutableList<Channel>,
   balances: Map<String, Balance>,
-  eltooScriptCoins: Map<String, List<Coin>>,
+  eltooScriptCoins: MutableMap<String, List<Coin>>,
   activity: MainActivity?,
 ) {
   ProvideTextStyle(value = TextStyle(fontSize = 10.sp, textAlign = TextAlign.Right)) {
@@ -66,7 +66,7 @@ fun ChannelTable(
         }
         if (showActions) {
           ChannelActions(channel, eltooScriptCoins, activity) {
-            scope.launch { channels.reload() }
+            scope.launch { channels.reload(eltooScriptCoins) }
           }
         }
       }
@@ -81,7 +81,7 @@ fun PreviewChannelTable() {
       ChannelTable(
         mutableListOf(fakeChannel, fakeChannel.copy(status = "TRIGGERED", eltooAddress = "Mx999", sequenceNumber = 3, updateTx = "abc")),
         fakeBalances,
-        mapOf("Mx999" to listOf(Coin(address = "", miniAddress = "", amount = BigDecimal.ONE, coinId = "", storeState = true, tokenId = "0x00", _created = "100", token = null, state = emptyList()))),
+        fakeEltooCoins,
         null
       )
     }

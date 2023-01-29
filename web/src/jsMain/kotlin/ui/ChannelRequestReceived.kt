@@ -3,6 +3,7 @@ package ui
 import androidx.compose.runtime.*
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.coroutines.launch
+import ltd.mbor.minimak.Token
 import ltd.mbor.minipay.common.Channel
 import ltd.mbor.minipay.common.acceptRequest
 import ltd.mbor.minipay.common.channelKey
@@ -19,12 +20,13 @@ fun ChannelRequestReceived(
   settleTxId: Int,
   sequenceNumber: Int,
   channelBalance: Pair<BigDecimal, BigDecimal>,
+  tokens: Map<String, Token>,
   dismiss: () -> Unit
 ) {
   var preparingResponse by remember { mutableStateOf(false) }
   val balanceChange = channel.my.balance - channelBalance.first
-  
-  Text("Request received to send ${balanceChange.toPlainString()} Minima over channel ${channel.id}")
+
+  Text("Request received to send ${balanceChange.toPlainString()} ${tokens[channel.tokenId]?.name ?: "[${channel.tokenId}]"} over channel ${channel.id}")
   Button({
     onClick {
       dismiss()

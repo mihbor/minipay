@@ -10,9 +10,44 @@ import kotlinx.serialization.json.jsonObject
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.jsonString
 
-suspend fun createDB() {
-  MDS.sql(//"""DROP TABLE IF EXISTS channel;
-    """CREATE TABLE IF NOT EXISTS channel(
+interface ChannelStorage{
+  suspend fun createDB()
+  suspend fun getChannel(eltooAddress: String): Channel?
+  suspend fun getChannels(status: String? = null): List<Channel>
+  suspend fun updateChannelStatus(channel: Channel, status: String): Channel
+  suspend fun setChannelOpen(multisigAddress: String)
+  suspend fun updateChannel(
+    channel: Channel,
+    triggerTx: String,
+    settlementTx: String
+  ): Channel
+  suspend fun updateChannel(
+    channel: Channel,
+    channelBalance: Pair<BigDecimal, BigDecimal>,
+    sequenceNumber: Int,
+    updateTx: String,
+    settlementTx: String
+  ): Channel
+  suspend fun insertChannel(
+    tokenId: String,
+    myBalance: BigDecimal,
+    theirBalance: BigDecimal,
+    myKeys: Channel.Keys,
+    theirKeys: Channel.Keys,
+    signedTriggerTx: String,
+    signedSettlementTx: String,
+    timeLock: Int,
+    multisigScriptAddress: String,
+    eltooScriptAddress: String,
+    myAddress: String,
+    otherAddress: String
+  ): Int
+}
+
+object storage: ChannelStorage {
+  override suspend fun createDB() {
+    MDS.sql(//"""DROP TABLE IF EXISTS channel;
+      """CREATE TABLE IF NOT EXISTS channel(
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     created_at BIGINT NOT NULL,
     updated_at BIGINT NOT NULL,
@@ -35,21 +70,135 @@ suspend fun createDB() {
     settle_tx VARCHAR,
     multisig_address VARCHAR,
     eltoo_address VARCHAR
-  );""".trimMargin())
-}
+  );""".trimMargin()
+    )
+  }
 
-suspend fun getChannel(eltooAddress: String): Channel? {
-  val sql = MDS.sql("SELECT * FROM channel WHERE eltoo_address = '$eltooAddress';")?.jsonObject
-  val rows = sql?.get("rows")?.jsonArray ?: emptyList()
+  override suspend fun getChannel(eltooAddress: String): Channel? {
+    val sql = MDS.sql("SELECT * FROM channel WHERE eltoo_address = '$eltooAddress';")?.jsonObject
+    val rows = sql?.get("rows")?.jsonArray ?: emptyList()
+    
+    return rows.firstOrNull()?.jsonObject?.toChannel()
+  }
 
-  return rows.firstOrNull()?.jsonObject?.toChannel()
-}
+  override suspend fun getChannels(status: String?): List<Channel> {
+    val sql = MDS.sql("SELECT * FROM channel WHERE status ${status?.let { " = '$it'" } ?: " <> 'DELETED'"} ORDER BY id DESC;")!!
+    val rows = sql.jsonObject["rows"]?.jsonArray ?: emptyList()
+    
+    return rows.map { it.jsonObject }.map(JsonObject::toChannel)
+  }
 
-suspend fun getChannels(status: String? = null): List<Channel> {
-  val sql = MDS.sql("SELECT * FROM channel WHERE status ${status?.let { " = '$it'" } ?: " <> 'DELETED'"} ORDER BY id DESC;")!!
-  val rows = sql.jsonObject["rows"]?.jsonArray ?: emptyList()
+  override suspend fun updateChannelStatus(channel: Channel, status: String): Channel {
+    val now = Clock.System.now()
+    MDS.sql(
+      """UPDATE channel SET
+    status = '$status',
+    updated_at = ${now.toEpochMilliseconds()}
+    WHERE id = ${channel.id};
+  """
+    )
+    return channel.copy(status = status, updatedAt = now)
+  }
 
-  return rows.map{ it.jsonObject }.map(JsonObject::toChannel)
+  override suspend fun setChannelOpen(multisigAddress: String) {
+    val now = Clock.System.now()
+    MDS.sql(
+      """UPDATE channel SET
+    updated_at = ${now.toEpochMilliseconds()},
+    status = 'OPEN'
+    WHERE multisig_address = '$multisigAddress'
+    AND status = 'OFFERED';
+  """
+    )
+  }
+
+  override suspend fun insertChannel(
+    tokenId: String,
+    myBalance: BigDecimal,
+    theirBalance: BigDecimal,
+    myKeys: Channel.Keys,
+    theirKeys: Channel.Keys,
+    signedTriggerTx: String,
+    signedSettlementTx: String,
+    timeLock: Int,
+    multisigScriptAddress: String,
+    eltooScriptAddress: String,
+    myAddress: String,
+    otherAddress: String
+  ): Int {
+    val now = Clock.System.now()
+    MDS.sql(
+      """INSERT INTO channel(
+      status, sequence_number, token_id, my_balance, other_balance,
+      my_trigger_key, my_update_key, my_settle_key,
+      other_trigger_key, other_update_key, other_settle_key,
+      trigger_tx, update_tx, settle_tx, time_lock,
+      multisig_address, eltoo_address, my_address, other_address,
+      created_at, updated_at
+    ) VALUES (
+      'OFFERED', 0, '$tokenId', ${myBalance.toPlainString()}, ${theirBalance.toPlainString()},
+      '${myKeys.trigger}', '${myKeys.update}', '${myKeys.settle}',
+      '${theirKeys.trigger}', '${theirKeys.update}', '${theirKeys.settle}',
+      '$signedTriggerTx', '', '$signedSettlementTx', $timeLock,
+      '$multisigScriptAddress', '$eltooScriptAddress', '$myAddress', '$otherAddress',
+      ${now.toEpochMilliseconds()}, ${now.toEpochMilliseconds()}
+    );
+  """
+    )
+    val sql = MDS.sql("SELECT IDENTITY() as ID;")
+    val results = sql!!.jsonObject["rows"]!!.jsonArray
+    return results[0].jsonString("ID").toInt()
+  }
+
+  override suspend fun updateChannel(
+    channel: Channel,
+    channelBalance: Pair<BigDecimal, BigDecimal>,
+    sequenceNumber: Int,
+    updateTx: String,
+    settlementTx: String
+  ): Channel {
+    val now = Clock.System.now()
+    MDS.sql(
+      """UPDATE channel SET
+    my_balance = ${channelBalance.first.toPlainString()},
+    other_balance = ${channelBalance.second.toPlainString()},
+    sequence_number = $sequenceNumber,
+    update_tx = '$updateTx',
+    settle_tx = '$settlementTx',
+    updated_at = ${now.toEpochMilliseconds()}
+    WHERE id = ${channel.id};
+  """
+    )
+    return channel.copy(
+      my = channel.my.copy(balance = channelBalance.first),
+      their = channel.their.copy(balance = channelBalance.second),
+      sequenceNumber = sequenceNumber,
+      updateTx = updateTx,
+      settlementTx = settlementTx,
+      updatedAt = now
+    )
+  }
+
+  override suspend fun updateChannel(
+    channel: Channel,
+    triggerTx: String,
+    settlementTx: String
+  ): Channel {
+    val now = Clock.System.now()
+    MDS.sql(
+      """UPDATE channel SET
+    trigger_tx = '$triggerTx',
+    settle_tx = '$settlementTx',
+    updated_at = ${now.toEpochMilliseconds()}
+    WHERE id = ${channel.id};
+  """
+    )
+    return channel.copy(
+      triggerTx = triggerTx,
+      settlementTx = settlementTx,
+      updatedAt = now
+    )
+  }
 }
 
 private fun JsonObject.toChannel() = Channel(
@@ -80,107 +229,7 @@ private fun JsonObject.toChannel() = Channel(
   settlementTx = jsonString("SETTLE_TX"),
   timeLock = jsonString("TIME_LOCK").toInt(),
   eltooAddress = jsonString("ELTOO_ADDRESS"),
+  multiSigAddress = jsonString("MULTISIG_ADDRESS"),
   updatedAt = Instant.fromEpochMilliseconds(jsonString("UPDATED_AT").toLong())
 )
 
-suspend fun updateChannelStatus(channel: Channel, status: String): Channel {
-  val now = Clock.System.now()
-  MDS.sql("""UPDATE channel SET
-    status = '$status',
-    updated_at = ${now.toEpochMilliseconds()}
-    WHERE id = ${channel.id};
-  """)
-  return channel.copy(status = status, updatedAt = now)
-}
-
-suspend fun setChannelOpen(multisigAddress: String) {
-  val now = Clock.System.now()
-  MDS.sql("""UPDATE channel SET
-    updated_at = ${now.toEpochMilliseconds()},
-    status = 'OPEN'
-    WHERE multisig_address = '$multisigAddress'
-    AND status = 'OFFERED';
-  """)
-}
-
-suspend fun insertChannel(
-  tokenId: String,
-  myBalance: BigDecimal,
-  theirBalance: BigDecimal,
-  myKeys: Channel.Keys,
-  theirKeys: Channel.Keys,
-  signedTriggerTx: String,
-  signedSettlementTx: String,
-  timeLock: Int,
-  multisigScriptAddress: String,
-  eltooScriptAddress: String,
-  myAddress: String,
-  otherAddress: String
-): Int {
-  val now = Clock.System.now()
-  MDS.sql("""INSERT INTO channel(
-      status, sequence_number, token_id, my_balance, other_balance,
-      my_trigger_key, my_update_key, my_settle_key,
-      other_trigger_key, other_update_key, other_settle_key,
-      trigger_tx, update_tx, settle_tx, time_lock,
-      multisig_address, eltoo_address, my_address, other_address,
-      created_at, updated_at
-    ) VALUES (
-      'OFFERED', 0, '$tokenId', ${myBalance.toPlainString()}, ${theirBalance.toPlainString()},
-      '${myKeys.trigger}', '${myKeys.update}', '${myKeys.settle}',
-      '${theirKeys.trigger}', '${theirKeys.update}', '${theirKeys.settle}',
-      '$signedTriggerTx', '', '$signedSettlementTx', $timeLock,
-      '$multisigScriptAddress', '$eltooScriptAddress', '$myAddress', '$otherAddress',
-      ${now.toEpochMilliseconds()}, ${now.toEpochMilliseconds()}
-    );
-  """)
-  val sql = MDS.sql("SELECT IDENTITY() as ID;")
-  val results = sql!!.jsonObject["rows"]!!.jsonArray
-  return results[0].jsonString("ID").toInt()
-}
-
-suspend fun updateChannel(
-  channel: Channel,
-  channelBalance: Pair<BigDecimal, BigDecimal>,
-  sequenceNumber: Int,
-  updateTx: String,
-  settlementTx: String
-): Channel {
-  val now = Clock.System.now()
-  MDS.sql("""UPDATE channel SET
-    my_balance = ${channelBalance.first.toPlainString()},
-    other_balance = ${channelBalance.second.toPlainString()},
-    sequence_number = $sequenceNumber,
-    update_tx = '$updateTx',
-    settle_tx = '$settlementTx',
-    updated_at = ${now.toEpochMilliseconds()}
-    WHERE id = ${channel.id};
-  """)
-  return channel.copy(
-    my = channel.my.copy(balance = channelBalance.first),
-    their = channel.their.copy(balance = channelBalance.second),
-    sequenceNumber = sequenceNumber,
-    updateTx = updateTx,
-    settlementTx = settlementTx,
-    updatedAt = now
-  )
-}
-
-suspend fun updateChannel(
-  channel: Channel,
-  triggerTx: String,
-  settlementTx: String
-): Channel {
-  val now = Clock.System.now()
-  MDS.sql("""UPDATE channel SET
-    trigger_tx = '$triggerTx',
-    settle_tx = '$settlementTx',
-    updated_at = ${now.toEpochMilliseconds()}
-    WHERE id = ${channel.id};
-  """)
-  return channel.copy(
-    triggerTx = triggerTx,
-    settlementTx = settlementTx,
-    updatedAt = now
-  )
-}

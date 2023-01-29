@@ -1,11 +1,16 @@
 package ltd.mbor.minipay.common
 
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.encodeToJsonElement
+import ltd.mbor.minimak.Coin
 import ltd.mbor.minimak.MdsApi
+import ltd.mbor.minimak.Transaction
 import ltd.mbor.minimak.json
 
-object SimulatedMDS: MdsApi {
-  var payloads: MutableList<JsonElement?> = mutableListOf(null)
+class SimulatedMDS: MdsApi {
+  var payloads: MutableList<JsonElement?> = mutableListOf()
   var iterator = payloads.iterator()
   var capturedCommands = mutableListOf<String>()
   var capturedQueries = mutableListOf<String>()
@@ -16,8 +21,24 @@ object SimulatedMDS: MdsApi {
     return this
   }
   
-  fun then(payload: String?): SimulatedMDS {
-    payloads += payload?.let(json::parseToJsonElement)
+  fun willReturnCoins(coins: List<Coin>): SimulatedMDS {
+    payloads += JsonObject(mapOf("response" to json.encodeToJsonElement(coins)))
+    iterator = payloads.iterator()
+    return this
+  }
+  
+  fun willReturnTransactions(transactions: List<Transaction>): SimulatedMDS {
+    payloads += JsonObject(mapOf(
+      "response" to JsonArray(transactions.map {
+        JsonObject(mapOf(
+          "body" to JsonObject(mapOf(
+            "txn" to json.encodeToJsonElement(it)
+          )),
+          "header" to json.encodeToJsonElement(it.header)
+        ))
+      })
+    ))
+    iterator = payloads.iterator()
     return this
   }
   
