@@ -40,7 +40,7 @@ tasks["jsBrowserProductionExecutableDistributeResources"].dependsOn("updateDappV
 
 tasks.register<Zip>("minidappDistribution") {
   dependsOn("jsBrowserDistribution", "updateDappVersion")
-  archiveFileName.set("${rootProject.name}.mds.zip")
+  archiveFileName.set("${rootProject.name}-${project.version}.mds.zip")
   destinationDirectory.set(layout.buildDirectory.dir("minidapp"))
   from(layout.buildDirectory.dir("distributions"))
   exclude("*.LICENSE.txt")

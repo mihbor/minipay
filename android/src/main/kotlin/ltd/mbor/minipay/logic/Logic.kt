@@ -1,6 +1,8 @@
 package ltd.mbor.minipay
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -25,15 +27,20 @@ val balances = mutableStateMapOf<String, Balance>()
 val tokens = mutableStateMapOf<String, Token>()
 var blockNumber by mutableStateOf(0)
 
-suspend fun initMDS(uid: String, host: String, port: Int) {
+suspend fun initMDS(uid: String, host: String, port: Int, context: Context) {
   inited = false
   MDS.init(uid, host, port, logging = true) { msg ->
     when(msg.jsonObject["event"]?.jsonPrimitive?.content) {
       "inited" -> {
         if (MDS.logging) Log.i(TAG, "Connected to Minima.")
+        try {
+          blockNumber = MDS.getBlockNumber()
+        } catch (e: NullPointerException) {
+          Toast.makeText(context, "Error getting status. Wrong UID?", Toast.LENGTH_LONG).show()
+          return@init
+        }
         balances.putAll(MDS.getBalances(confirmations = 0).associateBy { it.tokenId })
         tokens.putAll(MDS.getTokens().associateBy { it.tokenId })
-        blockNumber = MDS.getBlockNumber()
         createDB()
         channels.addAll(getChannels(status = "OPEN"))
         channels.forEach { channel ->

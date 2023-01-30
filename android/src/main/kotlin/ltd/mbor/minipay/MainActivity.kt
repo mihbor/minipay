@@ -55,7 +55,7 @@ class MainActivity : ComponentActivity(), CardReader.DataCallback {
   fun init(uid: String, host: String = "localhost", port: Int = 9004) {
     this.uid = uid
     scope.launch {
-      initMDS(uid, host, port)
+      initMDS(uid, host, port, applicationContext)
     }
   }
 
