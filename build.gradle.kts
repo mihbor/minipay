@@ -1,6 +1,16 @@
+plugins {
+  kotlin("multiplatform") version kotlinVersion apply false
+  kotlin("plugin.serialization") version kotlinVersion apply false
+  kotlin("android") version kotlinVersion apply false
+  id("com.android.application") version agpVversion apply false
+  id("com.android.library") version agpVversion apply false
+  id("org.jetbrains.compose") version composeVersion apply false
+  id("org.jetbrains.kotlinx.kover") version "0.6.1" apply true
+}
+
 allprojects {
   group = "ltd.mbor"
-  version = "0.2.5-SNAPSHOT"
+  version = "0.2.5"
 
   repositories {
     google()
@@ -13,15 +23,10 @@ allprojects {
       }
     }
   }
-}
-
-plugins {
-  kotlin("multiplatform") version kotlinVersion apply false
-  kotlin("plugin.serialization") version kotlinVersion apply false
-  kotlin("android") version kotlinVersion apply false
-  id("com.android.application") version agpVversion apply false
-  id("com.android.library") version agpVversion apply false
-  id("org.jetbrains.compose") version composeVersion apply false
+  apply(plugin = "org.jetbrains.kotlinx.kover")
+  koverMerged {
+    enable()
+  }
 }
 
 tasks.register<Copy>("copyApk") {
@@ -37,3 +42,4 @@ tasks.register<Copy>("copyApk") {
 tasks.register("minidappWithApk") {
   dependsOn("copyApk", ":web:minidappDistribution")
 }
+
