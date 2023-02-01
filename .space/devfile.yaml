@@ -2,7 +2,7 @@ schemaVersion: 2.2.0
 attributes:
   space:
     editor:
-      type: Idea
+      type: Fleet
     requiredParameters:
     # (Required) the name of the environment variable
     # that will be available in the dev environment
