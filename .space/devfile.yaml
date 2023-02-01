@@ -1,0 +1,13 @@
+schemaVersion: 2.2.0
+attributes:
+  space:
+    editor:
+      type: Idea
+    requiredParameters:
+    # (Required) the name of the environment variable
+    # that will be available in the dev environment
+    - name: GITHUB_ACTOR
+      description: 'Space username'
+    requiredSecrets:
+    - name: GITHUB_TOKEN
+      description: 'Space permanent token'
