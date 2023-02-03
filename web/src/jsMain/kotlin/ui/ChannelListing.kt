@@ -52,7 +52,7 @@ fun ChannelListing(channels: MutableList<Channel>, eltooScriptCoins: MutableMap<
           Td{ Text(channel.sequenceNumber.toString()) }
           Td{
             TokenIcon(channel.tokenId, balances)
-            Text(balances[channel.tokenId]?.tokenName ?: "[${channel.tokenId}]")
+            Text(balances[channel.tokenId]?.tokenName ?: if(channel.tokenId == "0x00") "Minima" else "[${channel.tokenId.take(8)}...]")
           }
           Td{ Text(channel.my.balance.toPlainString()) }
           Td{ Text(channel.their.balance.toPlainString()) }

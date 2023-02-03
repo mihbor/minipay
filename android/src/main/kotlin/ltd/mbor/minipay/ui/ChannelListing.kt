@@ -53,7 +53,7 @@ fun PreviewChannelListing() {
   MiniPayTheme {
     Column {
       ChannelListing(
-        mutableListOf(fakeChannel, fakeChannel.copy(status = "TRIGGERED", eltooAddress = "Mx999", sequenceNumber = 3, updateTx = "abc")),
+        mutableListOf(fakeChannel, fakeChannel.copy(tokenId = "0x00", status = "TRIGGERED", eltooAddress = "Mx999", sequenceNumber = 3, updateTx = "abc")),
         fakeBalances,
         fakeEltooCoins,
         null

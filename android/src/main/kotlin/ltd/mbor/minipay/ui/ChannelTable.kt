@@ -51,7 +51,7 @@ fun ChannelTable(
           Text(channel.status, Modifier.width(60.dp))
           Text(channel.sequenceNumber.toString(), Modifier.width(50.dp))
           Row(Modifier.width(75.dp)) {
-            Text(balances[channel.tokenId]?.tokenName ?: "???", Modifier.width(60.dp))
+            Text(balances[channel.tokenId]?.tokenName ?: if(channel.tokenId == "0x00") "Minima" else "[${channel.tokenId.take(8)}...]", Modifier.width(60.dp))
             TokenIcon(channel.tokenId, balances, 15)
           }
           Text(channel.my.balance.toPlainString(), Modifier.width(50.dp))
@@ -79,8 +79,22 @@ fun PreviewChannelTable() {
   MiniPayTheme {
     Column {
       ChannelTable(
-        mutableListOf(fakeChannel, fakeChannel.copy(status = "TRIGGERED", eltooAddress = "Mx999", sequenceNumber = 3, updateTx = "abc")),
+        mutableListOf(fakeChannel, fakeChannel.copy(tokenId = "0x00", status = "TRIGGERED", eltooAddress = "Mx999", sequenceNumber = 3, updateTx = "abc")),
         fakeBalances,
+        fakeEltooCoins,
+        null
+      )
+    }
+  }
+}
+
+@Composable @Preview
+fun PreviewChannelTableNoBalances() {
+  MiniPayTheme {
+    Column {
+      ChannelTable(
+        mutableListOf(fakeChannel, fakeChannel.copy(tokenId = "0x00", status = "TRIGGERED", eltooAddress = "Mx999", sequenceNumber = 3, updateTx = "abc")),
+        emptyMap(),
         fakeEltooCoins,
         null
       )
