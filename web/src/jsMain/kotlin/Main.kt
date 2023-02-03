@@ -11,7 +11,7 @@ import ui.*
 val scope = MainScope()
 external fun require(module: String): dynamic
 
-var view by mutableStateOf("Settings")
+var view by mutableStateOf("MiniPay")
 
 fun main() {
   scope.launch {
@@ -22,6 +22,7 @@ fun main() {
     Style(StyleSheets)
     Menu(view) { view = it }
     when(view) {
+      "MiniPay" -> Welcome { view = it }
       "Receive" -> Receive(balances, tokens)
       "Send" -> Send(balances)
       "Fund channel" -> FundChannel(balances, tokens)

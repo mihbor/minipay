@@ -61,6 +61,7 @@ fun MainView(
     Menu(inited, showNavMenu, setView, startEmitting, stopEmitting) { showNavMenu = it }
     Column(Modifier.padding(it)) {
       when (view) {
+        "MiniPay" -> Welcome(inited, setView)
         "Settings" -> Settings(uid, setUid)
         "Receive" -> Receive(balances, tokens, address, setAddress, tokenId, setTokenId, amount, setAmount)
         "Send" -> Send(balances, address, setAddress, tokenId, setTokenId, amount, setAmount)
@@ -91,5 +92,12 @@ fun PreviewMainViewReceive() {
 fun PreviewMainViewChannels() {
   MiniPayTheme {
     MainView(true, "uid456", {}, previewBalances, previewTokens, "address", {}, BigDecimal.ONE, {}, "0x01234567890", {}, {}, {}, null, "Channels", {})
+  }
+}
+
+@Composable @Preview(showBackground = true)
+fun PreviewMainViewWelcome() {
+  MiniPayTheme {
+    MainView(false, "uid456", {}, previewBalances, previewTokens, "address", {}, BigDecimal.ONE, {}, "0x01234567890", {}, {}, {}, null, "MiniPay", {})
   }
 }

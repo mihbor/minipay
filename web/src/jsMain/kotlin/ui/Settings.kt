@@ -2,17 +2,20 @@ package ui
 
 import androidx.compose.runtime.Composable
 import logic.getParams
-import org.jetbrains.compose.web.dom.A
-import org.jetbrains.compose.web.dom.Br
-import org.jetbrains.compose.web.dom.Text
+import org.jetbrains.compose.web.dom.*
 
 @Composable
 fun Settings() {
   val uid = getParams("uid")
-  A("minipay.apk") {
-    Text("Download standalone Android app")
+  H2 {
+    Text("Download the native ")
+    A("minipay.apk") {
+      Text("Android app")
+    }
   }
-  Br()
+  H3 {
+    Text("Copy the UID from below and paste it in the Android app")
+  }
   Text("UID:")
   uid?.let {
     Br()

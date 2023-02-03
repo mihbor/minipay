@@ -18,9 +18,9 @@ fun Settings(uid: String, setUid: (String) -> Unit) {
     Text("MiniDApp UID:")
   }
   Row{
-    OutlinedTextField(value = uidInput,
+    OutlinedTextField(
+      value = uidInput,
       modifier = Modifier.fillMaxWidth(),
-      //        textStyle = TextStyle(fontSize = (16.sp)),
       onValueChange = { uidInput = it }
     )
   }
