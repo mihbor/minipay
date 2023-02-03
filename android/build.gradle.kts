@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
   id("org.jetbrains.compose")
   id("com.android.application")
@@ -26,13 +24,13 @@ base {
   archivesName.set("${rootProject.name}-$version")
 }
 android {
-  compileSdk = 33
+  compileSdk = androidCompileSdk
   namespace = "$group.${rootProject.name}"
   
   defaultConfig {
     applicationId = "$group.${rootProject.name}"
-    minSdk = 24
-    targetSdk = 33
+    minSdk = androidMinSdk
+    targetSdk = androidCompileSdk
     versionCode = 1
     versionName = "$version"
   }
@@ -45,11 +43,5 @@ android {
   }
   composeOptions {
     kotlinCompilerExtensionVersion = "1.3.2"
-  }
-}
-
-tasks.withType<KotlinCompile>().configureEach {
-  kotlinOptions {
-    jvmTarget = "11"
   }
 }

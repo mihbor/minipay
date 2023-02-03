@@ -42,10 +42,10 @@ kotlin {
 
 android {
   namespace = "ltd.mbor.minipay.common"
-  compileSdk = 33
+  compileSdk = androidCompileSdk
   defaultConfig {
-    minSdk = 24
-    targetSdk = 33
+    minSdk = androidMinSdk
+    targetSdk = androidCompileSdk
   }
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_11

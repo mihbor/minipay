@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
   kotlin("multiplatform") version kotlinVersion apply false
   kotlin("plugin.serialization") version kotlinVersion apply false
@@ -26,6 +28,12 @@ allprojects {
   apply(plugin = "org.jetbrains.kotlinx.kover")
   koverMerged {
     enable()
+  }
+  
+  tasks.withType<KotlinCompile>().configureEach {
+    kotlinOptions {
+      jvmTarget = "11"
+    }
   }
 }
 
