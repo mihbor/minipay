@@ -16,7 +16,7 @@ var view by mutableStateOf("Settings")
 fun main() {
   scope.launch {
     initFirebase()
-    init(getParams("uid"))
+    initMDS(getParams("uid"))
   }
   renderComposableInBody {
     Style(StyleSheets)

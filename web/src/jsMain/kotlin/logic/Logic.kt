@@ -36,50 +36,57 @@ fun getParams(parameterName: String): String? {
   }.firstOrNull()
 }
 
-suspend fun init(uid: String?) {
+suspend fun initMDS(uid: String?) {
   MDS.init(uid ?: "0x00", window.location.hostname, 9004) { msg: JsonElement ->
     when(msg.jsonString("event")) {
       "inited" -> {
         if (MDS.logging) console.log("Connected to Minima.")
-        scope.launch {
+        try {
           blockNumber = MDS.getBlockNumber()
-          balances.putAll(MDS.getBalances(confirmations = 0).associateBy { it.tokenId })
-          tokens.putAll(MDS.getTokens().associateBy { it.tokenId })
-          createDB()
-          channels.addAll(getChannels(status = "OPEN"))
-          channels.forEach { channel ->
-            subscribe(channelKey(channel.my.keys, channel.tokenId), from = channel.updatedAt).onEach { msg ->
-              log("tx msg: $msg")
-              val splits = msg.split(";")
-              if (splits[0].startsWith("TXN_UPDATE")) {
-                channels.first { it.id == channel.id }.update(splits[0].endsWith("_ACK"), updateTxText = splits[1], settleTxText = splits[2])
-              } else if (splits[0] == "TXN_REQUEST") {
-                val (_, updateTxText, settleTxText) = splits
-                val updateTxId = newTxId()
-                MDS.importTx(updateTxId, updateTxText)
-                val settleTxId = newTxId()
-                val settleTx = MDS.importTx(settleTxId, settleTxText)
-                log("TXN_REQUEST for channel: ${channel.id}")
-                with(channels.first { it.id == channel.id }) {
-                  val channelBalance = (settleTx.outputs.firstOrNull{ it.address == my.address }?.tokenAmount ?: ZERO) to
-                    (settleTx.outputs.firstOrNull{ it.address == their.address }?.tokenAmount ?: ZERO)
-                  val newSequenceNumber = settleTx.state.first { it.port == 99 }.data.toInt()
-                  if (newSequenceNumber > sequenceNumber) {
-                    events += PaymentRequestReceived(
-                      this,
-                      updateTxId,
-                      settleTxId,
-                      newSequenceNumber,
-                      channelBalance,
-                    )
-                    view = "Channel events"
-                  } else log("Stale update $newSequenceNumber received for channel $id at $sequenceNumber")
-                }
-              }
-            }.onCompletion {
-              log("completed")
-            }.launchIn(scope)
+          if (blockNumber <= 0) {
+            window.alert("No blockes yet?")
+            return@init
           }
+        } catch (e: NullPointerException) {
+          window.alert("Error getting status. Wrong UID?")
+          return@init
+        }
+        balances.putAll(MDS.getBalances(confirmations = 0).associateBy { it.tokenId })
+        tokens.putAll(MDS.getTokens().associateBy { it.tokenId })
+        createDB()
+        channels.addAll(getChannels(status = "OPEN"))
+        channels.forEach { channel ->
+          subscribe(channelKey(channel.my.keys, channel.tokenId), from = channel.updatedAt).onEach { msg ->
+            log("tx msg: $msg")
+            val splits = msg.split(";")
+            if (splits[0].startsWith("TXN_UPDATE")) {
+              channels.first { it.id == channel.id }.update(splits[0].endsWith("_ACK"), updateTxText = splits[1], settleTxText = splits[2])
+            } else if (splits[0] == "TXN_REQUEST") {
+              val (_, updateTxText, settleTxText) = splits
+              val updateTxId = newTxId()
+              MDS.importTx(updateTxId, updateTxText)
+              val settleTxId = newTxId()
+              val settleTx = MDS.importTx(settleTxId, settleTxText)
+              log("TXN_REQUEST for channel: ${channel.id}")
+              with(channels.first { it.id == channel.id }) {
+                val channelBalance = (settleTx.outputs.firstOrNull{ it.address == my.address }?.tokenAmount ?: ZERO) to
+                  (settleTx.outputs.firstOrNull{ it.address == their.address }?.tokenAmount ?: ZERO)
+                val newSequenceNumber = settleTx.state.first { it.port == 99 }.data.toInt()
+                if (newSequenceNumber > sequenceNumber) {
+                  events += PaymentRequestReceived(
+                    this,
+                    updateTxId,
+                    settleTxId,
+                    newSequenceNumber,
+                    channelBalance,
+                  )
+                  view = "Channel events"
+                } else log("Stale update $newSequenceNumber received for channel $id at $sequenceNumber")
+              }
+            }
+          }.onCompletion {
+            log("completed")
+          }.launchIn(scope)
         }
       }
       "NEWBALANCE" -> {

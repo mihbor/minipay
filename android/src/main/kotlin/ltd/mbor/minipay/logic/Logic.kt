@@ -35,6 +35,10 @@ suspend fun initMDS(uid: String, host: String, port: Int, context: Context) {
         if (MDS.logging) Log.i(TAG, "Connected to Minima.")
         try {
           blockNumber = MDS.getBlockNumber()
+          if (blockNumber <= 0) {
+            Toast.makeText(context, "No blockes yet?", Toast.LENGTH_LONG).show()
+            return@init
+          }
         } catch (e: NullPointerException) {
           Toast.makeText(context, "Error getting status. Wrong UID?", Toast.LENGTH_LONG).show()
           return@init
