@@ -13,6 +13,8 @@ dependencies {
   implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
   implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
   implementation("androidx.activity:activity-compose:1.6.0")
+  implementation("androidx.datastore:datastore-preferences:1.0.0")
+
   implementation("com.google.zxing:core:3.5.1")
   implementation("com.journeyapps:zxing-android-embedded:4.3.0")
   implementation("com.google.firebase:firebase-common:20.1.0")

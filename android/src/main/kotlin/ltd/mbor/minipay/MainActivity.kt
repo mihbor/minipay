@@ -16,10 +16,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.getAddress
@@ -40,6 +47,10 @@ const val TAG = "MainActivity"
 
 val scope = MainScope()
 
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+
+val UID_KEY = stringPreferencesKey("uid")
+
 var view by mutableStateOf("MiniPay")
 
 class MainActivity : ComponentActivity(), CardReader.DataCallback {
@@ -56,6 +67,7 @@ class MainActivity : ComponentActivity(), CardReader.DataCallback {
     this.uid = uid
     scope.launch {
       initMDS(uid, host, port, applicationContext)
+      if (inited) applicationContext.dataStore.edit { it[UID_KEY] = uid }
     }
   }
 
@@ -79,6 +91,10 @@ class MainActivity : ComponentActivity(), CardReader.DataCallback {
       "/send" -> "Send"
       "/emit" -> "Receive"
       else -> view
+    }
+    if (uid.isBlank()) scope.launch{
+      val uidFlow = applicationContext.dataStore.data.map{ it[UID_KEY] }
+      uidFlow.first()?.let { init(it, "localhost", 9004) }
     }
     setContent {
       MiniPayTheme {
