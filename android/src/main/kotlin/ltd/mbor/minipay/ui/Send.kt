@@ -38,7 +38,10 @@ fun Send(
 ) {
   val context = LocalContext.current
   OutlinedTextField(address, setAddress, enabled = true, modifier = Modifier.fillMaxWidth())
-  TokenSelect(tokenId, balances, enabled = true, setTokenId = setTokenId)
+  Row {
+    TokenSelect(tokenId, balances, enabled = true, setTokenId = setTokenId)
+    TokenIcon(tokenId, balances, size = 50)
+  }
   Row{
     DecimalNumberField(amount, enabled = true, setValue = setAmount)
     var sending by remember { mutableStateOf(false) }

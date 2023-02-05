@@ -126,7 +126,7 @@ fun RequestChannel(
     DecimalNumberField(amount, min = ZERO, enabled = !showQR) {
       it?.let { amount = it }
     }
-    TokenSelect(tokenId, balances, tokens, enabled = !showQR) {
+    TokenSelect(tokenId, balances, tokens = tokens, enabled = !showQR) {
       tokenId = it
     }
     if (!showQR) Button(

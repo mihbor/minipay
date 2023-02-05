@@ -1,8 +1,7 @@
 package ltd.mbor.minipay.ui
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -17,7 +16,7 @@ import ltd.mbor.minimak.Balance
 import ltd.mbor.minipay.R
 
 @Composable
-fun TokenIcon(url: String, size: Int = 24) {
+fun TokenIcon(url: String, modifier: Modifier = Modifier, size: Int = 24) {
   AsyncImage(
     model = url,
     contentDescription = url,
@@ -25,24 +24,24 @@ fun TokenIcon(url: String, size: Int = 24) {
       .components {
         add(SvgDecoder.Factory())
       }.build(),
-    modifier = Modifier.width(size.dp).height(size.dp),
+    modifier = modifier.requiredSize(size.dp),
     placeholder = painterResource(id = R.drawable.ic_tap_and_play)
   )
 }
 
 @Composable
-fun TokenIcon(painter: Painter, size: Int = 24) {
+fun TokenIcon(painter: Painter, modifier: Modifier = Modifier, size: Int = 24) {
   Image(
     painter,
     "token logo",
-    modifier = Modifier.width(size.dp).height(size.dp),
+    modifier = modifier.requiredSize(size.dp),
   )
 }
 
 @Composable
-fun TokenIcon(tokenId: String, balances: Map<String, Balance>, size: Int = 24) {
-  balances[tokenId]?.tokenUrl?.takeIf { it.isNotBlank() }?.let{ TokenIcon(it, size) }
-  ?: TokenIcon(painterResource(if (tokenId == "0x00") R.drawable.minima else R.drawable.coins), size)
+fun TokenIcon(tokenId: String, balances: Map<String, Balance>, modifier: Modifier = Modifier, size: Int = 24) {
+  balances[tokenId]?.tokenUrl?.takeIf { it.isNotBlank() }?.let{ TokenIcon(it, modifier, size) }
+  ?: TokenIcon(painterResource(if (tokenId == "0x00") R.drawable.minima else R.drawable.coins), modifier, size)
 }
 
 @Composable @Preview

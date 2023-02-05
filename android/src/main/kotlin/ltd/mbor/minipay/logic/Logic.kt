@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
+import io.ktor.utils.io.errors.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
@@ -36,11 +37,16 @@ suspend fun initMDS(uid: String, host: String, port: Int, context: Context) {
         try {
           blockNumber = MDS.getBlockNumber()
           if (blockNumber <= 0) {
-            Toast.makeText(context, "No blockes yet?", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "No blocks yet? Minima disconnected?", Toast.LENGTH_LONG).show()
             return@init
           }
         } catch (e: NullPointerException) {
           Toast.makeText(context, "Error getting status. Wrong UID?", Toast.LENGTH_LONG).show()
+          log(e.toString())
+          return@init
+        } catch (e: IOException) {
+          Toast.makeText(context, "Error connecting. Wrong host or port?", Toast.LENGTH_LONG).show()
+          log(e.toString())
           return@init
         }
         balances.putAll(MDS.getBalances(confirmations = 0).associateBy { it.tokenId })

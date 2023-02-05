@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
@@ -31,6 +32,7 @@ import kotlinx.coroutines.launch
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.getAddress
 import ltd.mbor.minimak.importTx
+import ltd.mbor.minipay.common.Prefs
 import ltd.mbor.minipay.common.newTxId
 import ltd.mbor.minipay.common.storage.getChannel
 import ltd.mbor.minipay.logic.PaymentRequestReceived
@@ -50,24 +52,30 @@ val scope = MainScope()
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 val UID_KEY = stringPreferencesKey("uid")
+val HOST_KEY = stringPreferencesKey("host")
+val PORT_KEY = intPreferencesKey("port")
 
 var view by mutableStateOf("MiniPay")
 
 class MainActivity : ComponentActivity(), CardReader.DataCallback {
   var isReaderModeOn by mutableStateOf(true)
 
-  var uid by mutableStateOf("")
+  var prefs by mutableStateOf(Prefs("", "localhost", 9004))
   var address by mutableStateOf("")
   var tokenId by mutableStateOf("0x00")
   var amount by mutableStateOf(ZERO)
 
   var cardReader: CardReader = CardReader(this)
 
-  fun init(uid: String, host: String = "localhost", port: Int = 9004) {
-    this.uid = uid
+  fun init(prefs: Prefs) {
+    this.prefs = prefs
     scope.launch {
-      initMDS(uid, host, port, applicationContext)
-      if (inited) applicationContext.dataStore.edit { it[UID_KEY] = uid }
+      initMDS(prefs.uid, prefs.host, prefs.port, applicationContext)
+      if (inited) applicationContext.dataStore.edit {
+        it[UID_KEY] = prefs.uid
+        it[HOST_KEY] = prefs.host
+        it[PORT_KEY] = prefs.port
+      }
     }
   }
 
@@ -82,7 +90,7 @@ class MainActivity : ComponentActivity(), CardReader.DataCallback {
         scope.launch { emitReceive(address) }
       } else enableReaderMode()
 
-      uri.getQueryParameter("uid")?.let { init(it, uri.host ?: "localhost", uri.port) }
+      uri.getQueryParameter("uid")?.let { init(Prefs(it, checkNotNull(uri.host), uri.port)) }
       uri.getQueryParameter("address")?.let { address = it }
       uri.getQueryParameter("token")?.let { tokenId = it }
       uri.getQueryParameter("amount")?.toBigDecimalOrNull()?.let{ amount = it }
@@ -92,9 +100,11 @@ class MainActivity : ComponentActivity(), CardReader.DataCallback {
       "/emit" -> "Receive"
       else -> view
     }
-    if (uid.isBlank()) scope.launch{
-      val uidFlow = applicationContext.dataStore.data.map{ it[UID_KEY] }
-      uidFlow.first()?.let { init(it, "localhost", 9004) }
+    if (prefs.uid.isBlank()) scope.launch{
+      val uidFlow = applicationContext.dataStore.data.map{
+        Prefs(it[UID_KEY] ?: "", it[HOST_KEY] ?: "localhost", it[PORT_KEY] ?: 9004)
+      }
+      uidFlow.first().let { init(it) }
     }
     setContent {
       MiniPayTheme {
@@ -102,8 +112,8 @@ class MainActivity : ComponentActivity(), CardReader.DataCallback {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
           MainView(
             inited = inited,
-            uid = uid,
-            setUid = this::init,
+            prefs = prefs,
+            setPrefs = this::init,
             balances = balances,
             tokens = tokens,
             address = address,

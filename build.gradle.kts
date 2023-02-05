@@ -4,8 +4,8 @@ plugins {
   kotlin("multiplatform") version kotlinVersion apply false
   kotlin("plugin.serialization") version kotlinVersion apply false
   kotlin("android") version kotlinVersion apply false
-  id("com.android.application") version agpVversion apply false
-  id("com.android.library") version agpVversion apply false
+  id("com.android.application") version agpVersion apply false
+  id("com.android.library") version agpVersion apply false
   id("org.jetbrains.compose") version composeVersion apply false
   id("org.jetbrains.kotlinx.kover") version "0.6.1" apply true
 }

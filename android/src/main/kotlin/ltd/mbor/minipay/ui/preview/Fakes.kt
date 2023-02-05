@@ -11,6 +11,7 @@ import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Coin
 import ltd.mbor.minimak.Token
 import ltd.mbor.minipay.common.Channel
+import ltd.mbor.minipay.common.Prefs
 import ltd.mbor.minipay.logic.PaymentRequestReceived
 import ltd.mbor.minipay.logic.PaymentRequestSent
 
@@ -98,6 +99,8 @@ val fakeBalances = mapOf(
 )
 
 val fakeEltooCoins = mutableMapOf("Mx999" to listOf(Coin(address = "", miniAddress = "", amount = BigDecimal.ONE, coinId = "", storeState = true, tokenId = "0x00", _created = "100", token = null, state = emptyList())))
+
+val previewPrefs = Prefs("uid123", "localhost", 9004)
 
 val previewBalances = listOf(
   Balance("0x00", JsonNull, ONE, ONE, ONE, ONE, "1"),

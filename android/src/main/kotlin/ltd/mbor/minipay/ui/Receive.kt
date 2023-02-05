@@ -33,7 +33,10 @@ fun Receive(
     bitmap = encodeAsBitmap("$address;${amount.toPlainString()};$tokenId").asImageBitmap()
   }
   OutlinedTextField(address, setAddress, enabled = true, modifier = Modifier.fillMaxWidth())
-  TokenSelect(tokenId, balances, tokens, true, setTokenId)
+  Row {
+    TokenSelect(tokenId, balances, tokens = tokens, enabled = true, setTokenId = setTokenId)
+    TokenIcon(tokenId, balances, size = 50)
+  }
   Row{
     DecimalNumberField(amount, enabled = true, setValue = setAmount)
   }

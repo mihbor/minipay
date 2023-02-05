@@ -52,7 +52,7 @@ fun ChannelTable(
           Text(channel.sequenceNumber.toString(), Modifier.width(50.dp))
           Row(Modifier.width(75.dp)) {
             Text(balances[channel.tokenId]?.tokenName ?: if(channel.tokenId == "0x00") "Minima" else "[${channel.tokenId.take(8)}...]", Modifier.width(60.dp))
-            TokenIcon(channel.tokenId, balances, 15)
+            TokenIcon(channel.tokenId, balances, size = 15)
           }
           Text(channel.my.balance.toPlainString(), Modifier.width(50.dp))
           Text(channel.their.balance.toPlainString(), Modifier.width(50.dp))

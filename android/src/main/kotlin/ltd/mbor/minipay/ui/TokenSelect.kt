@@ -1,9 +1,7 @@
 package ltd.mbor.minipay.ui
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import ltd.mbor.minimak.Balance
@@ -27,7 +25,6 @@ fun TokenSelect(
     OutlinedTextField(
       value = unifiedBalances[tokenId]?.let { (it.tokenName ?: "[$tokenId]") + " [${it.sendable.toPlainString().take(12)}]" } ?: "",
       { },
-      modifier = Modifier.fillMaxWidth(),
       readOnly = true,
       enabled = enabled,
       trailingIcon = {
@@ -60,6 +57,6 @@ fun Token.toEmptyBalance() = Balance(tokenId, _name, ZERO, ZERO, ZERO, ZERO, "0"
 @Preview
 fun PreviewTokenSelect() {
   MiniPayTheme {
-    TokenSelect(previewBalances.values.first().tokenId, previewBalances, previewTokens, true) {}
+    TokenSelect(previewBalances.values.first().tokenId, previewBalances, tokens = previewTokens, enabled = true) {}
   }
 }
