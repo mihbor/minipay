@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
 import ltd.mbor.minimak.*
+import ltd.mbor.minipay.common.Prefs
 import ltd.mbor.minipay.common.channelKey
 import ltd.mbor.minipay.common.newTxId
 import ltd.mbor.minipay.common.storage.createDB
@@ -36,82 +37,86 @@ fun getParams(parameterName: String): String? {
   }.firstOrNull()
 }
 
-suspend fun initMDS(uid: String?) {
-  MDS.init(uid ?: "0x00", window.location.hostname, 9004) { msg: JsonElement ->
-    when(msg.jsonString("event")) {
-      "inited" -> {
-        if (MDS.logging) console.log("Connected to Minima.")
-        try {
-          blockNumber = MDS.getBlockNumber()
-          if (blockNumber <= 0) {
-            window.alert("No blockes yet?")
+fun initMDS(prefs: Prefs) {
+  scope.launch {
+    MDS.init(prefs.uid, prefs.host, prefs.port) { msg: JsonElement ->
+      when (msg.jsonString("event")) {
+        "inited" -> {
+          if (MDS.logging) console.log("Connected to Minima.")
+          try {
+            blockNumber = MDS.getBlockNumber()
+            if (blockNumber <= 0) {
+              window.alert("No blockes yet?")
+              return@init
+            }
+          } catch (e: NullPointerException) {
+            window.alert("Error getting status. Wrong UID?")
             return@init
           }
-        } catch (e: NullPointerException) {
-          window.alert("Error getting status. Wrong UID?")
-          return@init
-        }
-        balances.putAll(MDS.getBalances(confirmations = 0).associateBy { it.tokenId })
-        tokens.putAll(MDS.getTokens().associateBy { it.tokenId })
-        createDB()
-        channels.addAll(getChannels(status = "OPEN"))
-        channels.forEach { channel ->
-          subscribe(channelKey(channel.my.keys, channel.tokenId), from = channel.updatedAt).onEach { msg ->
-            log("tx msg: $msg")
-            val splits = msg.split(";")
-            if (splits[0].startsWith("TXN_UPDATE")) {
-              channels.first { it.id == channel.id }.update(splits[0].endsWith("_ACK"), updateTxText = splits[1], settleTxText = splits[2])
-            } else if (splits[0] == "TXN_REQUEST") {
-              val (_, updateTxText, settleTxText) = splits
-              val updateTxId = newTxId()
-              MDS.importTx(updateTxId, updateTxText)
-              val settleTxId = newTxId()
-              val settleTx = MDS.importTx(settleTxId, settleTxText)
-              log("TXN_REQUEST for channel: ${channel.id}")
-              with(channels.first { it.id == channel.id }) {
-                val channelBalance = (settleTx.outputs.firstOrNull{ it.address == my.address }?.tokenAmount ?: ZERO) to
-                  (settleTx.outputs.firstOrNull{ it.address == their.address }?.tokenAmount ?: ZERO)
-                val newSequenceNumber = settleTx.state.first { it.port == 99 }.data.toInt()
-                if (newSequenceNumber > sequenceNumber) {
-                  events += PaymentRequestReceived(
-                    this,
-                    updateTxId,
-                    settleTxId,
-                    newSequenceNumber,
-                    channelBalance,
-                  )
-                  view = "Channel events"
-                } else log("Stale update $newSequenceNumber received for channel $id at $sequenceNumber")
+          balances.putAll(MDS.getBalances(confirmations = 0).associateBy { it.tokenId })
+          tokens.putAll(MDS.getTokens().associateBy { it.tokenId })
+          createDB()
+          channels.addAll(getChannels(status = "OPEN"))
+          channels.forEach { channel ->
+            subscribe(channelKey(channel.my.keys, channel.tokenId), from = channel.updatedAt).onEach { msg ->
+              log("tx msg: $msg")
+              val splits = msg.split(";")
+              if (splits[0].startsWith("TXN_UPDATE")) {
+                channels.first { it.id == channel.id }.update(splits[0].endsWith("_ACK"), updateTxText = splits[1], settleTxText = splits[2])
+              } else if (splits[0] == "TXN_REQUEST") {
+                val (_, updateTxText, settleTxText) = splits
+                val updateTxId = newTxId()
+                MDS.importTx(updateTxId, updateTxText)
+                val settleTxId = newTxId()
+                val settleTx = MDS.importTx(settleTxId, settleTxText)
+                log("TXN_REQUEST for channel: ${channel.id}")
+                with(channels.first { it.id == channel.id }) {
+                  val channelBalance = (settleTx.outputs.firstOrNull { it.address == my.address }?.tokenAmount ?: ZERO) to
+                    (settleTx.outputs.firstOrNull { it.address == their.address }?.tokenAmount ?: ZERO)
+                  val newSequenceNumber = settleTx.state.first { it.port == 99 }.data.toInt()
+                  if (newSequenceNumber > sequenceNumber) {
+                    events += PaymentRequestReceived(
+                      this,
+                      updateTxId,
+                      settleTxId,
+                      newSequenceNumber,
+                      channelBalance,
+                    )
+                    view = "Channel events"
+                  } else log("Stale update $newSequenceNumber received for channel $id at $sequenceNumber")
+                }
               }
-            }
-          }.onCompletion {
-            log("completed")
-          }.launchIn(scope)
-        }
-      }
-      "NEWBALANCE" -> {
-        val newBalances = MDS.getBalances(confirmations = 0).associateBy { it.tokenId }
-        balances.clear()
-        balances.putAll(newBalances)
-        val newTokens = MDS.getTokens().associateBy { it.tokenId }
-        tokens.clear()
-        tokens.putAll(newTokens)
-      }
-      "NEWBLOCK" -> {
-        blockNumber = msg.jsonObject["data"]!!.jsonObject["txpow"]!!.jsonObject["header"]!!.jsonString("block").toInt()
-        if (multisigScriptAddress.isNotEmpty()) {
-          scope.launch {
-            val newBalances = MDS.getBalances(multisigScriptAddress, confirmations = 0)
-            if (newBalances.any { it.confirmed > ZERO } && multisigScriptBalances.none { it.confirmed > ZERO }) {
-              setChannelOpen(multisigScriptAddress)
-            }
-            multisigScriptBalances.clear()
-            multisigScriptBalances.addAll(newBalances)
+            }.onCompletion {
+              log("completed")
+            }.launchIn(scope)
           }
         }
-        if (eltooScriptAddress.isNotEmpty()) {
-          scope.launch {
-            eltooScriptCoins.put(eltooScriptAddress, MDS.getCoins(address = eltooScriptAddress))
+      
+        "NEWBALANCE" -> {
+          val newBalances = MDS.getBalances(confirmations = 0).associateBy { it.tokenId }
+          balances.clear()
+          balances.putAll(newBalances)
+          val newTokens = MDS.getTokens().associateBy { it.tokenId }
+          tokens.clear()
+          tokens.putAll(newTokens)
+        }
+      
+        "NEWBLOCK" -> {
+          blockNumber = msg.jsonObject["data"]!!.jsonObject["txpow"]!!.jsonObject["header"]!!.jsonString("block").toInt()
+          if (multisigScriptAddress.isNotEmpty()) {
+            scope.launch {
+              val newBalances = MDS.getBalances(multisigScriptAddress, confirmations = 0)
+              if (newBalances.any { it.confirmed > ZERO } && multisigScriptBalances.none { it.confirmed > ZERO }) {
+                setChannelOpen(multisigScriptAddress)
+              }
+              multisigScriptBalances.clear()
+              multisigScriptBalances.addAll(newBalances)
+            }
+          }
+          if (eltooScriptAddress.isNotEmpty()) {
+            scope.launch {
+              eltooScriptCoins.put(eltooScriptAddress, MDS.getCoins(address = eltooScriptAddress))
+            }
           }
         }
       }
