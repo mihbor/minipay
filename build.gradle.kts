@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   kotlin("multiplatform") version kotlinVersion apply false
-  kotlin("plugin.serialization") version kotlinVersion apply false
+  kotlin("plugin.serialization") version kotlinVersion apply true
   kotlin("android") version kotlinVersion apply false
   id("com.android.application") version agpVersion apply false
   id("com.android.library") version agpVersion apply false

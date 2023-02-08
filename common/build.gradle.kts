@@ -1,7 +1,6 @@
 plugins {
   kotlin("multiplatform")
   kotlin("plugin.serialization")
-  id("org.jetbrains.compose")
   id("com.android.library")
 }
 
@@ -13,7 +12,6 @@ kotlin {
   sourceSets {
     val commonMain by getting {
       dependencies {
-        api(compose.runtime)
         api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
         api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
         api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
