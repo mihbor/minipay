@@ -4,15 +4,27 @@ import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.launch
 import ltd.mbor.minipay.common.Channel
 import ltd.mbor.minipay.common.delete
 import ltd.mbor.minipay.scope
+import ltd.mbor.minipay.ui.preview.fakeChannel
+import ltd.mbor.minipay.ui.theme.MiniPayTheme
 
 @Composable
 fun DeleteChannel(channel: Channel, onDelete: (Channel) -> Unit) {
   var deleteDisabled by remember { mutableStateOf(false) }
   var confirmDialogOpen by remember { mutableStateOf(false) }
+  Button(enabled = !deleteDisabled, onClick = {
+    scope.launch{
+      deleteDisabled = true
+      confirmDialogOpen = true
+    }
+  }) {
+    Text("\uD83D\uDDD1 Delete")
+  }
+
   if (confirmDialogOpen) {
     AlertDialog(
       onDismissRequest = {
@@ -48,12 +60,11 @@ fun DeleteChannel(channel: Channel, onDelete: (Channel) -> Unit) {
       }
     )
   }
-  Button(enabled = !deleteDisabled, onClick = {
-    scope.launch{
-      deleteDisabled = true
-      confirmDialogOpen = true
-    }
-  }) {
-    Text("\uD83D\uDDD1 Delete")
+}
+
+@Composable @Preview
+fun PreviewDeleteChannel() {
+  MiniPayTheme {
+    DeleteChannel(fakeChannel) {}
   }
 }

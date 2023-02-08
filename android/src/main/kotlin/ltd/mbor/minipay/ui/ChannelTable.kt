@@ -2,6 +2,7 @@ package ltd.mbor.minipay.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -23,6 +24,7 @@ import ltd.mbor.minipay.scope
 import ltd.mbor.minipay.ui.preview.fakeBalances
 import ltd.mbor.minipay.ui.preview.fakeChannel
 import ltd.mbor.minipay.ui.preview.fakeEltooCoins
+import ltd.mbor.minipay.ui.preview.fakeTriggeredChannel
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -64,8 +66,8 @@ fun ChannelTable(
             }
           }
         }
-        if (showActions) {
-          ChannelActions(channel, eltooScriptCoins, activity) {
+        if (showActions) Row(Modifier.fillMaxWidth()){
+          ChannelActions(channel, balances, eltooScriptCoins, activity) {
             scope.launch { channels.reload(eltooScriptCoins) }
           }
         }
@@ -79,7 +81,7 @@ fun PreviewChannelTable() {
   MiniPayTheme {
     Column {
       ChannelTable(
-        mutableListOf(fakeChannel, fakeChannel.copy(tokenId = "0x00", status = "TRIGGERED", eltooAddress = "Mx999", sequenceNumber = 3, updateTx = "abc")),
+        mutableListOf(fakeChannel, fakeTriggeredChannel.copy(tokenId = "0x00")),
         fakeBalances,
         fakeEltooCoins,
         null
@@ -93,7 +95,7 @@ fun PreviewChannelTableNoBalances() {
   MiniPayTheme {
     Column {
       ChannelTable(
-        mutableListOf(fakeChannel, fakeChannel.copy(tokenId = "0x00", status = "TRIGGERED", eltooAddress = "Mx999", sequenceNumber = 3, updateTx = "abc")),
+        mutableListOf(fakeChannel, fakeTriggeredChannel.copy(tokenId = "0x00")),
         emptyMap(),
         fakeEltooCoins,
         null

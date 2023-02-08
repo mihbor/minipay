@@ -47,7 +47,7 @@ val fakeChannel = Channel(
   updatedAt = Instant.fromEpochMilliseconds(123)
 )
 
-val fakeTriggeredChannel = fakeChannel.copy(status = "TRIGGERED")
+val fakeTriggeredChannel = fakeChannel.copy(status = "TRIGGERED", sequenceNumber = 3, eltooAddress = "0x999", updateTx = "abc")
 
 val fakeMinimaChannel = Channel(
   id = 1,
@@ -98,7 +98,7 @@ val fakeBalances = mapOf(
   "0x00" to Balance("0x00", JsonObject(mapOf("name" to JsonPrimitive("Minima"))), ONE, ONE, ZERO, ONE, "1")
 )
 
-val fakeEltooCoins = mutableMapOf("Mx999" to listOf(Coin(address = "", miniAddress = "", amount = BigDecimal.ONE, coinId = "", storeState = true, tokenId = "0x00", _created = "100", token = null, state = emptyList())))
+val fakeEltooCoins = mutableMapOf("0x999" to listOf(Coin(address = "", miniAddress = "", amount = BigDecimal.ONE, coinId = "", storeState = true, tokenId = "0x00", _created = "100", token = null, state = emptyList())))
 
 val previewPrefs = Prefs("uid123", "localhost", 9004)
 

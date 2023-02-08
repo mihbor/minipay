@@ -27,6 +27,7 @@ fun ChannelView(
 ) {
   Column{
     Row{
+      Text("Token: ")
       TokenIcon(channel.tokenId, balances)
       Text(balances[channel.tokenId]?.tokenName ?: "[${channel.tokenId}]")
     }
@@ -35,6 +36,18 @@ fun ChannelView(
       Text(channel.my.balance.toPlainString(), Modifier.width(60.dp))
       Text("Their balance: ")
       Text(channel.their.balance.toPlainString(), Modifier.width(60.dp))
+    }
+    Row {
+      Text("Multi-signature script address:")
+    }
+    Row {
+      Text(channel.multiSigAddress)
+    }
+    Row {
+      Text("Eltoo script address:")
+    }
+    Row {
+      Text(channel.eltooAddress)
     }
     Settlement(
       if (multisigScriptBalances.any { it.confirmed > ZERO }) channel.copy(status = "OPEN") else channel,

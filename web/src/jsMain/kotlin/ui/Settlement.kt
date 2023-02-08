@@ -42,11 +42,11 @@ fun Settlement(channel: Channel, blockNumber: Int, eltooScriptCoins: List<Coin>,
     }
   }
   if (eltooScriptCoins.isNotEmpty()) {
-    eltooScriptCoins.forEach {
+    eltooScriptCoins.firstOrNull()?.let {
       Br()
       TokenIcon(it.tokenId, balances)
-      Text("${balances[it.tokenId]?.tokenName ?: "[${it.tokenId}]"} token eltoo coin: ${it.tokenAmount.toPlainString()} timelock ${
-        (it.created + channel.timeLock - blockNumber).takeIf { it > 0 }?.let { "ends in $it blocks" } ?: "ended"}"
+      Text("Timelock ${
+        (it.created + channel.timeLock - blockNumber).takeIf { it > 0 }?.let { "ends in $it blocks \uD83D\uDD51" } ?: "ended"}"
       )
     }
     if (channel.status == "TRIGGERED" && channel.sequenceNumber > 0) {

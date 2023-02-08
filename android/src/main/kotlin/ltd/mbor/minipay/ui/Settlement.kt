@@ -5,9 +5,11 @@ import android.widget.Toast
 import android.widget.Toast.LENGTH_LONG
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Button
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
@@ -32,66 +34,69 @@ fun Settlement(channel: Channel, blockNumber: Int, eltooScriptCoins: List<Coin>,
   var updatePosting by remember { mutableStateOf(false) }
   var settlementCompleting by remember { mutableStateOf(false) }
   Log.i(TAG, "Channel status: " + channel.status)
-
-  if (channel.status == "OPEN") {
-    Button(
-      onClick = {
-        settlementTriggering = true
-        scope.launch {
-          try {
-            updateChannel(channel.triggerSettlement())
-          } catch(e: MinimaException) {
-            e.message?.let{ Toast.makeText(context, it, LENGTH_LONG).show() }
-          }
-          settlementTriggering = false
-        }
-      },
-      enabled = !settlementTriggering
-    ) {
-      Text("Trigger settlement!", fontSize = 10.sp)
-    }
-  }
-  if (eltooScriptCoins.isNotEmpty()) {
-    eltooScriptCoins.forEach {
-      Text("[${it.tokenId}] token eltoo coin: ${it.tokenAmount.toPlainString()} timelock ${
-        (it.created + channel.timeLock - blockNumber).takeIf { it > 0 }?.let { "ends in $it blocks" } ?: "ended"}",
-        fontSize = 8.sp
-      )
-    }
-    if (channel.status == "TRIGGERED" && channel.sequenceNumber > 0) {
-      if (channel.updateTx.isNotEmpty()) Button(
+  
+  val fontSize = 10.sp
+  ProvideTextStyle(value = TextStyle(fontSize = fontSize)) {
+    if (channel.status == "OPEN") {
+      Button(
         onClick = {
-          updatePosting = true
+          settlementTriggering = true
           scope.launch {
             try {
-              updateChannel(channel.postUpdate())
-            } catch(e: MinimaException) {
-              e.message?.let{ Toast.makeText(context, it, LENGTH_LONG).show() }
+              updateChannel(channel.triggerSettlement())
+            } catch (e: MinimaException) {
+              e.message?.let { Toast.makeText(context, it, LENGTH_LONG).show() }
             }
-            updatePosting = false
+            settlementTriggering = false
           }
         },
-        enabled = !updatePosting
+        enabled = !settlementTriggering
       ) {
-        Text("Post latest update", fontSize = 10.sp)
+        Text("Trigger settlement!", fontSize = fontSize)
       }
     }
-    if (channel.status in listOf("TRIGGERED", "UPDATED")) {
-      Button(
-        enabled = !settlementCompleting && !updatePosting && eltooScriptCoins.none { it.created + channel.timeLock > blockNumber },
-        onClick = {
-          settlementCompleting = true
-          scope.launch {
-            try {
-              updateChannel(channel.completeSettlement())
-            } catch(e: MinimaException) {
-              e.message?.let{ Toast.makeText(context, it, LENGTH_LONG).show() }
+    if (eltooScriptCoins.isNotEmpty()) {
+      eltooScriptCoins.firstOrNull()?.let {
+        Text("Timelock ${
+          (it.created + channel.timeLock - blockNumber).takeIf { it > 0 }?.let { "ends in $it blocks \uD83D\uDD51" } ?: "ended"
+        }"
+        )
+      }
+      if (channel.status == "TRIGGERED" && channel.sequenceNumber > 0) {
+        if (channel.updateTx.isNotEmpty()) Button(
+          onClick = {
+            updatePosting = true
+            scope.launch {
+              try {
+                updateChannel(channel.postUpdate())
+              } catch (e: MinimaException) {
+                e.message?.let { Toast.makeText(context, it, LENGTH_LONG).show() }
+              }
+              updatePosting = false
             }
-            settlementCompleting = false
-          }
+          },
+          enabled = !updatePosting
+        ) {
+          Text("Post latest update", fontSize = fontSize)
         }
-      ) {
-        Text("Complete settlement!", fontSize = 10.sp)
+      }
+      if (channel.status in listOf("TRIGGERED", "UPDATED")) {
+        Button(
+          enabled = !settlementCompleting && !updatePosting && eltooScriptCoins.none { it.created + channel.timeLock > blockNumber },
+          onClick = {
+            settlementCompleting = true
+            scope.launch {
+              try {
+                updateChannel(channel.completeSettlement())
+              } catch (e: MinimaException) {
+                e.message?.let { Toast.makeText(context, it, LENGTH_LONG).show() }
+              }
+              settlementCompleting = false
+            }
+          }
+        ) {
+          Text("Complete settlement!", fontSize = fontSize)
+        }
       }
     }
   }
