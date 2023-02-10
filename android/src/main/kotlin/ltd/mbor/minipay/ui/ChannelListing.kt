@@ -16,7 +16,7 @@ import ltd.mbor.minipay.common.Channel
 import ltd.mbor.minipay.logic.reload
 import ltd.mbor.minipay.scope
 import ltd.mbor.minipay.ui.preview.fakeBalances
-import ltd.mbor.minipay.ui.preview.fakeChannel
+import ltd.mbor.minipay.ui.preview.fakeChannelOpen
 import ltd.mbor.minipay.ui.preview.fakeEltooCoins
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
 
@@ -26,6 +26,7 @@ fun ChannelListing(
   balances: Map<String, Balance>,
   eltooScriptCoins: MutableMap<String, List<Coin>>,
   activity: MainActivity?,
+  setChannel: (Channel) -> Unit,
 ) {
   LaunchedEffect("channels") {
     channels.reload(eltooScriptCoins)
@@ -43,7 +44,7 @@ fun ChannelListing(
       }
     }
     item {
-      ChannelTable(channels, balances, eltooScriptCoins, activity)
+      ChannelTable(channels, balances, eltooScriptCoins, activity, setChannel)
     }
   }
 }
@@ -53,10 +54,11 @@ fun PreviewChannelListing() {
   MiniPayTheme {
     Column {
       ChannelListing(
-        mutableListOf(fakeChannel, fakeChannel.copy(tokenId = "0x00", status = "TRIGGERED", eltooAddress = "Mx999", sequenceNumber = 3, updateTx = "abc")),
+        mutableListOf(fakeChannelOpen, fakeChannelOpen.copy(tokenId = "0x00", status = "TRIGGERED", eltooAddress = "Mx999", sequenceNumber = 3, updateTx = "abc")),
         fakeBalances,
         fakeEltooCoins,
-        null
+        null,
+        {}
       )
     }
   }

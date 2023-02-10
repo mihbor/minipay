@@ -15,7 +15,7 @@ import ltd.mbor.minipay.common.Prefs
 import ltd.mbor.minipay.logic.PaymentRequestReceived
 import ltd.mbor.minipay.logic.PaymentRequestSent
 
-val fakeChannel = Channel(
+val fakeChannelOpen = Channel(
   id = 1,
   sequenceNumber = 0,
   status = "OPEN",
@@ -47,7 +47,7 @@ val fakeChannel = Channel(
   updatedAt = Instant.fromEpochMilliseconds(123)
 )
 
-val fakeTriggeredChannel = fakeChannel.copy(status = "TRIGGERED", sequenceNumber = 3, eltooAddress = "0x999", updateTx = "abc")
+val fakeChannelTriggered = fakeChannelOpen.copy(status = "TRIGGERED", sequenceNumber = 3, eltooAddress = "0x999", updateTx = "abc")
 
 val fakeMinimaChannel = Channel(
   id = 1,
@@ -114,8 +114,8 @@ val previewTokens = listOf(
 ).associateBy { it.tokenId }
 
 val previewEvents = mutableListOf(
-  PaymentRequestSent(fakeChannel, 1, 2, 3, ZERO to ONE, true),
-  PaymentRequestSent(fakeChannel, 1, 2, 3, ZERO to ONE, false),
-  PaymentRequestReceived(fakeChannel, 1, 2, 3, ZERO to ONE, true),
-  PaymentRequestReceived(fakeChannel, 1, 2, 3, ZERO to ONE, false),
+  PaymentRequestSent(fakeChannelOpen, 1, 2, 3, ZERO to ONE, true),
+  PaymentRequestSent(fakeChannelOpen, 1, 2, 3, ZERO to ONE, false),
+  PaymentRequestReceived(fakeChannelOpen, 1, 2, 3, ZERO to ONE, true),
+  PaymentRequestReceived(fakeChannelOpen, 1, 2, 3, ZERO to ONE, false),
 )

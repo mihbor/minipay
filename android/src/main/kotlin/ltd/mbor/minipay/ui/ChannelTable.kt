@@ -22,9 +22,9 @@ import ltd.mbor.minipay.common.Channel
 import ltd.mbor.minipay.logic.reload
 import ltd.mbor.minipay.scope
 import ltd.mbor.minipay.ui.preview.fakeBalances
-import ltd.mbor.minipay.ui.preview.fakeChannel
+import ltd.mbor.minipay.ui.preview.fakeChannelOpen
+import ltd.mbor.minipay.ui.preview.fakeChannelTriggered
 import ltd.mbor.minipay.ui.preview.fakeEltooCoins
-import ltd.mbor.minipay.ui.preview.fakeTriggeredChannel
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -34,6 +34,7 @@ fun ChannelTable(
   balances: Map<String, Balance>,
   eltooScriptCoins: MutableMap<String, List<Coin>>,
   activity: MainActivity?,
+  setChannel: (Channel) -> Unit,
 ) {
   ProvideTextStyle(value = TextStyle(fontSize = 10.sp, textAlign = TextAlign.Right)) {
     Row {
@@ -45,6 +46,7 @@ fun ChannelTable(
       Text("Their\nbalance", Modifier.width(50.dp))
       Text("Actions", Modifier.width(40.dp))
     }
+    Divider()
     channels.forEach { channel ->
       key(channel.id) {
         var showActions by remember { mutableStateOf(false) }
@@ -67,10 +69,11 @@ fun ChannelTable(
           }
         }
         if (showActions) Row(Modifier.fillMaxWidth()){
-          ChannelActions(channel, balances, eltooScriptCoins, activity) {
+          ChannelActions(channel, activity, setChannel) {
             scope.launch { channels.reload(eltooScriptCoins) }
           }
         }
+        Divider()
       }
     }
   }
@@ -81,10 +84,11 @@ fun PreviewChannelTable() {
   MiniPayTheme {
     Column {
       ChannelTable(
-        mutableListOf(fakeChannel, fakeTriggeredChannel.copy(tokenId = "0x00")),
+        mutableListOf(fakeChannelOpen, fakeChannelTriggered.copy(tokenId = "0x00")),
         fakeBalances,
         fakeEltooCoins,
-        null
+        null,
+        {}
       )
     }
   }
@@ -95,10 +99,11 @@ fun PreviewChannelTableNoBalances() {
   MiniPayTheme {
     Column {
       ChannelTable(
-        mutableListOf(fakeChannel, fakeTriggeredChannel.copy(tokenId = "0x00")),
+        mutableListOf(fakeChannelOpen, fakeChannelTriggered.copy(tokenId = "0x00")),
         emptyMap(),
         fakeEltooCoins,
-        null
+        null,
+        {}
       )
     }
   }

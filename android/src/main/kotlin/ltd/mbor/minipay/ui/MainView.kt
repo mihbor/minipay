@@ -13,6 +13,7 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Token
 import ltd.mbor.minipay.MainActivity
+import ltd.mbor.minipay.common.Channel
 import ltd.mbor.minipay.common.Prefs
 import ltd.mbor.minipay.logic.channels
 import ltd.mbor.minipay.logic.eltooScriptCoins
@@ -41,11 +42,16 @@ fun MainView(
   view: String,
   setView: (String) -> Unit
 ) {
-
   var showNavMenu by remember{ mutableStateOf(false) }
 
   fun toggleNavMenu() {
     showNavMenu = !showNavMenu
+  }
+
+  var channel by remember { mutableStateOf<Channel?>(null) }
+  fun setChannel(newChannel: Channel?) {
+    channel = newChannel
+    setView(if (newChannel != null) "Channel details" else "Channels")
   }
 
   Scaffold(
@@ -67,10 +73,13 @@ fun MainView(
         "Settings" -> Settings(prefs, setPrefs)
         "Receive" -> Receive(balances, tokens, address, setAddress, tokenId, setTokenId, amount, setAmount)
         "Send" -> Send(balances, address, setAddress, tokenId, setTokenId, amount, setAmount)
-        "Channels" -> ChannelListing(channels, balances, eltooScriptCoins, activity)
+        "Channels" -> ChannelListing(channels, balances, eltooScriptCoins, activity, ::setChannel)
         "Request channel" -> RequestChannel(balances, tokens, activity)
         "Fund channel" -> FundChannel(balances, tokens, activity)
         "Channel events" -> ChannelEvents(events, tokens, activity)
+        "Channel details" -> channel?.let{
+          ChannelDetails(it, balances, activity, ::setChannel)
+        }
       }
     }
   }

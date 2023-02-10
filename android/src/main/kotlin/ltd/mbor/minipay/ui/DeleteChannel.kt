@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 import ltd.mbor.minipay.common.Channel
 import ltd.mbor.minipay.common.delete
 import ltd.mbor.minipay.scope
-import ltd.mbor.minipay.ui.preview.fakeChannel
+import ltd.mbor.minipay.ui.preview.fakeChannelOpen
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
 
 @Composable
@@ -65,6 +65,6 @@ fun DeleteChannel(channel: Channel, onDelete: (Channel) -> Unit) {
 @Composable @Preview
 fun PreviewDeleteChannel() {
   MiniPayTheme {
-    DeleteChannel(fakeChannel) {}
+    DeleteChannel(fakeChannelOpen) {}
   }
 }

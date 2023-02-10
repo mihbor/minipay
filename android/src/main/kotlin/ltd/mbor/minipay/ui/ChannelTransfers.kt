@@ -22,7 +22,7 @@ import ltd.mbor.minipay.common.request
 import ltd.mbor.minipay.common.send
 import ltd.mbor.minipay.logic.PaymentRequestSent
 import ltd.mbor.minipay.logic.events
-import ltd.mbor.minipay.ui.preview.fakeChannel
+import ltd.mbor.minipay.ui.preview.fakeChannelOpen
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
 
 @Composable
@@ -48,7 +48,7 @@ fun ChannelTransfers(channel: Channel, activity: MainActivity?) {
         },
         enabled = !isSending
       ) {
-        Text("Send", Modifier.width(50.dp), fontSize = fontSize)
+        Text("Send", Modifier.width(65.dp))
       }
     }
     if (channel.their.balance > ZERO) Row {
@@ -81,7 +81,7 @@ fun ChannelTransfers(channel: Channel, activity: MainActivity?) {
         },
         enabled = !preparingRequest
       ) {
-        Text(if (preparingRequest) "Preparing..." else "Request", Modifier.width(50.dp), fontSize = fontSize)
+        Text(if (preparingRequest) "Preparing..." else "Request", Modifier.width(65.dp))
       }
       Button(
         onClick = {
@@ -107,10 +107,10 @@ fun ChannelTransfers(channel: Channel, activity: MainActivity?) {
           }
         },
         enabled = !preparingRequest,
-        contentPadding = PaddingValues(10.dp, 2.dp)
+        contentPadding = PaddingValues(16.dp, 2.dp)
       ) {
         Image(painterResource(R.drawable.contactless_24), "contactless")
-        Text(if (preparingRequest) "Preparing..." else " Request", fontSize = fontSize)
+        Text(if (preparingRequest) "Preparing..." else " Request")
       }
     }
   }
@@ -120,7 +120,7 @@ fun ChannelTransfers(channel: Channel, activity: MainActivity?) {
 fun PreviewTransfers() {
   MiniPayTheme {
     Column(Modifier.width(350.dp)) {
-      ChannelTransfers(fakeChannel, null)
+      ChannelTransfers(fakeChannelOpen, null)
     }
   }
 }

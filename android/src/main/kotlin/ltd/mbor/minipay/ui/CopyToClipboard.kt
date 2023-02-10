@@ -16,7 +16,7 @@ fun CopyToClipboard(value: String) {
 
   Button(onClick = {
     clipboardManager.setText(AnnotatedString(value))
-    Toast.makeText(context, "Copied!", Toast.LENGTH_SHORT).show()
+    Toast.makeText(context, "Copied to clipboard!", Toast.LENGTH_SHORT).show()
   }, enabled = value.isNotBlank()) {
     Text("⎘")
   }
