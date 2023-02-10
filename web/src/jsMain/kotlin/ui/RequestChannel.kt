@@ -153,7 +153,7 @@ fun RequestChannel(
     Br()
   }
   channel?.let {
-    ChannelView(it) {
+    ChannelView(it, balances) {
       channel = it
     }
   }

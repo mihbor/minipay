@@ -9,16 +9,15 @@ import ltd.mbor.minipay.common.Channel
 import ltd.mbor.minipay.common.request
 import ltd.mbor.minipay.common.send
 import org.jetbrains.compose.web.attributes.disabled
-import org.jetbrains.compose.web.dom.Br
 import org.jetbrains.compose.web.dom.Button
+import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
 import scope
 import view
 
 @Composable
 fun ChannelTransfers(channel: Channel) {
-  if (channel.my.balance > ZERO) {
-    Br()
+  if (channel.my.balance > ZERO) Div{
     var amount by remember { mutableStateOf(ZERO) }
     DecimalNumberInput(amount, min = ZERO, max = channel.my.balance) { it?.let { amount = it } }
     var isSending by remember { mutableStateOf(false) }
@@ -36,8 +35,7 @@ fun ChannelTransfers(channel: Channel) {
       Text("Send via channel")
     }
   }
-  if (channel.their.balance > ZERO) {
-    Br()
+  if (channel.their.balance > ZERO) Div{
     var amount by remember { mutableStateOf(ZERO) }
     DecimalNumberInput(amount, min = ZERO, max = channel.their.balance) { it?.let { amount = it } }
     var isSending by remember { mutableStateOf(false) }

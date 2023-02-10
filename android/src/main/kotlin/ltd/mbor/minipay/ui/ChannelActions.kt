@@ -19,7 +19,7 @@ import ltd.mbor.minipay.ui.theme.MiniPayTheme
 fun ChannelActions(
   channel: Channel,
   activity: MainActivity?,
-  setChannel: (Channel) -> Unit,
+  selectChannel: (Channel) -> Unit,
   updateChannel: (Channel) -> Unit
 ) {
   Column(Modifier.fillMaxWidth()) {
@@ -32,7 +32,7 @@ fun ChannelActions(
       }
       Spacer(Modifier.weight(1f))
       Button({
-        setChannel(channel)
+        selectChannel(channel)
       }) {
         Text("Details")
       }

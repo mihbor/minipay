@@ -5,10 +5,13 @@ import logic.blockNumber
 import logic.eltooScriptCoins
 import ltd.mbor.minipay.common.Channel
 import org.jetbrains.compose.web.dom.Br
+import org.jetbrains.compose.web.dom.Button
+import org.jetbrains.compose.web.dom.Text
 
 @Composable
 fun ChannelActions(
   channel: Channel,
+  selectChannel: (Channel) -> Unit,
   updateChannel: (Channel) -> Unit
 ) {
   if (channel.status == "OPEN") {
@@ -18,5 +21,10 @@ fun ChannelActions(
   Br()
   if (channel.status in setOf("OFFERED", "SETTLED")) {
     DeleteChannel(channel, updateChannel)
+  }
+  Button({
+    onClick { selectChannel(channel) }
+  }) {
+    Text("Details")
   }
 }

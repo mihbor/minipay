@@ -12,7 +12,11 @@ import org.jetbrains.compose.web.dom.*
 import scope
 
 @Composable
-fun ChannelListing(channels: MutableList<Channel>, eltooScriptCoins: MutableMap<String, List<Coin>>) {
+fun ChannelListing(
+  channels: MutableList<Channel>,
+  eltooScriptCoins: MutableMap<String, List<Coin>>,
+  selectChannel: (Channel?) -> Unit,
+) {
   LaunchedEffect("channels") {
     channels.reload(eltooScriptCoins)
   }
@@ -61,7 +65,7 @@ fun ChannelListing(channels: MutableList<Channel>, eltooScriptCoins: MutableMap<
               textAlign("left")
             }
           }) {
-            ChannelActions(channel) {
+            ChannelActions(channel, selectChannel) {
               scope.launch { channels.reload(eltooScriptCoins) }
             }
           }

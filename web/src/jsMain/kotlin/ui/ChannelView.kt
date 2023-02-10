@@ -1,35 +1,62 @@
 package ui
 
 import androidx.compose.runtime.Composable
-import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
-import logic.balances
 import logic.blockNumber
 import logic.eltooScriptCoins
-import logic.multisigScriptBalances
+import ltd.mbor.minimak.Balance
 import ltd.mbor.minipay.common.Channel
+import org.jetbrains.compose.web.css.margin
+import org.jetbrains.compose.web.css.marginRight
+import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.dom.Br
+import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 
 @Composable
 fun ChannelView(
   channel: Channel,
+  balances: Map<String, Balance>,
   updateChannel: (Channel) -> Unit
 ) {
-  Br()
-  multisigScriptBalances.firstOrNull{ it.tokenId == channel.tokenId }?.let{
-    TokenIcon(it.tokenId, balances)
-    Text("${it.tokenName} token funding balance: ${it.confirmed.toPlainString()}")
-    Br()
+  Div({
+    style { margin(10.px) }
+  }) {
+    Div {
+      Text("Token: ")
+      TokenIcon(channel.tokenId, balances)
+    }
+    Div {
+      Span({
+        style { marginRight(50.px) }
+      }) {
+        Text("My balance: ")
+        Text(channel.my.balance.toPlainString())
+      }
+      Text("Their balance: ")
+      Text(channel.their.balance.toPlainString())
+    }
+    Div {
+      Text("Sequence number: ${channel.sequenceNumber}")
+    }
+    Div {
+      Text("Multi-signature script address:")
+      Br()
+      Text(channel.multiSigAddress)
+      CopyToClipboard(channel.multiSigAddress)
+    }
+    Div {
+      Text("Eltoo script address:")
+      Br()
+      Text(channel.eltooAddress)
+      CopyToClipboard(channel.eltooAddress)
+    }
+    if (channel.status == "OPEN") {
+      ChannelTransfers(channel)
+    }
+    Settlement(channel, blockNumber, eltooScriptCoins[channel.eltooAddress] ?: emptyList(), updateChannel)
+    if (channel.status in setOf("OFFERED", "SETTLED")) {
+      DeleteChannel(channel, updateChannel)
+    }
   }
-  if (multisigScriptBalances.any { it.confirmed > ZERO }) {
-    Text("channel balance: me ${channel.my.balance.toPlainString()}, counterparty ${channel.their.balance.toPlainString()}")
-    ChannelTransfers(channel)
-    Br()
-  }
-  Settlement(
-    if (multisigScriptBalances.any { it.confirmed > ZERO }) channel.copy(status = "OPEN") else channel,
-    blockNumber,
-    eltooScriptCoins[channel.eltooAddress] ?: emptyList(),
-    updateChannel
-  )
 }

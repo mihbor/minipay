@@ -9,7 +9,7 @@ fun Welcome(setView: (String) -> Unit) {
     Text("Welcome to MiniPay")
   }
   H2 {
-    Text("Please select an option from the menu")
+    Text("Please select an option from the menu ☰")
   }
   H3 {
     Text("You can also download a native Android app in: ")

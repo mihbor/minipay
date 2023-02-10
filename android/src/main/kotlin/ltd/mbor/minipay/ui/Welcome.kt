@@ -21,7 +21,7 @@ fun Welcome(inited: Boolean, setView: (String) -> Unit) {
   Text("Welcome to MiniPay", modifier = Modifier.padding(20.dp), fontSize = 20.sp)
   ProvideTextStyle(value = TextStyle(fontSize = 16.sp)) {
     Column(Modifier.padding(20.dp)) {
-      if (inited) Text("Please select an option from the menu")
+      if (inited) Text("Please select an option from the menu ☰")
       else {
         Row {
           Text("Please go to ")

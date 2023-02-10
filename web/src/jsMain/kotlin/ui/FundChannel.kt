@@ -145,7 +145,7 @@ fun FundChannel(
     Br()
   }
   channel?.let {
-    ChannelView(it) {
+    ChannelView(it, balances) {
       channel = it
     }
   }

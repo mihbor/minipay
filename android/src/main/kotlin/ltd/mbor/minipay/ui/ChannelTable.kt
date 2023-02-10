@@ -34,7 +34,7 @@ fun ChannelTable(
   balances: Map<String, Balance>,
   eltooScriptCoins: MutableMap<String, List<Coin>>,
   activity: MainActivity?,
-  setChannel: (Channel) -> Unit,
+  selectChannel: (Channel) -> Unit,
 ) {
   ProvideTextStyle(value = TextStyle(fontSize = 10.sp, textAlign = TextAlign.Right)) {
     Row {
@@ -69,7 +69,7 @@ fun ChannelTable(
           }
         }
         if (showActions) Row(Modifier.fillMaxWidth()){
-          ChannelActions(channel, activity, setChannel) {
+          ChannelActions(channel, activity, selectChannel) {
             scope.launch { channels.reload(eltooScriptCoins) }
           }
         }
