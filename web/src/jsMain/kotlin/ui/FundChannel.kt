@@ -39,7 +39,6 @@ fun FundChannel(
   
   var fundingTxStatus by remember { mutableStateOf("") }
   var triggerTxStatus by remember { mutableStateOf("") }
-  var updateTxStatus by remember { mutableStateOf("") }
   var settlementTxStatus by remember { mutableStateOf("") }
   
   var showFundScanner by remember { mutableStateOf(false) }
@@ -136,10 +135,6 @@ fun FundChannel(
     Text(it)
     Br()
   }
-  updateTxStatus.takeUnless { it.isEmpty() }?.let {
-    Text(it)
-    Br()
-  }
   settlementTxStatus.takeUnless { it.isEmpty() }?.let {
     Text(it)
     Br()
@@ -187,13 +182,9 @@ fun FundChannel(
                 settlementTxStatus += " and received back."
               }
               CHANNEL_FUNDED -> fundingTxStatus += ", signed and posted!"
-              CHANNEL_UPDATED -> {
+              CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED -> {
                 channel = newChannel
-                updateTxStatus += "Update transaction received. "
-              }
-              CHANNEL_UPDATED_ACKED -> {
-                channel = newChannel
-                updateTxStatus += "Update transaction ack received. "
+                progressStep--
               }
               else -> {}
             }

@@ -47,7 +47,6 @@ fun RequestChannel(
   var showQR by remember { mutableStateOf(false) }
   var bitmap by remember { mutableStateOf<ImageBitmap?>(null) }
   var triggerTxStatus by remember { mutableStateOf("") }
-  var updateTxStatus by remember { mutableStateOf("") }
   var settlementTxStatus by remember { mutableStateOf("") }
 
   var progressStep: Int by remember { mutableStateOf(0) }
@@ -84,13 +83,9 @@ fun RequestChannel(
           triggerTxStatus += " and sent back."
           settlementTxStatus += " and sent back."
         }
-        CHANNEL_UPDATED -> {
+        CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED -> {
           channel = newChannel
-          updateTxStatus += "Update transaction received. "
-        }
-        CHANNEL_UPDATED_ACKED -> {
-          channel = newChannel
-          updateTxStatus += "Update transaction ack received. "
+          progressStep--
         }
         else -> {}
       }
@@ -146,9 +141,6 @@ fun RequestChannel(
     }
   }
   triggerTxStatus.takeUnless { it.isEmpty() }?.let {
-    Text(it)
-  }
-  updateTxStatus.takeUnless { it.isEmpty() }?.let {
     Text(it)
   }
   settlementTxStatus.takeUnless { it.isEmpty() }?.let {

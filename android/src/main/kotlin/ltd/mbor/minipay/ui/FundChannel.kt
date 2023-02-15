@@ -49,7 +49,6 @@ fun FundChannel(balances: Map<String, Balance>, tokens: Map<String, Token>, acti
 
   var fundingTxStatus by remember { mutableStateOf("") }
   var triggerTxStatus by remember { mutableStateOf("") }
-  var updateTxStatus by remember { mutableStateOf("") }
   var settlementTxStatus by remember { mutableStateOf("") }
 
   var showFundScanner by remember { mutableStateOf(true) }
@@ -123,9 +122,6 @@ fun FundChannel(balances: Map<String, Balance>, tokens: Map<String, Token>, acti
         triggerTxStatus.takeUnless { it.isEmpty() }?.let {
           Text(it)
         }
-        updateTxStatus.takeUnless { it.isEmpty() }?.let {
-          Text(it)
-        }
         settlementTxStatus.takeUnless { it.isEmpty() }?.let {
           Text(it)
         }
@@ -169,23 +165,15 @@ fun FundChannel(balances: Map<String, Balance>, tokens: Map<String, Token>, acti
                       channel = newChannel
                       log("channelId: ${channel!!.id}")
                     }
-
                     SIGS_RECEIVED -> {
                       triggerTxStatus += " and received back."
                       settlementTxStatus += " and received back."
                     }
-
                     CHANNEL_FUNDED -> fundingTxStatus += ", signed and posted!"
-                    CHANNEL_UPDATED -> {
+                    CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED -> {
                       channel = newChannel
-                      updateTxStatus += "Update transaction received. "
+                      progressStep--
                     }
-
-                    CHANNEL_UPDATED_ACKED -> {
-                      channel = newChannel
-                      updateTxStatus += "Update transaction ack received. "
-                    }
-
                     else -> {}
                   }
                 }
