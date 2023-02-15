@@ -22,9 +22,9 @@ import ltd.mbor.minimak.Token
 import ltd.mbor.minimak.getAddress
 import ltd.mbor.minipay.MainActivity
 import ltd.mbor.minipay.common.Channel
+import ltd.mbor.minipay.common.JoinChannelEvent.*
 import ltd.mbor.minipay.common.channelKey
 import ltd.mbor.minipay.common.newKeys
-import ltd.mbor.minipay.logic.JoinChannelEvent.*
 import ltd.mbor.minipay.logic.eltooScriptAddress
 import ltd.mbor.minipay.logic.joinChannel
 import ltd.mbor.minipay.logic.multisigScriptAddress

@@ -4,7 +4,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.browser.document
-import logic.JoinChannelEvent.*
 import logic.eltooScriptAddress
 import logic.joinChannel
 import logic.multisigScriptAddress
@@ -14,6 +13,7 @@ import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.Token
 import ltd.mbor.minimak.getAddress
 import ltd.mbor.minipay.common.Channel
+import ltd.mbor.minipay.common.JoinChannelEvent.*
 import ltd.mbor.minipay.common.channelKey
 import ltd.mbor.minipay.common.newKeys
 import org.jetbrains.compose.web.attributes.disabled
