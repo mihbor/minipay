@@ -1,6 +1,7 @@
 package ltd.mbor.minipay.common
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import ltd.mbor.minipay.common.model.Channel
 
 object SimulatedStorage: ChannelStorage {
   var channels = mutableListOf<Channel>()

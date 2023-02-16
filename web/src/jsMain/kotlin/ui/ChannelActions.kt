@@ -3,7 +3,7 @@ package ui
 import androidx.compose.runtime.Composable
 import logic.blockNumber
 import logic.eltooScriptCoins
-import ltd.mbor.minipay.common.Channel
+import ltd.mbor.minipay.common.model.Channel
 import org.jetbrains.compose.web.dom.Br
 import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Text

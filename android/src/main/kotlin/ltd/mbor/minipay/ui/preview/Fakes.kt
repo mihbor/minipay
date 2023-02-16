@@ -10,12 +10,12 @@ import kotlinx.serialization.json.JsonPrimitive
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Coin
 import ltd.mbor.minimak.Token
-import ltd.mbor.minipay.common.Channel
-import ltd.mbor.minipay.common.PaymentRequestReceived
-import ltd.mbor.minipay.common.PaymentRequestSent
-import ltd.mbor.minipay.common.Prefs
-import ltd.mbor.minipay.common.Transport.FIREBASE
-import ltd.mbor.minipay.common.Transport.NFC
+import ltd.mbor.minipay.common.model.Channel
+import ltd.mbor.minipay.common.model.PaymentRequestReceived
+import ltd.mbor.minipay.common.model.PaymentRequestSent
+import ltd.mbor.minipay.common.model.Prefs
+import ltd.mbor.minipay.common.model.Transport.FIREBASE
+import ltd.mbor.minipay.common.model.Transport.NFC
 
 val fakeChannelOpen = Channel(
   id = 1,

@@ -7,10 +7,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import ltd.mbor.minimak.Token
 import ltd.mbor.minipay.MainActivity
-import ltd.mbor.minipay.common.ChannelEvent
-import ltd.mbor.minipay.common.PaymentRequestReceived
-import ltd.mbor.minipay.common.PaymentRequestSent
-import ltd.mbor.minipay.common.Transport.NFC
+import ltd.mbor.minipay.common.model.ChannelEvent
+import ltd.mbor.minipay.common.model.PaymentRequestReceived
+import ltd.mbor.minipay.common.model.PaymentRequestSent
+import ltd.mbor.minipay.common.model.Transport.NFC
 import ltd.mbor.minipay.ui.preview.previewEvents
 import ltd.mbor.minipay.ui.preview.previewTokens
 import ltd.mbor.minipay.ui.theme.MiniPayTheme

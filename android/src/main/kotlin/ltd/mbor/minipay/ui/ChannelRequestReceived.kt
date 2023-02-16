@@ -10,9 +10,9 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ONE
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Token
-import ltd.mbor.minipay.common.Channel
 import ltd.mbor.minipay.common.acceptRequest
 import ltd.mbor.minipay.common.channelKey
+import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.publish
 import ltd.mbor.minipay.scope
 import ltd.mbor.minipay.ui.preview.fakeMinimaChannel

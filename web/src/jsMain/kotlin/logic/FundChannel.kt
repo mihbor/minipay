@@ -11,6 +11,7 @@ import ltd.mbor.minimak.log
 import ltd.mbor.minimak.newScript
 import ltd.mbor.minipay.common.*
 import ltd.mbor.minipay.common.FundChannelEvent.*
+import ltd.mbor.minipay.common.model.Channel
 import scope
 import view
 

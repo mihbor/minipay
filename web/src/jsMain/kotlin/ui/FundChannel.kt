@@ -14,8 +14,8 @@ import logic.multisigScriptBalances
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.Token
-import ltd.mbor.minipay.common.Channel
 import ltd.mbor.minipay.common.FundChannelEvent.*
+import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.newKeys
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.css.*

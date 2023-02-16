@@ -3,6 +3,7 @@ package ltd.mbor.minipay.common
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ONE
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.coroutines.test.runTest
+import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.resources.importAndPostError
 import ltd.mbor.minipay.common.resources.three_new_keys
 import kotlin.test.*

@@ -1,4 +1,4 @@
-package ltd.mbor.minipay.common
+package ltd.mbor.minipay.common.model
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.datetime.Instant
@@ -28,9 +28,4 @@ data class Channel(
     val update: String,
     val settle: String
   )
-}
-
-enum class Transport {
-  FIREBASE,
-  NFC
 }

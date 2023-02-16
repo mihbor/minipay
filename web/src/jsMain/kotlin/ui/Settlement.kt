@@ -6,8 +6,8 @@ import kotlinx.coroutines.launch
 import logic.balances
 import ltd.mbor.minimak.Coin
 import ltd.mbor.minimak.MinimaException
-import ltd.mbor.minipay.common.Channel
 import ltd.mbor.minipay.common.completeSettlement
+import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.postUpdate
 import ltd.mbor.minipay.common.triggerSettlement
 import org.jetbrains.compose.web.attributes.disabled

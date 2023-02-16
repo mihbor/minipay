@@ -13,8 +13,8 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
 import ltd.mbor.minimak.*
-import ltd.mbor.minipay.common.Prefs
 import ltd.mbor.minipay.common.channelKey
+import ltd.mbor.minipay.common.model.Prefs
 import ltd.mbor.minipay.common.processRequest
 import ltd.mbor.minipay.common.storage.createDB
 import ltd.mbor.minipay.common.storage.getChannels

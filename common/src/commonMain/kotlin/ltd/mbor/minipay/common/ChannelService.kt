@@ -1,6 +1,7 @@
 package ltd.mbor.minipay.common
 
 import ltd.mbor.minimak.*
+import ltd.mbor.minipay.common.model.Channel
 
 class ChannelService(
   val mds: MdsApi,

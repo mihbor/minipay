@@ -3,6 +3,9 @@ package logic
 import androidx.compose.runtime.*
 import ltd.mbor.minimak.*
 import ltd.mbor.minipay.common.*
+import ltd.mbor.minipay.common.model.Channel
+import ltd.mbor.minipay.common.model.ChannelEvent
+import ltd.mbor.minipay.common.model.PaymentRequestSent
 
 val channels = mutableStateListOf<Channel>()
 var multisigScriptAddress by mutableStateOf("")

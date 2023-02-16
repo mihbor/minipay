@@ -11,7 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import ltd.mbor.minipay.common.Prefs
+import ltd.mbor.minipay.common.model.Prefs
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
 
 @Composable

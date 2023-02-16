@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Coin
 import ltd.mbor.minipay.MainActivity
-import ltd.mbor.minipay.common.Channel
+import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.logic.reload
 import ltd.mbor.minipay.scope
 import ltd.mbor.minipay.ui.preview.fakeBalances

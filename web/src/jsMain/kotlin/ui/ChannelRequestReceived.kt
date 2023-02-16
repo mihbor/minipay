@@ -4,9 +4,9 @@ import androidx.compose.runtime.*
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Token
-import ltd.mbor.minipay.common.Channel
 import ltd.mbor.minipay.common.acceptRequest
 import ltd.mbor.minipay.common.channelKey
+import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.publish
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.dom.Button

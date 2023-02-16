@@ -2,9 +2,9 @@ package ui
 
 import androidx.compose.runtime.Composable
 import ltd.mbor.minimak.Token
-import ltd.mbor.minipay.common.ChannelEvent
-import ltd.mbor.minipay.common.PaymentRequestReceived
-import ltd.mbor.minipay.common.PaymentRequestSent
+import ltd.mbor.minipay.common.model.ChannelEvent
+import ltd.mbor.minipay.common.model.PaymentRequestReceived
+import ltd.mbor.minipay.common.model.PaymentRequestSent
 import org.jetbrains.compose.web.dom.Div
 
 @Composable

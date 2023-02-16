@@ -4,9 +4,9 @@ import androidx.compose.runtime.*
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.coroutines.launch
 import logic.events
-import ltd.mbor.minipay.common.Channel
-import ltd.mbor.minipay.common.PaymentRequestSent
-import ltd.mbor.minipay.common.Transport.FIREBASE
+import ltd.mbor.minipay.common.model.Channel
+import ltd.mbor.minipay.common.model.PaymentRequestSent
+import ltd.mbor.minipay.common.model.Transport.FIREBASE
 import ltd.mbor.minipay.common.request
 import ltd.mbor.minipay.common.send
 import org.jetbrains.compose.web.attributes.disabled

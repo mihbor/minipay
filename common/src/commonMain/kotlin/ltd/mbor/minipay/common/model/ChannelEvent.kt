@@ -1,6 +1,11 @@
-package ltd.mbor.minipay.common
+package ltd.mbor.minipay.common.model
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
+
+enum class Transport {
+  FIREBASE,
+  NFC
+}
 
 interface ChannelEvent {
   val channel: Channel

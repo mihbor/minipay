@@ -6,8 +6,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.launch
-import ltd.mbor.minipay.common.Channel
 import ltd.mbor.minipay.common.delete
+import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.scope
 import ltd.mbor.minipay.ui.preview.fakeChannelOpen
 import ltd.mbor.minipay.ui.theme.MiniPayTheme

@@ -1,4 +1,4 @@
-package ltd.mbor.minipay.common
+package ltd.mbor.minipay.common.model
 
 data class Prefs(
   val uid: String,

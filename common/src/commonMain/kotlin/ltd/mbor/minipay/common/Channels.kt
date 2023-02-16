@@ -6,7 +6,9 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import ltd.mbor.minimak.*
-import ltd.mbor.minipay.common.Transport.FIREBASE
+import ltd.mbor.minipay.common.model.Channel
+import ltd.mbor.minipay.common.model.PaymentRequestReceived
+import ltd.mbor.minipay.common.model.Transport.FIREBASE
 import ltd.mbor.minipay.common.storage.getChannels
 import ltd.mbor.minipay.common.storage.updateChannel
 import ltd.mbor.minipay.common.storage.updateChannelStatus

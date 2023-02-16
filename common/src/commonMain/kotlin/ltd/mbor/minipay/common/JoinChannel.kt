@@ -5,6 +5,7 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.datetime.Clock
 import ltd.mbor.minimak.*
 import ltd.mbor.minipay.common.JoinChannelEvent.*
+import ltd.mbor.minipay.common.model.Channel
 
 enum class JoinChannelEvent{
   SCRIPTS_DEPLOYED, SIGS_RECEIVED, TRIGGER_TX_SIGNED, SETTLEMENT_TX_SIGNED, CHANNEL_PERSISTED, CHANNEL_PUBLISHED, CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED

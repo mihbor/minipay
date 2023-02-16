@@ -13,8 +13,8 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Token
 import ltd.mbor.minipay.MainActivity
-import ltd.mbor.minipay.common.Channel
-import ltd.mbor.minipay.common.Prefs
+import ltd.mbor.minipay.common.model.Channel
+import ltd.mbor.minipay.common.model.Prefs
 import ltd.mbor.minipay.logic.channels
 import ltd.mbor.minipay.logic.eltooScriptCoins
 import ltd.mbor.minipay.logic.events

@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.dp
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minipay.MainActivity
 import ltd.mbor.minipay.blockNumber
-import ltd.mbor.minipay.common.Channel
+import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.logic.eltooScriptCoins
 import ltd.mbor.minipay.ui.preview.fakeBalances
 import ltd.mbor.minipay.ui.preview.fakeChannelOpen

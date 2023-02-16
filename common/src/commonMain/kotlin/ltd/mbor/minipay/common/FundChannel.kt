@@ -5,6 +5,7 @@ import kotlinx.datetime.Clock
 import kotlinx.serialization.json.jsonArray
 import ltd.mbor.minimak.*
 import ltd.mbor.minipay.common.FundChannelEvent.*
+import ltd.mbor.minipay.common.model.Channel
 
 enum class FundChannelEvent{
   SCRIPTS_DEPLOYED, FUNDING_TX_CREATED, TRIGGER_TX_SIGNED, SETTLEMENT_TX_SIGNED, CHANNEL_PERSISTED, CHANNEL_PUBLISHED, SIGS_RECEIVED, CHANNEL_FUNDED, CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED

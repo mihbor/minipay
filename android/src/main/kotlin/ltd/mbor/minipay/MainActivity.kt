@@ -32,9 +32,9 @@ import kotlinx.coroutines.launch
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.getAddress
 import ltd.mbor.minimak.importTx
-import ltd.mbor.minipay.common.PaymentRequestReceived
-import ltd.mbor.minipay.common.Prefs
-import ltd.mbor.minipay.common.Transport.NFC
+import ltd.mbor.minipay.common.model.PaymentRequestReceived
+import ltd.mbor.minipay.common.model.Prefs
+import ltd.mbor.minipay.common.model.Transport.NFC
 import ltd.mbor.minipay.common.newTxId
 import ltd.mbor.minipay.common.storage.getChannel
 import ltd.mbor.minipay.logic.channelUpdateAck

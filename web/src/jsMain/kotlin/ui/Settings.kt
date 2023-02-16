@@ -2,7 +2,7 @@ package ui
 
 import androidx.compose.runtime.*
 import kotlinx.browser.window
-import ltd.mbor.minipay.common.Prefs
+import ltd.mbor.minipay.common.model.Prefs
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.width
 import org.jetbrains.compose.web.dom.*

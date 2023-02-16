@@ -9,6 +9,7 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.jsonString
+import ltd.mbor.minipay.common.model.Channel
 
 interface ChannelStorage{
   suspend fun createDB()

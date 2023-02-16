@@ -17,10 +17,10 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.coroutines.launch
 import ltd.mbor.minipay.*
 import ltd.mbor.minipay.R
-import ltd.mbor.minipay.common.Channel
-import ltd.mbor.minipay.common.PaymentRequestSent
-import ltd.mbor.minipay.common.Transport.FIREBASE
-import ltd.mbor.minipay.common.Transport.NFC
+import ltd.mbor.minipay.common.model.Channel
+import ltd.mbor.minipay.common.model.PaymentRequestSent
+import ltd.mbor.minipay.common.model.Transport.FIREBASE
+import ltd.mbor.minipay.common.model.Transport.NFC
 import ltd.mbor.minipay.common.request
 import ltd.mbor.minipay.common.send
 import ltd.mbor.minipay.logic.events

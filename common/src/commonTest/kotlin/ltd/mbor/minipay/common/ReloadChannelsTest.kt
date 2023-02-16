@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import ltd.mbor.minimak.Coin
 import ltd.mbor.minimak.Transaction
+import ltd.mbor.minipay.common.model.Channel
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

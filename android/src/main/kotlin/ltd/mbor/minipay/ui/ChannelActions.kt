@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import ltd.mbor.minipay.MainActivity
-import ltd.mbor.minipay.common.Channel
+import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.ui.preview.fakeChannelOpen
 import ltd.mbor.minipay.ui.preview.fakeChannelTriggered
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
