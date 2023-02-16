@@ -166,6 +166,21 @@ suspend fun Channel.acceptRequest(updateTxId: Int, settleTxId: Int, sequenceNumb
   return signedUpdateTx to signedSettleTx
 }
 
+suspend fun Channel.processUpdate(isAck: Boolean, updateTxText: String, settleTxText: String, onSuccess: (Channel) -> Unit): Channel {
+  log("Updating channel isAck:$isAck")
+  val updateTxnId = newTxId()
+  MDS.importTx(updateTxnId, updateTxText)
+  val settleTxnId = newTxId()
+  val settleTx = MDS.importTx(settleTxnId, settleTxText)
+  
+  val signedUpdateTx = if (isAck) updateTxText else signAndExportTx(updateTxnId, my.keys.update)
+  val signedSettleTx = if (isAck) settleTxText else signAndExportTx(settleTxnId, my.keys.settle)
+  if (!isAck) {
+    publish(channelKey(their.keys, tokenId), listOf("TXN_UPDATE_ACK", signedUpdateTx, signedSettleTx).joinToString(";"))
+  }
+  return update(signedUpdateTx, signedSettleTx, settleTx, onSuccess)
+}
+
 suspend fun Channel.update(updateTxText: String, settleTxText: String, settleTx: Transaction, onSuccess: (Channel) -> Unit): Channel {
   val sequenceNumber = settleTx.state.find { it.port == 99 }?.data?.toInt()!!
   val outputs = settleTx.outputs
