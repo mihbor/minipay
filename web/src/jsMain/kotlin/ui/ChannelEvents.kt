@@ -1,10 +1,10 @@
 package ui
 
 import androidx.compose.runtime.Composable
-import logic.ChannelEvent
-import logic.PaymentRequestReceived
-import logic.PaymentRequestSent
 import ltd.mbor.minimak.Token
+import ltd.mbor.minipay.common.ChannelEvent
+import ltd.mbor.minipay.common.PaymentRequestReceived
+import ltd.mbor.minipay.common.PaymentRequestSent
 import org.jetbrains.compose.web.dom.Div
 
 @Composable

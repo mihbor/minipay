@@ -3,9 +3,10 @@ package ui
 import androidx.compose.runtime.*
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.coroutines.launch
-import logic.PaymentRequestSent
 import logic.events
 import ltd.mbor.minipay.common.Channel
+import ltd.mbor.minipay.common.PaymentRequestSent
+import ltd.mbor.minipay.common.Transport.FIREBASE
 import ltd.mbor.minipay.common.request
 import ltd.mbor.minipay.common.send
 import org.jetbrains.compose.web.attributes.disabled
@@ -51,6 +52,7 @@ fun ChannelTransfers(channel: Channel) {
             settleTxAndId.second,
             channel.sequenceNumber + 1,
             channel.my.balance + amount to channel.their.balance - amount,
+            FIREBASE
           )
           isSending = false
           view = "Channel events"

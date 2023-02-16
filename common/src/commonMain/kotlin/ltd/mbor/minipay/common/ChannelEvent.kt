@@ -1,7 +1,6 @@
-package logic
+package ltd.mbor.minipay.common
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
-import ltd.mbor.minipay.common.Channel
 
 interface ChannelEvent {
   val channel: Channel
@@ -9,6 +8,7 @@ interface ChannelEvent {
   val settleTxId: Int
   val sequenceNumber: Int
   val channelBalance: Pair<BigDecimal, BigDecimal>
+  val transport: Transport
 }
 
 data class PaymentRequestReceived(
@@ -17,6 +17,7 @@ data class PaymentRequestReceived(
   override val settleTxId: Int,
   override val sequenceNumber: Int,
   override val channelBalance: Pair<BigDecimal, BigDecimal>,
+  override val transport: Transport,
 ) : ChannelEvent
 
 data class PaymentRequestSent(
@@ -25,4 +26,5 @@ data class PaymentRequestSent(
   override val settleTxId: Int,
   override val sequenceNumber: Int,
   override val channelBalance: Pair<BigDecimal, BigDecimal>,
+  override val transport: Transport
 ) : ChannelEvent

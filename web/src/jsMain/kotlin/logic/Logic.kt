@@ -15,7 +15,7 @@ import kotlinx.serialization.json.jsonObject
 import ltd.mbor.minimak.*
 import ltd.mbor.minipay.common.Prefs
 import ltd.mbor.minipay.common.channelKey
-import ltd.mbor.minipay.common.newTxId
+import ltd.mbor.minipay.common.processRequest
 import ltd.mbor.minipay.common.storage.createDB
 import ltd.mbor.minipay.common.storage.getChannels
 import ltd.mbor.minipay.common.storage.setChannelOpen
@@ -62,28 +62,12 @@ fun initMDS(prefs: Prefs) {
               log("tx msg: $msg")
               val splits = msg.split(";")
               if (splits[0].startsWith("TXN_UPDATE")) {
-                channels.first { it.id == channel.id }.update(splits[0].endsWith("_ACK"), updateTxText = splits[1], settleTxText = splits[2])
+                channels.first { it.id == channel.id }.processUpdate(splits[0].endsWith("_ACK"), updateTxText = splits[1], settleTxText = splits[2])
               } else if (splits[0] == "TXN_REQUEST") {
                 val (_, updateTxText, settleTxText) = splits
-                val updateTxId = newTxId()
-                MDS.importTx(updateTxId, updateTxText)
-                val settleTxId = newTxId()
-                val settleTx = MDS.importTx(settleTxId, settleTxText)
-                log("TXN_REQUEST for channel: ${channel.id}")
-                with(channels.first { it.id == channel.id }) {
-                  val channelBalance = (settleTx.outputs.firstOrNull { it.address == my.address }?.tokenAmount ?: ZERO) to
-                    (settleTx.outputs.firstOrNull { it.address == their.address }?.tokenAmount ?: ZERO)
-                  val newSequenceNumber = settleTx.state.first { it.port == 99 }.data.toInt()
-                  if (newSequenceNumber > sequenceNumber) {
-                    events += PaymentRequestReceived(
-                      this,
-                      updateTxId,
-                      settleTxId,
-                      newSequenceNumber,
-                      channelBalance,
-                    )
-                    view = "Channel events"
-                  } else log("Stale update $newSequenceNumber received for channel $id at $sequenceNumber")
+                channels.first { it.id == channel.id }.processRequest(updateTxText, settleTxText) {
+                  events += it
+                  view = "Channel events"
                 }
               }
             }.onCompletion {

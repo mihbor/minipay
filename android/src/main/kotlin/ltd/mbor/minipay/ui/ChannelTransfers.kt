@@ -18,9 +18,11 @@ import kotlinx.coroutines.launch
 import ltd.mbor.minipay.*
 import ltd.mbor.minipay.R
 import ltd.mbor.minipay.common.Channel
+import ltd.mbor.minipay.common.PaymentRequestSent
+import ltd.mbor.minipay.common.Transport.FIREBASE
+import ltd.mbor.minipay.common.Transport.NFC
 import ltd.mbor.minipay.common.request
 import ltd.mbor.minipay.common.send
-import ltd.mbor.minipay.logic.PaymentRequestSent
 import ltd.mbor.minipay.logic.events
 import ltd.mbor.minipay.ui.preview.fakeChannelOpen
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
@@ -72,7 +74,7 @@ fun ChannelTransfers(channel: Channel, activity: MainActivity?) {
                 settleTxAndId.second,
                 channel.sequenceNumber + 1,
                 channel.my.balance + amount to channel.their.balance - amount,
-                isNfc = false
+                FIREBASE
               )
             )
             preparingRequest = false
@@ -98,7 +100,7 @@ fun ChannelTransfers(channel: Channel, activity: MainActivity?) {
                   settleTxAndId.second,
                   channel.sequenceNumber + 1,
                   channel.my.balance + amount to channel.their.balance - amount,
-                  isNfc = false
+                  NFC
                 )
               )
               preparingRequest = false

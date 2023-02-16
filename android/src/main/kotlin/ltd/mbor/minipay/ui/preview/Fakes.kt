@@ -11,9 +11,11 @@ import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Coin
 import ltd.mbor.minimak.Token
 import ltd.mbor.minipay.common.Channel
+import ltd.mbor.minipay.common.PaymentRequestReceived
+import ltd.mbor.minipay.common.PaymentRequestSent
 import ltd.mbor.minipay.common.Prefs
-import ltd.mbor.minipay.logic.PaymentRequestReceived
-import ltd.mbor.minipay.logic.PaymentRequestSent
+import ltd.mbor.minipay.common.Transport.FIREBASE
+import ltd.mbor.minipay.common.Transport.NFC
 
 val fakeChannelOpen = Channel(
   id = 1,
@@ -114,8 +116,8 @@ val previewTokens = listOf(
 ).associateBy { it.tokenId }
 
 val previewEvents = mutableListOf(
-  PaymentRequestSent(fakeChannelOpen, 1, 2, 3, ZERO to ONE, true),
-  PaymentRequestSent(fakeChannelOpen, 1, 2, 3, ZERO to ONE, false),
-  PaymentRequestReceived(fakeChannelOpen, 1, 2, 3, ZERO to ONE, true),
-  PaymentRequestReceived(fakeChannelOpen, 1, 2, 3, ZERO to ONE, false),
+  PaymentRequestSent(fakeChannelOpen, 1, 2, 3, ZERO to ONE, NFC),
+  PaymentRequestSent(fakeChannelOpen, 1, 2, 3, ZERO to ONE, FIREBASE),
+  PaymentRequestReceived(fakeChannelOpen, 1, 2, 3, ZERO to ONE, NFC),
+  PaymentRequestReceived(fakeChannelOpen, 1, 2, 3, ZERO to ONE, FIREBASE),
 )

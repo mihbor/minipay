@@ -29,3 +29,8 @@ data class Channel(
     val settle: String
   )
 }
+
+enum class Transport {
+  FIREBASE,
+  NFC
+}

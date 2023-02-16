@@ -1,12 +1,10 @@
 package ltd.mbor.minipay.logic
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
-import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import ltd.mbor.minimak.MDS
-import ltd.mbor.minimak.importTx
 import ltd.mbor.minimak.log
 import ltd.mbor.minimak.newScript
 import ltd.mbor.minipay.common.*
@@ -28,28 +26,14 @@ fun joinChannel(
     val splits = msg.split(";")
     if (splits[0].startsWith("TXN_UPDATE")) {
       val isAck = splits[0].endsWith("_ACK")
-      channel = channel?.update(isAck, updateTxText = splits[1], settleTxText = splits[2])
+      channel = channel?.processUpdate(isAck, updateTxText = splits[1], settleTxText = splits[2])
       onEvent(if (isAck) CHANNEL_UPDATED_ACKED else CHANNEL_UPDATED, channel)
     } else if (splits[0] == "TXN_REQUEST") {
       val (_, updateTxText, settleTxText) = splits
-      val updateTxId = newTxId()
-      MDS.importTx(updateTxId, updateTxText)
-      val settleTxId = newTxId()
-      val settleTx = MDS.importTx(settleTxId, settleTxText)
-      val channelBalance = (settleTx.outputs.firstOrNull{ it.address == channel!!.my.address }?.tokenAmount ?: ZERO) to
-        (settleTx.outputs.firstOrNull{ it.address == channel!!.their.address }?.tokenAmount ?: ZERO)
-      val newSequenceNumber = settleTx.state.first { it.port == 99 }.data.toInt()
-      if (newSequenceNumber > channel!!.sequenceNumber) {
-        events += PaymentRequestReceived(
-          channel!!,
-          updateTxId,
-          settleTxId,
-          newSequenceNumber,
-          channelBalance,
-          false
-        )
+      channel!!.processRequest(updateTxText, settleTxText) {
+        events += it
         view = "Channel events"
-      } else log("Stale update $newSequenceNumber received for channel ${channel?.id} at ${channel?.sequenceNumber}")
+      }
     } else {
       val timeLock = splits[0].toInt()
       val theirKeys = Channel.Keys(splits[1], splits[2], splits[3])

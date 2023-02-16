@@ -32,10 +32,11 @@ import kotlinx.coroutines.launch
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.getAddress
 import ltd.mbor.minimak.importTx
+import ltd.mbor.minipay.common.PaymentRequestReceived
 import ltd.mbor.minipay.common.Prefs
+import ltd.mbor.minipay.common.Transport.NFC
 import ltd.mbor.minipay.common.newTxId
 import ltd.mbor.minipay.common.storage.getChannel
-import ltd.mbor.minipay.logic.PaymentRequestReceived
 import ltd.mbor.minipay.logic.channelUpdateAck
 import ltd.mbor.minipay.logic.events
 import ltd.mbor.minipay.logic.initFirebase
@@ -192,7 +193,7 @@ class MainActivity : ComponentActivity(), CardReader.DataCallback {
         val sequenceNumber = settleTx.state.first{ it.port == 99 }.data.toInt()
         check(sequenceNumber == channel.sequenceNumber + 1)
         val channelBalance = settleTx.outputs.first{ it.address == channel.my.address }.tokenAmount to settleTx.outputs.first{ it.address == channel.their.address }.tokenAmount
-        events.add(PaymentRequestReceived(channel, updateTxId, settleTxId,sequenceNumber, channelBalance, isNfc = true))
+        events.add(PaymentRequestReceived(channel, updateTxId, settleTxId,sequenceNumber, channelBalance, transport = NFC))
         view = "events"
       }
     } else if (splits[0] == "TXN_UPDATE_ACK") {

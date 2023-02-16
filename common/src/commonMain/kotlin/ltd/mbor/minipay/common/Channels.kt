@@ -6,6 +6,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import ltd.mbor.minimak.*
+import ltd.mbor.minipay.common.Transport.FIREBASE
 import ltd.mbor.minipay.common.storage.getChannels
 import ltd.mbor.minipay.common.storage.updateChannel
 import ltd.mbor.minipay.common.storage.updateChannelStatus
@@ -127,6 +128,27 @@ suspend fun Channel.send(amount: BigDecimal): Pair<Pair<String, Int>, Pair<Strin
 }
 
 suspend fun Channel.request(amount: BigDecimal) = this.send(-amount)
+
+suspend fun Channel.processRequest(updateTxText: String, settleTxText: String, onSuccess: (PaymentRequestReceived) -> Unit) {
+  val updateTxId = newTxId()
+  MDS.importTx(updateTxId, updateTxText)
+  val settleTxId = newTxId()
+  val settleTx = MDS.importTx(settleTxId, settleTxText)
+  val channelBalance = (settleTx.outputs.firstOrNull{ it.address == my.address }?.tokenAmount ?: ZERO) to
+    (settleTx.outputs.firstOrNull{ it.address == their.address }?.tokenAmount ?: ZERO)
+  val newSequenceNumber = settleTx.state.first { it.port == 99 }.data.toInt()
+  
+  if (newSequenceNumber > sequenceNumber) onSuccess(
+    PaymentRequestReceived(
+      this,
+      updateTxId,
+      settleTxId,
+      newSequenceNumber,
+      channelBalance,
+      FIREBASE
+    )
+  ) else log("Stale update $newSequenceNumber received for channel $id at $sequenceNumber")
+}
 
 suspend fun Channel.acceptRequest(updateTxId: Int, settleTxId: Int, sequenceNumber: Int, channelBalance: Pair<BigDecimal, BigDecimal>): Pair<String, String> {
 //  val sequenceNumber = settleTxId.first.state.find { it.port == 99 }?.data?.toInt()

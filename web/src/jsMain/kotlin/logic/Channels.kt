@@ -12,7 +12,7 @@ val eltooScriptCoins = mutableStateMapOf<String, List<Coin>>()
 
 val events = mutableStateListOf<ChannelEvent>()
 
-suspend fun Channel.update(isAck: Boolean, updateTxText: String, settleTxText: String): Channel {
+suspend fun Channel.processUpdate(isAck: Boolean, updateTxText: String, settleTxText: String): Channel {
   log("Updating channel isAck:$isAck")
   val updateTxnId = newTxId()
   MDS.importTx(updateTxnId, updateTxText)
