@@ -24,8 +24,8 @@ import ltd.mbor.minimak.log
 import ltd.mbor.minipay.MainActivity
 import ltd.mbor.minipay.TAG
 import ltd.mbor.minipay.common.Channel
+import ltd.mbor.minipay.common.FundChannelEvent.*
 import ltd.mbor.minipay.common.newKeys
-import ltd.mbor.minipay.logic.FundChannelEvent.*
 import ltd.mbor.minipay.logic.eltooScriptAddress
 import ltd.mbor.minipay.logic.fundChannel
 import ltd.mbor.minipay.logic.multisigScriptAddress

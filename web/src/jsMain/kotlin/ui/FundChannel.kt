@@ -7,7 +7,6 @@ import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import externals.QrScanner
 import kotlinx.browser.document
 import kotlinx.coroutines.launch
-import logic.FundChannelEvent.*
 import logic.eltooScriptAddress
 import logic.fundChannel
 import logic.multisigScriptAddress
@@ -16,6 +15,7 @@ import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.Token
 import ltd.mbor.minipay.common.Channel
+import ltd.mbor.minipay.common.FundChannelEvent.*
 import ltd.mbor.minipay.common.newKeys
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.css.*
