@@ -1,18 +1,17 @@
 package ltd.mbor.minipay.logic
 
 import androidx.compose.runtime.*
-import ltd.mbor.minimak.Balance
-import ltd.mbor.minimak.Coin
-import ltd.mbor.minimak.MDS
-import ltd.mbor.minimak.importTx
-import ltd.mbor.minipay.common.channelService
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
+import ltd.mbor.minimak.*
+import ltd.mbor.minipay.common.*
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.model.ChannelEvent
 import ltd.mbor.minipay.common.model.PaymentRequestSent
-import ltd.mbor.minipay.common.newTxId
-import ltd.mbor.minipay.common.processUpdate
 import ltd.mbor.minipay.common.storage.getChannel
-import ltd.mbor.minipay.common.update
+import ltd.mbor.minipay.scope
+import ltd.mbor.minipay.view
 
 val channels = mutableStateListOf<Channel>()
 var multisigScriptAddress by mutableStateOf("")
@@ -21,6 +20,10 @@ val multisigScriptBalances = mutableStateListOf<Balance>()
 val eltooScriptCoins = mutableStateMapOf<String, List<Coin>>()
 
 val events = mutableStateListOf<ChannelEvent>()
+
+suspend fun MutableList<Channel>.reload(eltooScriptCoins: MutableMap<String, List<Coin>>) {
+  channelService.reloadChannels(this, eltooScriptCoins)
+}
 
 suspend fun Channel.processUpdate(isAck: Boolean, updateTxText: String, settleTxText: String): Channel {
   return processUpdate(isAck, updateTxText, settleTxText)  {
@@ -39,6 +42,30 @@ suspend fun channelUpdateAck(updateTxText: String, settleTxText: String) {
   }
 }
 
-suspend fun MutableList<Channel>.reload(eltooScriptCoins: MutableMap<String, List<Coin>>) {
-  channelService.reloadChannels(this, eltooScriptCoins)
+fun String.subscribe(
+  initialChannel: Channel?,
+  onUpdate: (Channel, Boolean) -> Unit = { _, _ -> },
+  onUnhandled: (suspend (List<String>) -> Channel)? = null
+) {
+  var channel = initialChannel
+  subscribe(this).onEach { msg ->
+    log("tx msg: $msg")
+    val splits = msg.split(";")
+    if (splits[0].startsWith("TXN_UPDATE")) {
+      val isAck = splits[0].endsWith("_ACK")
+      channel = channel!!.processUpdate(isAck, updateTxText = splits[1], settleTxText = splits[2]).also {
+        onUpdate(it, isAck)
+      }
+    } else if (splits[0] == "TXN_REQUEST") {
+      val (_, updateTxText, settleTxText) = splits
+      channel!!.processRequest(updateTxText, settleTxText) {
+        events += it
+        view = "Channel events"
+      }
+    } else if (onUnhandled != null) {
+      channel = onUnhandled(splits)
+    }
+  }.onCompletion {
+    log("completed")
+  }.launchIn(scope)
 }
