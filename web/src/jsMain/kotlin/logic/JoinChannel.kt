@@ -14,7 +14,7 @@ fun joinChannel(
   amount: BigDecimal,
   onEvent: (JoinChannelEvent, Channel?) -> Unit = { _, _ -> }
 ) {
-  channelKey(myKeys, tokenId).subscribe(null, { channel, isAck ->
+  channelKey(myKeys, tokenId).subscribe({ channel, isAck ->
     onEvent(if (isAck) CHANNEL_UPDATED_ACKED else CHANNEL_UPDATED, channel)
   }) {
     val timeLock = it[0].toInt()
@@ -26,6 +26,8 @@ fun joinChannel(
     multisigScriptAddress = MDS.newScript(triggerScript(theirKeys.trigger, myKeys.trigger)).address
     eltooScriptAddress = MDS.newScript(eltooScript(timeLock, theirKeys.update, myKeys.update, theirKeys.settle, myKeys.settle)).address
     onEvent(SCRIPTS_DEPLOYED, null)
-    joinChannel(myAddress, myKeys, theirKeys, tokenId, amount, triggerTx, settlementTx, fundingTx, timeLock, multisigScriptAddress, eltooScriptAddress, onEvent)
+    val channel = joinChannel(myAddress, myKeys, theirKeys, tokenId, amount, triggerTx, settlementTx, fundingTx, timeLock, multisigScriptAddress, eltooScriptAddress, onEvent)
+    channels.put(channel)
+    channel.id
   }
 }

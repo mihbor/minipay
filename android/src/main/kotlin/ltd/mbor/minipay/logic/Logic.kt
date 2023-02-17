@@ -9,18 +9,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import io.ktor.utils.io.errors.*
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import ltd.mbor.minimak.*
 import ltd.mbor.minipay.common.channelKey
-import ltd.mbor.minipay.common.processRequest
 import ltd.mbor.minipay.common.storage.createDB
 import ltd.mbor.minipay.common.storage.getChannels
 import ltd.mbor.minipay.common.storage.setChannelOpen
-import ltd.mbor.minipay.common.subscribe
 import ltd.mbor.minipay.logic.*
 
 var inited by mutableStateOf(false)
@@ -54,21 +49,7 @@ suspend fun initMDS(uid: String, host: String, port: Int, context: Context) {
         createDB()
         channels.addAll(getChannels(status = "OPEN"))
         channels.forEach { channel ->
-          subscribe(channelKey(channel.my.keys, channel.tokenId), from = channel.updatedAt).onEach { msg ->
-            log("tx msg: $msg")
-            val splits = msg.split(";")
-            if (splits[0].startsWith("TXN_UPDATE")) {
-              channels.first { it.id == channel.id }.processUpdate(splits[0].endsWith("_ACK"), updateTxText = splits[1], settleTxText = splits[2])
-            } else if (splits[0] == "TXN_REQUEST") {
-              val (_, updateTxText, settleTxText) = splits
-              channels.first { it.id == channel.id }.processRequest(updateTxText, settleTxText) {
-                events += it
-                view = "Channel events"
-              }
-            }
-          }.onCompletion {
-            log("completed")
-          }.launchIn(scope)
+          channelKey(channel.my.keys, channel.tokenId).subscribe()
         }
         inited = true
       }

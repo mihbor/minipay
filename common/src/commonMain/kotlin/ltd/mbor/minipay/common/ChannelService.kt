@@ -15,7 +15,6 @@ class ChannelService(
           if (multiSigCoins.isNotEmpty()) storage.updateChannelStatus(channel, "OPEN")
           else channel
         }
-      
         in setOf("OPEN", "TRIGGERED", "UPDATED") -> {
           val eltooCoins = mds.getCoins(address = channel.eltooAddress)
           eltooScriptCoins[channel.eltooAddress] = eltooCoins
@@ -27,7 +26,6 @@ class ChannelService(
             else channel
           } else channel
         }
-      
         else -> channel
       }
     }
@@ -37,3 +35,15 @@ class ChannelService(
 }
 
 val channelService = ChannelService(MDS, storage)
+
+suspend fun MutableList<Channel>.reload(eltooScriptCoins: MutableMap<String, List<Coin>>) {
+  channelService.reloadChannels(this, eltooScriptCoins)
+}
+
+fun List<Channel>.forId(id: Int) = first { it.id == id }
+
+fun MutableList<Channel>.put(channel: Channel) {
+  val current = firstOrNull{ it.id == channel.id }
+  if (current != null) set(indexOf(current), channel)
+  else add(channel)
+}

@@ -52,7 +52,7 @@ val fakeChannelOpen = Channel(
 val fakeChannelTriggered = fakeChannelOpen.copy(status = "TRIGGERED", sequenceNumber = 3, eltooAddress = "0x999", updateTx = "abc")
 
 val fakeMinimaChannel = Channel(
-  id = 1,
+  id = 2,
   sequenceNumber = 0,
   status = "OPEN",
   tokenId = "0x00",

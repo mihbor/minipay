@@ -21,13 +21,9 @@ val eltooScriptCoins = mutableStateMapOf<String, List<Coin>>()
 
 val events = mutableStateListOf<ChannelEvent>()
 
-suspend fun MutableList<Channel>.reload(eltooScriptCoins: MutableMap<String, List<Coin>>) {
-  channelService.reloadChannels(this, eltooScriptCoins)
-}
-
 suspend fun Channel.processUpdate(isAck: Boolean, updateTxText: String, settleTxText: String): Channel {
   return processUpdate(isAck, updateTxText, settleTxText)  {
-    channels[channels.indexOf(channels.first{ it.id == id })] = it
+    channels.put(it)
     if (isAck) events.removeIf { it.channel.id == id && it is PaymentRequestSent }
   }
 }
@@ -37,33 +33,32 @@ suspend fun channelUpdateAck(updateTxText: String, settleTxText: String) {
   val settleTx = MDS.importTx(newTxId(), settleTxText)
   val channel = getChannel(updateTx.outputs.first().address)!!
   channel.update(updateTxText, settleTxText, settleTx) {
-    channels[channels.indexOf(channels.first{ it.id == channel.id })] = it
+    channels.put(it)
     events.removeIf { it.channel.id == channel.id && it is PaymentRequestSent }
   }
 }
 
 fun String.subscribe(
-  initialChannel: Channel?,
   onUpdate: (Channel, Boolean) -> Unit = { _, _ -> },
-  onUnhandled: (suspend (List<String>) -> Channel)? = null
+  onUnhandled: (suspend (List<String>) -> Int)? = null
 ) {
-  var channel = initialChannel
+  var channelId: Int? = null
   subscribe(this).onEach { msg ->
     log("tx msg: $msg")
     val splits = msg.split(";")
     if (splits[0].startsWith("TXN_UPDATE")) {
       val isAck = splits[0].endsWith("_ACK")
-      channel = channel!!.processUpdate(isAck, updateTxText = splits[1], settleTxText = splits[2]).also {
+      channels.forId(channelId!!).processUpdate(isAck, updateTxText = splits[1], settleTxText = splits[2]).also {
         onUpdate(it, isAck)
       }
     } else if (splits[0] == "TXN_REQUEST") {
       val (_, updateTxText, settleTxText) = splits
-      channel!!.processRequest(updateTxText, settleTxText) {
+      channels.forId(channelId!!).processRequest(updateTxText, settleTxText) {
         events += it
         view = "Channel events"
       }
     } else if (onUnhandled != null) {
-      channel = onUnhandled(splits)
+      channelId = onUnhandled(splits)
     }
   }.onCompletion {
     log("completed")

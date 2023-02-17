@@ -23,9 +23,9 @@ suspend fun fundChannel(
   eltooScriptAddress = MDS.newScript(eltooScript(timeLock, myKeys.update, theirKeys.update, myKeys.settle, theirKeys.settle)).address
   onEvent(SCRIPTS_DEPLOYED, null)
 
-  val channel = prepareFundChannel(myKeys, theirKeys, theirAddress, myAmount, theirAmount, tokenId, timeLock, multisigScriptAddress, eltooScriptAddress, onEvent)
+  var channel = prepareFundChannel(myKeys, theirKeys, theirAddress, myAmount, theirAmount, tokenId, timeLock, multisigScriptAddress, eltooScriptAddress, onEvent)
   
-  channelKey(channel.my.keys, channel.tokenId).subscribe(channel, { it, isAck ->
+  channelKey(channel.my.keys, channel.tokenId).subscribe({ it, isAck ->
     onEvent(if (isAck) CHANNEL_UPDATED_ACKED else CHANNEL_UPDATED, it)
   }) {
     val (triggerTx, settlementTx, fundingTx) = it
@@ -33,12 +33,12 @@ suspend fun fundChannel(
       .let{ it.takeUnless { it.isEmpty() }?.chunked(it.size/2) ?: listOf(emptyList(), emptyList()) }
     onEvent(SIGS_RECEIVED, channel)
     try {
-      channel.commitFund("auto", triggerTx, settlementTx, fundingTx, theirInputCoins, theirInputScripts).also {
-        onEvent(CHANNEL_FUNDED, it)
-      }
+      channel = channel.commitFund("auto", triggerTx, settlementTx, fundingTx, theirInputCoins, theirInputScripts)
+      onEvent(CHANNEL_FUNDED, channel)
+      channels.put(channel)
     } catch (e: MinimaException) {
       window.alert("MinimaException: ${e.message}")
-      channel
     }
+    channel.id
   }
 }

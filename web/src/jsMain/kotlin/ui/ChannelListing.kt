@@ -4,9 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import kotlinx.coroutines.launch
 import logic.balances
-import logic.reload
 import ltd.mbor.minimak.Coin
 import ltd.mbor.minipay.common.model.Channel
+import ltd.mbor.minipay.common.reload
 import org.jetbrains.compose.web.css.textAlign
 import org.jetbrains.compose.web.dom.*
 import scope
