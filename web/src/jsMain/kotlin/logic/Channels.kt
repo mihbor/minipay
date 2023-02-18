@@ -33,27 +33,44 @@ suspend fun Channel.processUpdate(isAck: Boolean, updateTxText: String, settleTx
   }
 }
 
+fun Channel.subscribe(
+  onUpdate: (Channel, Boolean) -> Unit = { _, _ -> },
+  onUnhandled: suspend (List<String>) -> Unit = { }
+) {
+  channelKey(my.keys, tokenId).subscribe({ id }, onUpdate, onUnhandled)
+}
+
 fun String.subscribe(
   onUpdate: (Channel, Boolean) -> Unit = { _, _ -> },
-  onUnhandled: (suspend (List<String>) -> Int)? = null
+  onUnhandled: suspend (List<String>) -> Int
 ) {
   var channelId: Int? = null
+  subscribe({ checkNotNull(channelId) }, onUpdate) {
+    channelId = onUnhandled(it)
+  }
+}
+
+fun String.subscribe(
+  getChannelId: (() -> Int),
+  onUpdate: (Channel, Boolean) -> Unit = { _, _ -> },
+  onUnhandled: suspend (List<String>) -> Unit
+) {
   subscribe(this).onEach { msg ->
     log("tx msg: $msg")
     val splits = msg.split(";")
     if (splits[0].startsWith("TXN_UPDATE")) {
       val isAck = splits[0].endsWith("_ACK")
-      channels.forId(channelId!!).processUpdate(isAck, updateTxText = splits[1], settleTxText = splits[2]).also {
+      channels.forId(getChannelId()).processUpdate(isAck, updateTxText = splits[1], settleTxText = splits[2]).also {
         onUpdate(it, isAck)
       }
     } else if (splits[0] == "TXN_REQUEST") {
       val (_, updateTxText, settleTxText) = splits
-      channels.forId(channelId!!).processRequest(updateTxText, settleTxText) {
+      channels.forId(getChannelId()).processRequest(updateTxText, settleTxText) {
         events += it
         view = "Channel events"
       }
-    } else if (onUnhandled != null) {
-      channelId = onUnhandled(splits)
+    } else {
+      onUnhandled(splits)
     }
   }.onCompletion {
     log("completed")

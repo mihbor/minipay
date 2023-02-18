@@ -12,7 +12,7 @@ import io.ktor.utils.io.errors.*
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import ltd.mbor.minimak.*
-import ltd.mbor.minipay.common.channelKey
+import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.storage.createDB
 import ltd.mbor.minipay.common.storage.getChannels
 import ltd.mbor.minipay.common.storage.setChannelOpen
@@ -48,9 +48,7 @@ suspend fun initMDS(uid: String, host: String, port: Int, context: Context) {
         tokens.putAll(MDS.getTokens().associateBy { it.tokenId })
         createDB()
         channels.addAll(getChannels(status = "OPEN"))
-        channels.forEach { channel ->
-          channelKey(channel.my.keys, channel.tokenId).subscribe()
-        }
+        channels.forEach(Channel::subscribe)
         inited = true
       }
       "NEWBALANCE" -> {
