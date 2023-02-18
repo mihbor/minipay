@@ -10,10 +10,8 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ONE
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Token
-import ltd.mbor.minipay.common.acceptRequest
-import ltd.mbor.minipay.common.channelKey
+import ltd.mbor.minipay.common.acceptRequestAndReply
 import ltd.mbor.minipay.common.model.Channel
-import ltd.mbor.minipay.common.publish
 import ltd.mbor.minipay.scope
 import ltd.mbor.minipay.ui.preview.fakeMinimaChannel
 import ltd.mbor.minipay.ui.preview.previewTokens
@@ -43,9 +41,7 @@ fun ChannelRequestReceived(
       onClick = {
         preparingResponse = true
         scope.launch {
-          channel.acceptRequest(updateTxId, settleTxId, sequenceNumber, channelBalance).let { (updateTx, settleTx) ->
-            publish(channelKey(channel.their.keys, channel.tokenId), "TXN_UPDATE_ACK;$updateTx;$settleTx")
-          }
+          channel.acceptRequestAndReply(updateTxId, settleTxId, sequenceNumber, channelBalance)
           preparingResponse = false
           dismiss()
         }

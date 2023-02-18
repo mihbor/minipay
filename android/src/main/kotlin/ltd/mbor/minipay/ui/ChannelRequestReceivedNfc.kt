@@ -11,10 +11,9 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Token
 import ltd.mbor.minipay.MainActivity
-import ltd.mbor.minipay.common.acceptRequest
 import ltd.mbor.minipay.common.model.Channel
+import ltd.mbor.minipay.logic.acceptRequestAndEmitResponse
 import ltd.mbor.minipay.scope
-import ltd.mbor.minipay.sendDataToService
 import ltd.mbor.minipay.ui.preview.fakeMinimaChannel
 import ltd.mbor.minipay.ui.preview.previewTokens
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
@@ -48,12 +47,7 @@ fun ChannelRequestReceivedNfc(
       onClick = {
         preparingResponse = true
         scope.launch {
-          channel.acceptRequest(updateTxId, settleTxId, sequenceNumber, channelBalance).let { (updateTx, settleTx) ->
-            activity?.apply {
-              disableReaderMode()
-              sendDataToService("TXN_UPDATE_ACK;$updateTx;$settleTx")
-            }
-          }
+          activity?.let { channel.acceptRequestAndEmitResponse(updateTxId, settleTxId, sequenceNumber, channelBalance, activity) }
           accepting = true
           preparingResponse = false
         }

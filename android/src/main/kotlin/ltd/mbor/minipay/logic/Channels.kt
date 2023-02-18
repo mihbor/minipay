@@ -1,16 +1,19 @@
 package ltd.mbor.minipay.logic
 
 import androidx.compose.runtime.*
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import ltd.mbor.minimak.*
+import ltd.mbor.minipay.MainActivity
 import ltd.mbor.minipay.common.*
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.model.ChannelEvent
 import ltd.mbor.minipay.common.model.PaymentRequestSent
 import ltd.mbor.minipay.common.storage.getChannel
 import ltd.mbor.minipay.scope
+import ltd.mbor.minipay.sendDataToService
 import ltd.mbor.minipay.view
 
 val channels = mutableStateListOf<Channel>()
@@ -26,6 +29,12 @@ suspend fun Channel.processUpdate(isAck: Boolean, updateTxText: String, settleTx
     channels.put(it)
     if (isAck) events.removeIf { it.channel.id == id && it is PaymentRequestSent }
   }
+}
+
+suspend fun Channel.acceptRequestAndEmitResponse(updateTxId: Int, settleTxId: Int, sequenceNumber: Int, channelBalance: Pair<BigDecimal, BigDecimal>, activity: MainActivity) {
+  val (updateTx, settleTx) = acceptRequest(updateTxId, settleTxId, sequenceNumber, channelBalance)
+  activity.disableReaderMode()
+  activity.sendDataToService("TXN_UPDATE_ACK;$updateTx;$settleTx")
 }
 
 suspend fun channelUpdateAck(updateTxText: String, settleTxText: String) {

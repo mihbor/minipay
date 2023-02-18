@@ -152,12 +152,13 @@ suspend fun Channel.processRequest(updateTxText: String, settleTxText: String, o
   ) else log("Stale update $newSequenceNumber received for channel $id at $sequenceNumber")
 }
 
-suspend fun Channel.acceptRequest(updateTxId: Int, settleTxId: Int, sequenceNumber: Int, channelBalance: Pair<BigDecimal, BigDecimal>): Pair<String, String> {
-//  val sequenceNumber = settleTxId.first.state.find { it.port == 99 }?.data?.toInt()
-//
-//  val outputs = settleTxId.first.outputs
-//  val channelBalance = outputs.find { it.address == my.address }!!.amount to outputs.find { it.address == their.address }!!.amount
+suspend fun Channel.acceptRequestAndReply(updateTxId: Int, settleTxId: Int, sequenceNumber: Int, channelBalance: Pair<BigDecimal, BigDecimal>) {
+  acceptRequest(updateTxId, settleTxId, sequenceNumber, channelBalance).let { (updateTx, settleTx) ->
+    publish(channelKey(their.keys, tokenId), "TXN_UPDATE_ACK;$updateTx;$settleTx")
+  }
+}
 
+suspend fun Channel.acceptRequest(updateTxId: Int, settleTxId: Int, sequenceNumber: Int, channelBalance: Pair<BigDecimal, BigDecimal>): Pair<String, String> {
   val signedUpdateTx = signAndExportTx(updateTxId, my.keys.update)
   val signedSettleTx = signAndExportTx(settleTxId, my.keys.settle)
 
