@@ -36,7 +36,7 @@ object SimulatedStorage: ChannelStorage {
   }
   
   override suspend fun updateChannel(channel: Channel, channelBalance: Pair<BigDecimal, BigDecimal>, sequenceNumber: Int, updateTx: String, settlementTx: String): Channel {
-    TODO("Not yet implemented")
+    return channel
   }
   
   override suspend fun insertChannel(

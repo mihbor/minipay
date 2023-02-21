@@ -1,17 +1,14 @@
 package logic
 
 import androidx.compose.runtime.*
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onEach
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Coin
-import ltd.mbor.minimak.log
-import ltd.mbor.minipay.common.*
+import ltd.mbor.minimak.MDS
+import ltd.mbor.minipay.common.ChannelService
+import ltd.mbor.minipay.common.channelKey
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.model.ChannelEvent
-import ltd.mbor.minipay.common.model.PaymentRequestSent
-import scope
+import ltd.mbor.minipay.common.storage
 import view
 
 val channels = mutableStateListOf<Channel>()
@@ -22,22 +19,17 @@ val eltooScriptCoins = mutableStateMapOf<String, List<Coin>>()
 
 val events = mutableStateListOf<ChannelEvent>()
 
-fun <T> MutableList<T>.removeIf(predicate: (T) -> Boolean) {
-  removeAll(filter(predicate))
-}
-
-suspend fun Channel.processUpdate(isAck: Boolean, updateTxText: String, settleTxText: String): Channel {
-  return processUpdate(isAck, updateTxText, settleTxText)  {
-    channels.put(it)
-    if (isAck) events.removeIf { it.channel.id == id && it is PaymentRequestSent }
-  }
-}
+val channelService = ChannelService(MDS, storage, channels, events)
 
 fun Channel.subscribe(
   onUpdate: (Channel, Boolean) -> Unit = { _, _ -> },
   onUnhandled: suspend (List<String>) -> Unit = { }
 ) {
-  channelKey(my.keys, tokenId).subscribe({ id }, onUpdate, onUnhandled)
+  with(channelService) {
+    channelKey(my.keys, tokenId).subscribe({ id }, onUpdate, onUnhandled) {
+      view = "Channel events"
+    }
+  }
 }
 
 fun String.subscribe(
@@ -45,34 +37,11 @@ fun String.subscribe(
   onUnhandled: suspend (List<String>) -> Int
 ) {
   var channelId: Int? = null
-  subscribe({ checkNotNull(channelId) }, onUpdate) {
-    channelId = onUnhandled(it)
+  with(channelService) {
+    subscribe({ checkNotNull(channelId) }, onUpdate, {
+      channelId = onUnhandled(it)
+    }, {
+      view = "Channel events"
+    })
   }
-}
-
-fun String.subscribe(
-  getChannelId: (() -> Int),
-  onUpdate: (Channel, Boolean) -> Unit = { _, _ -> },
-  onUnhandled: suspend (List<String>) -> Unit
-) {
-  subscribe(this).onEach { msg ->
-    log("tx msg: $msg")
-    val splits = msg.split(";")
-    if (splits[0].startsWith("TXN_UPDATE")) {
-      val isAck = splits[0].endsWith("_ACK")
-      channels.forId(getChannelId()).processUpdate(isAck, updateTxText = splits[1], settleTxText = splits[2]).also {
-        onUpdate(it, isAck)
-      }
-    } else if (splits[0] == "TXN_REQUEST") {
-      val (_, updateTxText, settleTxText) = splits
-      channels.forId(getChannelId()).processRequest(updateTxText, settleTxText) {
-        events += it
-        view = "Channel events"
-      }
-    } else {
-      onUnhandled(splits)
-    }
-  }.onCompletion {
-    log("completed")
-  }.launchIn(scope)
 }

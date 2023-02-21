@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Token
 import ltd.mbor.minipay.common.acceptRequestAndReply
 import ltd.mbor.minipay.common.model.Channel
-import ltd.mbor.minipay.scope
+import ltd.mbor.minipay.common.scope
 import ltd.mbor.minipay.ui.preview.fakeMinimaChannel
 import ltd.mbor.minipay.ui.preview.previewTokens
 import ltd.mbor.minipay.ui.theme.MiniPayTheme

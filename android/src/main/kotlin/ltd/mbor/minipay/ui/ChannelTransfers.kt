@@ -15,17 +15,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.coroutines.launch
-import ltd.mbor.minipay.*
+import ltd.mbor.minipay.MainActivity
 import ltd.mbor.minipay.R
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.model.PaymentRequestSent
 import ltd.mbor.minipay.common.model.Transport.FIREBASE
 import ltd.mbor.minipay.common.model.Transport.NFC
 import ltd.mbor.minipay.common.request
+import ltd.mbor.minipay.common.scope
 import ltd.mbor.minipay.common.send
 import ltd.mbor.minipay.logic.events
+import ltd.mbor.minipay.sendDataToService
 import ltd.mbor.minipay.ui.preview.fakeChannelOpen
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
+import ltd.mbor.minipay.view
 
 @Composable
 fun ChannelTransfers(channel: Channel, activity: MainActivity?) {

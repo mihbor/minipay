@@ -8,12 +8,12 @@ import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.model.PaymentRequestSent
 import ltd.mbor.minipay.common.model.Transport.FIREBASE
 import ltd.mbor.minipay.common.request
+import ltd.mbor.minipay.common.scope
 import ltd.mbor.minipay.common.send
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
-import scope
 import view
 
 @Composable

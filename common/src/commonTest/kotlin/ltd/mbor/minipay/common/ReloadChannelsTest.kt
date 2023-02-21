@@ -48,9 +48,9 @@ class ReloadChannelsTest {
     val eltooCoins = mutableMapOf<String, List<Coin>>()
     val mds = SimulatedMDS().willReturnCoins(emptyList())
     val storage = SimulatedStorage.willReturn(channels)
-    val channelService = ChannelService(mds, storage)
+    val channelService = ChannelService(mds, storage, channels, mutableListOf())
     //when
-    channelService.reloadChannels(channels, eltooCoins)
+    channelService.reloadChannels(eltooCoins)
     //then
     assertEquals(expected, channels)
     assertTrue(eltooCoins.isEmpty())
@@ -64,9 +64,9 @@ class ReloadChannelsTest {
     val eltooCoins = mutableMapOf<String, List<Coin>>()
     val mds = SimulatedMDS().willReturnCoins(listOf(aCoin))
     val storage = SimulatedStorage.willReturn(channels)
-    val channelService = ChannelService(mds, storage)
+    val channelService = ChannelService(mds, storage, channels, mutableListOf())
     //when
-    channelService.reloadChannels(channels, eltooCoins)
+    channelService.reloadChannels(eltooCoins)
     //then
     assertEquals(expected, channels)
     assertTrue(eltooCoins.isEmpty())
@@ -80,9 +80,9 @@ class ReloadChannelsTest {
     val eltooCoins = mutableMapOf<String, List<Coin>>()
     val mds = SimulatedMDS().willReturnCoins(emptyList())
     val storage = SimulatedStorage.willReturn(channels)
-    val channelService = ChannelService(mds, storage)
+    val channelService = ChannelService(mds, storage, channels, mutableListOf())
     //when
-    channelService.reloadChannels(channels, eltooCoins)
+    channelService.reloadChannels(eltooCoins)
     //then
     assertEquals(expected, channels)
     assertTrue(checkNotNull(eltooCoins[offeredChannel.eltooAddress]).isEmpty())
@@ -96,9 +96,9 @@ class ReloadChannelsTest {
     val eltooCoins = mutableMapOf<String, List<Coin>>()
     val mds = SimulatedMDS().willReturnCoins(listOf(aCoin))
     val storage = SimulatedStorage.willReturn(channels)
-    val channelService = ChannelService(mds, storage)
+    val channelService = ChannelService(mds, storage, channels, mutableListOf())
     //when
-    channelService.reloadChannels(channels, eltooCoins)
+    channelService.reloadChannels(eltooCoins)
     //then
     assertEquals(expected, channels)
     assertEquals(listOf(aCoin), eltooCoins[offeredChannel.eltooAddress])
@@ -112,9 +112,9 @@ class ReloadChannelsTest {
     val eltooCoins = mutableMapOf<String, List<Coin>>()
     val mds = SimulatedMDS().willReturnCoins(listOf(aCoin)).willReturnTransactions(emptyList())
     val storage = SimulatedStorage.willReturn(channels)
-    val channelService = ChannelService(mds, storage)
+    val channelService = ChannelService(mds, storage, channels, mutableListOf())
     //when
-    channelService.reloadChannels(channels, eltooCoins)
+    channelService.reloadChannels(eltooCoins)
     //then
     assertEquals(expected, channels)
     assertEquals(listOf(aCoin), eltooCoins[offeredChannel.eltooAddress])
@@ -128,9 +128,9 @@ class ReloadChannelsTest {
     val eltooCoins = mutableMapOf<String, List<Coin>>()
     val mds = SimulatedMDS().willReturnCoins(emptyList()).willReturnTransactions(emptyList())
     val storage = SimulatedStorage.willReturn(channels)
-    val channelService = ChannelService(mds, storage)
+    val channelService = ChannelService(mds, storage, channels, mutableListOf())
     //when
-    channelService.reloadChannels(channels, eltooCoins)
+    channelService.reloadChannels(eltooCoins)
     //then
     assertEquals(expected, channels)
     assertTrue(checkNotNull(eltooCoins[offeredChannel.eltooAddress]).isEmpty())
@@ -144,9 +144,9 @@ class ReloadChannelsTest {
     val eltooCoins = mutableMapOf<String, List<Coin>>()
     val mds = SimulatedMDS().willReturnCoins(emptyList()).willReturnTransactions(listOf(aTransaction))
     val storage = SimulatedStorage.willReturn(channels)
-    val channelService = ChannelService(mds, storage)
+    val channelService = ChannelService(mds, storage, channels, mutableListOf())
     //when
-    channelService.reloadChannels(channels, eltooCoins)
+    channelService.reloadChannels(eltooCoins)
     //then
     assertEquals(expected, channels)
     assertTrue(checkNotNull(eltooCoins[offeredChannel.eltooAddress]).isEmpty())
@@ -161,9 +161,9 @@ class ReloadChannelsTest {
     val transactionFromEltoo = aTransaction.copy(inputs = aTransaction.inputs.map { it.copy(address = triggeredChannel.eltooAddress) })
     val mds = SimulatedMDS().willReturnCoins(emptyList()).willReturnTransactions(listOf(transactionFromEltoo))
     val storage = SimulatedStorage.willReturn(channels)
-    val channelService = ChannelService(mds, storage)
+    val channelService = ChannelService(mds, storage, channels, mutableListOf())
     //when
-    channelService.reloadChannels(channels, eltooCoins)
+    channelService.reloadChannels(eltooCoins)
     //then
     assertEquals(expected, channels)
     assertTrue(checkNotNull(eltooCoins[offeredChannel.eltooAddress]).isEmpty())
@@ -176,9 +176,9 @@ class ReloadChannelsTest {
     val expected = listOf(settledChannel)
     val eltooCoins = mutableMapOf<String, List<Coin>>()
     val storage = SimulatedStorage.willReturn(channels)
-    val channelService = ChannelService(SimulatedMDS(), storage)
+    val channelService = ChannelService(SimulatedMDS(), storage, channels, mutableListOf())
     //when
-    channelService.reloadChannels(channels, eltooCoins)
+    channelService.reloadChannels(eltooCoins)
     //then
     assertEquals(expected, channels)
     assertTrue(eltooCoins.isEmpty())

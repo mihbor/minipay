@@ -11,11 +11,11 @@ import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.send
 import ltd.mbor.minipay.common.isPaymentChannelAvailable
+import ltd.mbor.minipay.common.scope
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.*
 import org.w3c.dom.HTMLVideoElement
-import scope
 
 @Composable
 fun Send(balances: SnapshotStateMap<String, Balance>) {

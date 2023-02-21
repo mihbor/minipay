@@ -4,12 +4,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import kotlinx.coroutines.launch
 import logic.balances
+import logic.channelService
 import ltd.mbor.minimak.Coin
 import ltd.mbor.minipay.common.model.Channel
-import ltd.mbor.minipay.common.reload
+import ltd.mbor.minipay.common.scope
 import org.jetbrains.compose.web.css.textAlign
 import org.jetbrains.compose.web.dom.*
-import scope
 
 @Composable
 fun ChannelListing(
@@ -18,12 +18,12 @@ fun ChannelListing(
   selectChannel: (Channel?) -> Unit,
 ) {
   LaunchedEffect("channels") {
-    channels.reload(eltooScriptCoins)
+    channelService.reloadChannels(eltooScriptCoins)
   }
   Button({
     onClick {
       scope.launch {
-        channels.reload(eltooScriptCoins)
+        channelService.reloadChannels(eltooScriptCoins)
       }
     }
   }) {
@@ -66,7 +66,7 @@ fun ChannelListing(
             }
           }) {
             ChannelActions(channel, selectChannel) {
-              scope.launch { channels.reload(eltooScriptCoins) }
+              scope.launch { channelService.reloadChannels(eltooScriptCoins) }
             }
           }
         }

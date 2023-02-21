@@ -12,10 +12,10 @@ import kotlinx.serialization.json.jsonObject
 import ltd.mbor.minimak.*
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.model.Prefs
+import ltd.mbor.minipay.common.scope
 import ltd.mbor.minipay.common.storage.createDB
 import ltd.mbor.minipay.common.storage.getChannels
 import ltd.mbor.minipay.common.storage.setChannelOpen
-import scope
 
 val balances = mutableStateMapOf<String, Balance>()
 val tokens = mutableStateMapOf<String, Token>()

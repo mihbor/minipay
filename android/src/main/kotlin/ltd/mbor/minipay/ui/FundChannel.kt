@@ -26,11 +26,11 @@ import ltd.mbor.minipay.TAG
 import ltd.mbor.minipay.common.FundChannelEvent.*
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.newKeys
+import ltd.mbor.minipay.common.scope
 import ltd.mbor.minipay.logic.eltooScriptAddress
 import ltd.mbor.minipay.logic.fundChannel
 import ltd.mbor.minipay.logic.multisigScriptAddress
 import ltd.mbor.minipay.logic.multisigScriptBalances
-import ltd.mbor.minipay.scope
 import ltd.mbor.minipay.ui.preview.previewBalances
 import ltd.mbor.minipay.ui.preview.previewTokens
 import ltd.mbor.minipay.ui.theme.MiniPayTheme

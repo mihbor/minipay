@@ -19,8 +19,8 @@ import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Coin
 import ltd.mbor.minipay.MainActivity
 import ltd.mbor.minipay.common.model.Channel
-import ltd.mbor.minipay.common.reload
-import ltd.mbor.minipay.scope
+import ltd.mbor.minipay.common.scope
+import ltd.mbor.minipay.logic.channelService
 import ltd.mbor.minipay.ui.preview.fakeBalances
 import ltd.mbor.minipay.ui.preview.fakeChannelOpen
 import ltd.mbor.minipay.ui.preview.fakeChannelTriggered
@@ -70,7 +70,7 @@ fun ChannelTable(
         }
         if (showActions) Row(Modifier.fillMaxWidth()){
           ChannelActions(channel, activity, selectChannel) {
-            scope.launch { channels.reload(eltooScriptCoins) }
+            scope.launch { channelService.reloadChannels(eltooScriptCoins) }
           }
         }
         Divider()

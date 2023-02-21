@@ -2,7 +2,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.browser.window
-import kotlinx.coroutines.MainScope
 import logic.*
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.model.Prefs
@@ -10,7 +9,6 @@ import org.jetbrains.compose.web.css.Style
 import org.jetbrains.compose.web.renderComposableInBody
 import ui.*
 
-val scope = MainScope()
 external fun require(module: String): dynamic
 
 var view by mutableStateOf("MiniPay")

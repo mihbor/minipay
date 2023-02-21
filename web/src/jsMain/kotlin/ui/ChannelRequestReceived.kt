@@ -6,10 +6,10 @@ import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Token
 import ltd.mbor.minipay.common.acceptRequestAndReply
 import ltd.mbor.minipay.common.model.Channel
+import ltd.mbor.minipay.common.scope
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Text
-import scope
 
 @Composable
 fun ChannelRequestReceived(

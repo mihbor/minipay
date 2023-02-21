@@ -17,11 +17,11 @@ import ltd.mbor.minimak.Token
 import ltd.mbor.minipay.common.FundChannelEvent.*
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.newKeys
+import ltd.mbor.minipay.common.scope
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.*
 import org.w3c.dom.HTMLVideoElement
-import scope
 
 @Composable
 fun FundChannel(

@@ -21,7 +21,7 @@ kotlin {
         
         api("dev.gitlive:firebase-firestore:1.6.2")
 
-        api("ltd.mbor:minimak:0.3.1")
+        api("ltd.mbor:minimak:0.3.2")
       }
     }
     val commonTest by getting {
@@ -48,6 +48,9 @@ android {
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
+  }
+  testOptions {
+    unitTests.isReturnDefaultValues = true
   }
 }
 

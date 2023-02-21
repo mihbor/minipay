@@ -22,7 +22,7 @@ import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.send
 import ltd.mbor.minipay.TAG
-import ltd.mbor.minipay.scope
+import ltd.mbor.minipay.common.scope
 import ltd.mbor.minipay.ui.preview.previewBalances
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
 

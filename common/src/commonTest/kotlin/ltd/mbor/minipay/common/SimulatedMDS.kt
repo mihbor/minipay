@@ -16,7 +16,7 @@ class SimulatedMDS: MdsApi {
   var capturedQueries = mutableListOf<String>()
   
   fun willReturn(payload: String?): SimulatedMDS {
-    payloads = mutableListOf(payload?.let(json::parseToJsonElement))
+    payloads += payload?.let(json::parseToJsonElement)
     iterator = payloads.iterator()
     return this
   }

@@ -19,8 +19,8 @@ import ltd.mbor.minipay.TAG
 import ltd.mbor.minipay.common.completeSettlement
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.postUpdate
+import ltd.mbor.minipay.common.scope
 import ltd.mbor.minipay.common.triggerSettlement
-import ltd.mbor.minipay.scope
 import ltd.mbor.minipay.ui.preview.fakeChannelOpen
 import ltd.mbor.minipay.ui.preview.fakeChannelTriggered
 import ltd.mbor.minipay.ui.preview.fakeCoin

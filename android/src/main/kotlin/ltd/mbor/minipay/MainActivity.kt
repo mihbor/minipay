@@ -25,7 +25,6 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -36,6 +35,7 @@ import ltd.mbor.minipay.common.model.PaymentRequestReceived
 import ltd.mbor.minipay.common.model.Prefs
 import ltd.mbor.minipay.common.model.Transport.NFC
 import ltd.mbor.minipay.common.newTxId
+import ltd.mbor.minipay.common.scope
 import ltd.mbor.minipay.common.storage.getChannel
 import ltd.mbor.minipay.logic.channelUpdateAck
 import ltd.mbor.minipay.logic.events
@@ -47,8 +47,6 @@ import ltd.mbor.minipay.ui.toBigDecimalOrNull
 val READER_FLAGS = NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK
 
 const val TAG = "MainActivity"
-
-val scope = MainScope()
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 

@@ -13,8 +13,8 @@ import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Coin
 import ltd.mbor.minipay.MainActivity
 import ltd.mbor.minipay.common.model.Channel
-import ltd.mbor.minipay.common.reload
-import ltd.mbor.minipay.scope
+import ltd.mbor.minipay.common.scope
+import ltd.mbor.minipay.logic.channelService
 import ltd.mbor.minipay.ui.preview.fakeBalances
 import ltd.mbor.minipay.ui.preview.fakeChannelOpen
 import ltd.mbor.minipay.ui.preview.fakeEltooCoins
@@ -29,14 +29,14 @@ fun ChannelListing(
   setChannel: (Channel) -> Unit,
 ) {
   LaunchedEffect("channels") {
-    channels.reload(eltooScriptCoins)
+    channelService.reloadChannels(eltooScriptCoins)
   }
   LazyColumn {
     item {
       Row {
         Button(onClick = {
           scope.launch {
-            channels.reload(eltooScriptCoins)
+            channelService.reloadChannels(eltooScriptCoins)
           }
         }) {
           Text("Refresh")
