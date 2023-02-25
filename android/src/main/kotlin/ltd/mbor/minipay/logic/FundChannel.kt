@@ -10,6 +10,7 @@ import ltd.mbor.minipay.common.model.Channel
 suspend fun fundChannel(
   myKeys: Channel.Keys,
   theirKeys: Channel.Keys,
+  myAddress: String,
   theirAddress: String,
   myAmount: BigDecimal,
   theirAmount: BigDecimal,
@@ -21,7 +22,7 @@ suspend fun fundChannel(
   eltooScriptAddress = MDS.newScript(eltooScript(timeLock, myKeys.update, theirKeys.update, myKeys.settle, theirKeys.settle)).address
   onEvent(SCRIPTS_DEPLOYED, null)
 
-  val channel = channelService.prepareFundChannel(myKeys, theirKeys, theirAddress, myAmount, theirAmount, tokenId, timeLock, multisigScriptAddress, eltooScriptAddress, onEvent)
+  val channel = channelService.prepareFundChannel(myKeys, theirKeys, myAddress, theirAddress, myAmount, theirAmount, tokenId, timeLock, multisigScriptAddress, eltooScriptAddress, onEvent)
 
   channel.subscribe({ it, isAck ->
     onEvent(if (isAck) CHANNEL_UPDATED_ACKED else CHANNEL_UPDATED, it)

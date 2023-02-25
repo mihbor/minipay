@@ -17,7 +17,6 @@ class FundChannelTest {
   fun prepareFundChannel() = runTest {
     //given
     val mds = SimulatedMDS()
-      .willReturn(address.getAddress)
       .willReturnCoins(listOf(aCoin))
       .willReturn("""{"TODO": "fundingTx"}""")
       .willReturn("""["TODO", "signFloatingTx"]""")
@@ -30,7 +29,7 @@ class FundChannelTest {
     val channelService = ChannelService(mds, storage, transport, mutableListOf(), mutableListOf())
     val events = mutableListOf<Pair<FundChannelEvent, Channel?>>()
     //when
-    val channel = channelService.prepareFundChannel(keys, keys, "their address", ONE, TEN, "0x00", 10, "multisig", "eltoo") { event, channel -> events.add(event to channel) }
+    val channel = channelService.prepareFundChannel(keys, keys, "my address", "their address", ONE, TEN, "0x00", 10, "multisig", "eltoo") { event, channel -> events.add(event to channel) }
     //then
     assertNotNull(channel)
     assertEquals(1, transport.published.size)
@@ -40,7 +39,7 @@ class FundChannelTest {
     assertEquals(SETTLEMENT_TX_SIGNED to null, eventsIterator.next())
     assertEquals(CHANNEL_PERSISTED to channel, eventsIterator.next())
     assertEquals(CHANNEL_PUBLISHED to channel, eventsIterator.next())
-    assertEquals("0xB4A680430A9808AFA98D9F7E3398750AA71DD88E1A815D87C4FCC2A48C0A57D8", channel.my.address)
+    assertEquals("my address", channel.my.address)
     assertEquals(keys, channel.my.keys)
     assertEquals(ONE, channel.my.balance)
     assertEquals("their address", channel.their.address)

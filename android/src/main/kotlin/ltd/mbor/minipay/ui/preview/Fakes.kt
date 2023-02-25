@@ -104,6 +104,8 @@ val fakeEltooCoins = mutableMapOf("0x999" to listOf(Coin(address = "", miniAddre
 
 val previewPrefs = Prefs("uid123", "localhost", 9004)
 
+val previewKeys = Channel.Keys("a", "b", "c")
+
 val previewBalances = listOf(
   Balance("0x00", JsonNull, ONE, ONE, ONE, ONE, "1"),
   Balance("0x01234567890", JsonPrimitive("test token"), ONE, ONE, ONE, ONE, "1"),

@@ -12,11 +12,9 @@ import logic.fundChannel
 import logic.multisigScriptAddress
 import logic.multisigScriptBalances
 import ltd.mbor.minimak.Balance
-import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.Token
 import ltd.mbor.minipay.common.FundChannelEvent.*
 import ltd.mbor.minipay.common.model.Channel
-import ltd.mbor.minipay.common.newKeys
 import ltd.mbor.minipay.common.scope
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.css.*
@@ -25,6 +23,8 @@ import org.w3c.dom.HTMLVideoElement
 
 @Composable
 fun FundChannel(
+  myKeys: Channel.Keys,
+  myAddress: String,
   balances: SnapshotStateMap<String, Balance>,
   tokens: SnapshotStateMap<String, Token>,
 ) {
@@ -33,7 +33,6 @@ fun FundChannel(
   var theirAddress by remember { mutableStateOf("") }
   var tokenId by remember { mutableStateOf("0x00") }
   
-  var myKeys by remember { mutableStateOf(Channel.Keys("", "", "")) }
   var theirKeys by remember { mutableStateOf(Channel.Keys("", "", "")) }
   var timeLock by remember { mutableStateOf(10) }
   
@@ -48,11 +47,6 @@ fun FundChannel(
   var channel by remember { mutableStateOf<Channel?>(null) }
   
   LaunchedEffect("fundChannel") {
-    MDS.newKeys(3).apply {
-      myKeys = Channel.Keys(this[0], this[1], this[2])
-      multisigScriptAddress = ""
-      eltooScriptAddress = ""
-    }
     fundingTxStatus = ""
     triggerTxStatus = ""
     settlementTxStatus = ""
@@ -72,12 +66,6 @@ fun FundChannel(
     Br()
   }
   if (fundingTxStatus.isEmpty()) {
-    Text("My trigger key: ${myKeys.trigger}")
-    Br()
-    Text("My update key: ${myKeys.update}")
-    Br()
-    Text("My settlement key: ${myKeys.settle}")
-    Br()
     Text("Counterparty trigger key:")
     TextInput(theirKeys.trigger) {
       onInput {
@@ -165,7 +153,7 @@ fun FundChannel(
         showFundScanner = false
         qrScanner?.stop()
         scope.launch {
-          fundChannel(myKeys, theirKeys, theirAddress, myAmount, theirAmount, tokenId, timeLock) { event, newChannel ->
+          fundChannel(myKeys, theirKeys, myAddress, theirAddress, myAmount, theirAmount, tokenId, timeLock) { event, newChannel ->
             progressStep++
             when(event) {
               FUNDING_TX_CREATED -> fundingTxStatus = "Funding transaction created"

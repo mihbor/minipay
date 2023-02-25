@@ -9,13 +9,10 @@ import logic.joinChannel
 import logic.multisigScriptAddress
 import logic.multisigScriptBalances
 import ltd.mbor.minimak.Balance
-import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.Token
-import ltd.mbor.minimak.getAddress
 import ltd.mbor.minipay.common.JoinChannelEvent.*
 import ltd.mbor.minipay.common.channelKey
 import ltd.mbor.minipay.common.model.Channel
-import ltd.mbor.minipay.common.newKeys
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.display
@@ -29,14 +26,14 @@ import org.w3c.dom.HTMLCanvasElement
 
 @Composable
 fun RequestChannel(
+  myKeys: Channel.Keys,
+  myAddress: String,
   balances: SnapshotStateMap<String, Balance>,
   tokens: SnapshotStateMap<String, Token>,
 ) {
-  var myAddress by remember { mutableStateOf("") }
   var amount by remember { mutableStateOf(BigDecimal.ZERO) }
   var tokenId by remember { mutableStateOf("0x00") }
-  var myKeys by remember { mutableStateOf(Channel.Keys("", "", "")) }
-  
+
   var showQR by remember { mutableStateOf(false) }
   var triggerTxStatus by remember { mutableStateOf("") }
   var settlementTxStatus by remember { mutableStateOf("") }
@@ -46,10 +43,6 @@ fun RequestChannel(
   var channel by remember { mutableStateOf<Channel?>(null) }
   
   LaunchedEffect("requestChannel") {
-    MDS.newKeys(3).apply {
-      myKeys = Channel.Keys(this[0], this[1], this[2])
-    }
-    myAddress = MDS.getAddress().address
     triggerTxStatus = ""
     settlementTxStatus = ""
     multisigScriptAddress = ""
@@ -100,18 +93,6 @@ fun RequestChannel(
     Br()
   }
   if (triggerTxStatus.isEmpty()) {
-    Text("Trigger key: ${myKeys.trigger}")
-    CopyToClipboard(myKeys.trigger)
-    Br()
-    Text("Update key: ${myKeys.update}")
-    CopyToClipboard(myKeys.update)
-    Br()
-    Text("Settlement key: ${myKeys.settle}")
-    CopyToClipboard(myKeys.settle)
-    Br()
-    Text("Address: $myAddress")
-    CopyToClipboard(myAddress)
-    Br()
     DecimalNumberInput(amount, min = BigDecimal.ZERO, disabled = showQR) {
       it?.let { amount = it }
     }

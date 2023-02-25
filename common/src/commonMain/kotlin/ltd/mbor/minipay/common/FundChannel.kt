@@ -3,7 +3,6 @@ package ltd.mbor.minipay.common
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.datetime.Clock
 import ltd.mbor.minimak.exportTx
-import ltd.mbor.minimak.getAddress
 import ltd.mbor.minimak.inputsWithChange
 import ltd.mbor.minipay.common.FundChannelEvent.*
 import ltd.mbor.minipay.common.model.Channel
@@ -15,6 +14,7 @@ enum class FundChannelEvent{
 suspend fun ChannelService.prepareFundChannel(
   myKeys: Channel.Keys,
   theirKeys: Channel.Keys,
+  myAddress: String,
   theirAddress: String,
   myAmount: BigDecimal,
   theirAmount: BigDecimal,
@@ -24,7 +24,6 @@ suspend fun ChannelService.prepareFundChannel(
   eltooScriptAddress: String,
   event: (FundChannelEvent, Channel?) -> Unit = { _, _ -> }
 ): Channel {
-  val myAddress = mds.getAddress().address
   val fundingTxId = fundingTx(myAmount, tokenId)
   event(FUNDING_TX_CREATED, null)
   
