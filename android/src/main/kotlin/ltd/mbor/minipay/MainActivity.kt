@@ -31,15 +31,15 @@ import kotlinx.coroutines.launch
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.getAddress
 import ltd.mbor.minimak.importTx
+import ltd.mbor.minipay.common.ChannelService
 import ltd.mbor.minipay.common.model.PaymentRequestReceived
 import ltd.mbor.minipay.common.model.Prefs
 import ltd.mbor.minipay.common.model.Transport.NFC
 import ltd.mbor.minipay.common.newTxId
 import ltd.mbor.minipay.common.scope
+import ltd.mbor.minipay.common.storage
 import ltd.mbor.minipay.common.storage.getChannel
-import ltd.mbor.minipay.logic.channelUpdateAck
-import ltd.mbor.minipay.logic.events
-import ltd.mbor.minipay.logic.initFirebase
+import ltd.mbor.minipay.logic.*
 import ltd.mbor.minipay.ui.MainView
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
 import ltd.mbor.minipay.ui.toBigDecimalOrNull
@@ -80,7 +80,7 @@ class MainActivity : ComponentActivity(), CardReader.DataCallback {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    initFirebase(applicationContext)
+    channelService = ChannelService(MDS, storage, initFirebase(applicationContext), channels, events)
 
     intent?.data?.let{ uri ->
       Log.i(TAG, uri.toString())

@@ -21,9 +21,8 @@ import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.model.PaymentRequestSent
 import ltd.mbor.minipay.common.model.Transport.FIREBASE
 import ltd.mbor.minipay.common.model.Transport.NFC
-import ltd.mbor.minipay.common.request
 import ltd.mbor.minipay.common.scope
-import ltd.mbor.minipay.common.send
+import ltd.mbor.minipay.logic.channelService
 import ltd.mbor.minipay.logic.events
 import ltd.mbor.minipay.sendDataToService
 import ltd.mbor.minipay.ui.preview.fakeChannelOpen
@@ -47,7 +46,7 @@ fun ChannelTransfers(channel: Channel, activity: MainActivity?) {
         onClick = {
           isSending = true
           scope.launch {
-            channel.send(amount)
+            with(channelService) { channel.send(amount) }
             isSending = false
           }
         },
@@ -69,7 +68,7 @@ fun ChannelTransfers(channel: Channel, activity: MainActivity?) {
         onClick = {
           preparingRequest = true
           scope.launch {
-            val (updateTxAndId, settleTxAndId) = channel.request(amount)
+            val (updateTxAndId, settleTxAndId) = with(channelService) { channel.request(amount) }
             events.add(
               PaymentRequestSent(
                 channel,
@@ -92,7 +91,7 @@ fun ChannelTransfers(channel: Channel, activity: MainActivity?) {
         onClick = {
           preparingRequest = true
           scope.launch {
-            val (updateTxAndId, settleTxAndId) = channel.request(amount)
+            val (updateTxAndId, settleTxAndId) = with(channelService) {  channel.request(amount) }
             activity?.apply {
               disableReaderMode()
               sendDataToService("TXN_REQUEST;${updateTxAndId.first};${settleTxAndId.first}")

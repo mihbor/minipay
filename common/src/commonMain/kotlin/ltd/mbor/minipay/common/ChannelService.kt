@@ -4,14 +4,18 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
 import ltd.mbor.minimak.*
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.model.ChannelEvent
 import ltd.mbor.minipay.common.model.PaymentRequestSent
+import ltd.mbor.minipay.common.transport.Transport
 
 class ChannelService(
   val mds: MdsApi,
   val storage: ChannelStorage,
+  val transport: Transport,
   val channels: MutableList<Channel>,
   val events: MutableList<ChannelEvent>
 ) {
@@ -62,7 +66,7 @@ class ChannelService(
     val signedUpdateTx = if (isAck) updateTxText else signAndExportTx(updateTxnId, my.keys.update)
     val signedSettleTx = if (isAck) settleTxText else signAndExportTx(settleTxnId, my.keys.settle)
     if (!isAck) {
-      publish(channelKey(their.keys, tokenId), listOf("TXN_UPDATE_ACK", signedUpdateTx, signedSettleTx).joinToString(";"))
+      transport.publish(channelKey(their.keys, tokenId), listOf("TXN_UPDATE_ACK", signedUpdateTx, signedSettleTx).joinToString(";"))
     }
     return update(signedUpdateTx, signedSettleTx, settleTx, onSuccess)
   }
@@ -106,11 +110,58 @@ class ChannelService(
     onUnhandled: suspend (List<String>) -> Unit,
     onEvent: (ChannelEvent) -> Unit
   ) {
-    subscribe(this).onEach { msg ->
+    transport.subscribe(this).onEach { msg ->
       processMessage(msg, onUpdate, onUnhandled, getChannelId, onEvent)
     }.onCompletion {
       log("completed")
     }.launchIn(scope)
+  }
+
+  suspend fun Channel.send(amount: BigDecimal): Pair<Pair<String, Int>, Pair<String, Int>> {
+    val currentSettlementTx = MDS.importTx(newTxId(), settlementTx)
+    val input = currentSettlementTx.inputs.first()
+    val updateTxnId = newTxId()
+    val updatetxncreator = buildString {
+      appendLine("txncreate id:$updateTxnId;")
+      appendLine("txninput id:$updateTxnId address:${input.address} amount:${input.amount} tokenid:${input.tokenId} floating:true;")
+      appendLine("txnstate id:$updateTxnId port:99 value:${sequenceNumber + 1};")
+      appendLine("txnoutput id:$updateTxnId amount:${input.amount} tokenid:${input.tokenId} address:${input.address};")
+      appendLine("txnsign id:$updateTxnId publickey:${my.keys.update};")
+      append("txnexport id:$updateTxnId;")
+    }
+    val updateTxn = MDS.cmd(updatetxncreator)!!.jsonArray.last().jsonObject["response"]!!.jsonString("data")
+    val settleTxnId = newTxId()
+    val settletxncreator = buildString {
+      appendLine("txncreate id:$settleTxnId;")
+      appendLine("txninput id:$settleTxnId address:${input.address} amount:${input.amount} tokenid:${input.tokenId} floating:true;")
+      appendLine("txnstate id:$settleTxnId port:99 value:${sequenceNumber + 1};")
+      if(my.balance - amount > BigDecimal.ZERO) appendLine("txnoutput id:$settleTxnId amount:${(my.balance - amount).toPlainString()} tokenid:${input.tokenId} address:${my.address};")
+      if(their.balance + amount > BigDecimal.ZERO) appendLine("txnoutput id:$settleTxnId amount:${(their.balance + amount).toPlainString()} tokenid:${input.tokenId} address:${their.address};")
+      appendLine("txnsign id:$settleTxnId publickey:${my.keys.settle};")
+      append("txnexport id:$settleTxnId;")
+    }
+    val settleTxn = MDS.cmd(settletxncreator)!!.jsonArray.last().jsonObject["response"]!!.jsonString("data")
+
+    transport.publish(
+      channelKey(their.keys, tokenId),
+      listOf(
+        if(amount > BigDecimal.ZERO) "TXN_UPDATE" else "TXN_REQUEST",
+        updateTxn,
+        settleTxn
+      ).joinToString(";").also {
+        log(it)
+      }
+    )
+
+    return (updateTxn to updateTxnId) to (settleTxn to settleTxnId)
+  }
+
+  suspend fun Channel.request(amount: BigDecimal) = this.send(-amount)
+
+  suspend fun Channel.acceptRequestAndReply(updateTxId: Int, settleTxId: Int, sequenceNumber: Int, channelBalance: Pair<BigDecimal, BigDecimal>) {
+    acceptRequest(updateTxId, settleTxId, sequenceNumber, channelBalance).let { (updateTx, settleTx) ->
+      transport.publish(channelKey(their.keys, tokenId), "TXN_UPDATE_ACK;$updateTx;$settleTx")
+    }
   }
 }
 

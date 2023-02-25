@@ -3,13 +3,12 @@ package ui
 import androidx.compose.runtime.*
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.coroutines.launch
+import logic.channelService
 import logic.events
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.model.PaymentRequestSent
 import ltd.mbor.minipay.common.model.Transport.FIREBASE
-import ltd.mbor.minipay.common.request
 import ltd.mbor.minipay.common.scope
-import ltd.mbor.minipay.common.send
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Div
@@ -27,7 +26,7 @@ fun ChannelTransfers(channel: Channel) {
       onClick {
         isSending = true
         scope.launch {
-          channel.send(amount)
+          with(channelService) { channel.send(amount) }
           amount = ZERO
           isSending = false
         }
@@ -45,7 +44,7 @@ fun ChannelTransfers(channel: Channel) {
       onClick {
         isSending = true
         scope.launch {
-          val (updateTxAndId, settleTxAndId) = channel.request(amount)
+          val (updateTxAndId, settleTxAndId) = with(channelService) { channel.request(amount) }
           events += PaymentRequestSent(
             channel,
             updateTxAndId.second,

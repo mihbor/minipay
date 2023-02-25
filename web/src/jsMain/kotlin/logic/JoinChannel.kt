@@ -26,7 +26,7 @@ fun joinChannel(
     multisigScriptAddress = MDS.newScript(triggerScript(theirKeys.trigger, myKeys.trigger)).address
     eltooScriptAddress = MDS.newScript(eltooScript(timeLock, theirKeys.update, myKeys.update, theirKeys.settle, myKeys.settle)).address
     onEvent(SCRIPTS_DEPLOYED, null)
-    val channel = joinChannel(myAddress, myKeys, theirKeys, tokenId, amount, triggerTx, settlementTx, fundingTx, timeLock, multisigScriptAddress, eltooScriptAddress, onEvent)
+    val channel = channelService.joinChannel(myAddress, myKeys, theirKeys, tokenId, amount, triggerTx, settlementTx, fundingTx, timeLock, multisigScriptAddress, eltooScriptAddress, onEvent)
     channels.put(channel)
     channel.id
   }

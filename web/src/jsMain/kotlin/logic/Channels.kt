@@ -3,12 +3,10 @@ package logic
 import androidx.compose.runtime.*
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Coin
-import ltd.mbor.minimak.MDS
 import ltd.mbor.minipay.common.ChannelService
 import ltd.mbor.minipay.common.channelKey
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.model.ChannelEvent
-import ltd.mbor.minipay.common.storage
 import view
 
 val channels = mutableStateListOf<Channel>()
@@ -19,7 +17,7 @@ val eltooScriptCoins = mutableStateMapOf<String, List<Coin>>()
 
 val events = mutableStateListOf<ChannelEvent>()
 
-val channelService = ChannelService(MDS, storage, channels, events)
+lateinit var channelService: ChannelService
 
 fun Channel.subscribe(
   onUpdate: (Channel, Boolean) -> Unit = { _, _ -> },

@@ -11,7 +11,7 @@ enum class FundChannelEvent{
   SCRIPTS_DEPLOYED, FUNDING_TX_CREATED, TRIGGER_TX_SIGNED, SETTLEMENT_TX_SIGNED, CHANNEL_PERSISTED, CHANNEL_PUBLISHED, SIGS_RECEIVED, CHANNEL_FUNDED, CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED
 }
 
-suspend fun prepareFundChannel(
+suspend fun ChannelService.prepareFundChannel(
   myKeys: Channel.Keys,
   theirKeys: Channel.Keys,
   theirAddress: String,
@@ -23,19 +23,19 @@ suspend fun prepareFundChannel(
   eltooScriptAddress: String,
   event: (FundChannelEvent, Channel?) -> Unit = { _, _ -> }
 ): Channel {
-  val myAddress = MDS.getAddress().address
+  val myAddress = mds.getAddress().address
   val fundingTxId = fundingTx(myAmount, tokenId)
   event(FUNDING_TX_CREATED, null)
   
-  val triggerTxId = MDS.signFloatingTx(myKeys.trigger, multisigScriptAddress, tokenId, mapOf(99 to "0"), myAmount+theirAmount to eltooScriptAddress)
+  val triggerTxId = mds.signFloatingTx(myKeys.trigger, multisigScriptAddress, tokenId, mapOf(99 to "0"), myAmount+theirAmount to eltooScriptAddress)
   event(TRIGGER_TX_SIGNED, null)
   
-  val settlementTxId = MDS.signFloatingTx(myKeys.settle, eltooScriptAddress, tokenId, mapOf(99 to "0"), myAmount to myAddress, theirAmount to theirAddress)
+  val settlementTxId = mds.signFloatingTx(myKeys.settle, eltooScriptAddress, tokenId, mapOf(99 to "0"), myAmount to myAddress, theirAmount to theirAddress)
   event(SETTLEMENT_TX_SIGNED, null)
   
-  val signedTriggerTx = MDS.exportTx(triggerTxId)
-  val signedSettlementTx = MDS.exportTx(settlementTxId)
-  val unsignedFundingTx = MDS.exportTx(fundingTxId)
+  val signedTriggerTx = mds.exportTx(triggerTxId)
+  val signedSettlementTx = mds.exportTx(settlementTxId)
+  val unsignedFundingTx = mds.exportTx(fundingTxId)
   
   val channelId =
     storage.insertChannel(tokenId, myAmount, theirAmount, myKeys, theirKeys, signedTriggerTx, signedSettlementTx, timeLock, multisigScriptAddress, eltooScriptAddress, myAddress, theirAddress)
@@ -63,7 +63,7 @@ suspend fun prepareFundChannel(
   )
   event(CHANNEL_PERSISTED, channel)
   
-  publish(
+  transport.publish(
     channelKey(theirKeys, tokenId),
     listOf(timeLock, myKeys.trigger, myKeys.update, myKeys.settle, signedTriggerTx, signedSettlementTx, unsignedFundingTx).joinToString(";")
   )
@@ -72,17 +72,17 @@ suspend fun prepareFundChannel(
   return channel
 }
 
-suspend fun fundingTx(amount: BigDecimal, tokenId: String): Int {
+suspend fun ChannelService.fundingTx(amount: BigDecimal, tokenId: String): Int {
   val txnId = newTxId()
-  val (inputs, change) = MDS.inputsWithChange(tokenId, amount)
-  
+  val (inputs, change) = mds.inputsWithChange(tokenId, amount)
+
   val txncreator = buildString {
     appendLine("txncreate id:$txnId;")
     inputs.forEach { appendLine("txninput id:$txnId coinid:${it.coinId};") }
     change.forEach { appendLine("txnoutput id:$txnId amount:${it.amount.toPlainString()} tokenid:${it.tokenId} address:${it.address};") }
   }.trim()
-  
-  MDS.cmd(txncreator)
+
+  mds.cmd(txncreator)
   return txnId
 }
 

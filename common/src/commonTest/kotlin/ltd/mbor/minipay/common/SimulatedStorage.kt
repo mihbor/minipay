@@ -5,9 +5,15 @@ import ltd.mbor.minipay.common.model.Channel
 
 object SimulatedStorage: ChannelStorage {
   var channels = mutableListOf<Channel>()
+  var insertChannelId = 0
 
-  fun willReturn(newChannels: List<Channel>): SimulatedStorage {
+  fun getChannelsWillReturn(newChannels: List<Channel>): SimulatedStorage {
     channels = newChannels.toMutableList()
+    return this
+  }
+
+  fun insertChannelWillReturn(id: Int): SimulatedStorage {
+    insertChannelId = id
     return this
   }
 
@@ -53,6 +59,6 @@ object SimulatedStorage: ChannelStorage {
     myAddress: String,
     otherAddress: String
   ): Int {
-    TODO("Not yet implemented")
+    return insertChannelId
   }
 }

@@ -10,9 +10,9 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ONE
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Token
-import ltd.mbor.minipay.common.acceptRequestAndReply
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.scope
+import ltd.mbor.minipay.logic.channelService
 import ltd.mbor.minipay.ui.preview.fakeMinimaChannel
 import ltd.mbor.minipay.ui.preview.previewTokens
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
@@ -41,7 +41,9 @@ fun ChannelRequestReceived(
       onClick = {
         preparingResponse = true
         scope.launch {
-          channel.acceptRequestAndReply(updateTxId, settleTxId, sequenceNumber, channelBalance)
+          with(channelService) {
+            channel.acceptRequestAndReply(updateTxId, settleTxId, sequenceNumber, channelBalance)
+          }
           preparingResponse = false
           dismiss()
         }

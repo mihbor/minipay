@@ -3,8 +3,8 @@ package ui
 import androidx.compose.runtime.*
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.coroutines.launch
+import logic.channelService
 import ltd.mbor.minimak.Token
-import ltd.mbor.minipay.common.acceptRequestAndReply
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.scope
 import org.jetbrains.compose.web.attributes.disabled
@@ -36,7 +36,7 @@ fun ChannelRequestReceived(
     onClick {
       preparingResponse = true
       scope.launch {
-        channel.acceptRequestAndReply(updateTxId, settleTxId, sequenceNumber, channelBalance)
+        with(channelService) { channel.acceptRequestAndReply(updateTxId, settleTxId, sequenceNumber, channelBalance) }
         preparingResponse = false
         dismiss()
       }

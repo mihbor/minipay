@@ -23,7 +23,7 @@ val eltooScriptCoins = mutableStateMapOf<String, List<Coin>>()
 
 val events = mutableStateListOf<ChannelEvent>()
 
-val channelService = ChannelService(MDS, storage, channels, events)
+lateinit var channelService: ChannelService
 
 suspend fun Channel.acceptRequestAndEmitResponse(updateTxId: Int, settleTxId: Int, sequenceNumber: Int, channelBalance: Pair<BigDecimal, BigDecimal>, activity: MainActivity) {
   val (updateTx, settleTx) = acceptRequest(updateTxId, settleTxId, sequenceNumber, channelBalance)

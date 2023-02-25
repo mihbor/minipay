@@ -90,47 +90,6 @@ suspend fun MdsApi.signFloatingTx(
   return txnId
 }
 
-suspend fun Channel.send(amount: BigDecimal): Pair<Pair<String, Int>, Pair<String, Int>> {
-  val currentSettlementTx = MDS.importTx(newTxId(), settlementTx)
-  val input = currentSettlementTx.inputs.first()
-  val updateTxnId = newTxId()
-  val updatetxncreator = buildString {
-    appendLine("txncreate id:$updateTxnId;")
-    appendLine("txninput id:$updateTxnId address:${input.address} amount:${input.amount} tokenid:${input.tokenId} floating:true;")
-    appendLine("txnstate id:$updateTxnId port:99 value:${sequenceNumber + 1};")
-    appendLine("txnoutput id:$updateTxnId amount:${input.amount} tokenid:${input.tokenId} address:${input.address};")
-    appendLine("txnsign id:$updateTxnId publickey:${my.keys.update};")
-    append("txnexport id:$updateTxnId;")
-  }
-  val updateTxn = MDS.cmd(updatetxncreator)!!.jsonArray.last().jsonObject["response"]!!.jsonString("data")
-  val settleTxnId = newTxId()
-  val settletxncreator = buildString {
-    appendLine("txncreate id:$settleTxnId;")
-    appendLine("txninput id:$settleTxnId address:${input.address} amount:${input.amount} tokenid:${input.tokenId} floating:true;")
-    appendLine("txnstate id:$settleTxnId port:99 value:${sequenceNumber + 1};")
-    if(my.balance - amount > ZERO) appendLine("txnoutput id:$settleTxnId amount:${(my.balance - amount).toPlainString()} tokenid:${input.tokenId} address:${my.address};")
-    if(their.balance + amount > ZERO) appendLine("txnoutput id:$settleTxnId amount:${(their.balance + amount).toPlainString()} tokenid:${input.tokenId} address:${their.address};")
-    appendLine("txnsign id:$settleTxnId publickey:${my.keys.settle};")
-    append("txnexport id:$settleTxnId;")
-  }
-  val settleTxn = MDS.cmd(settletxncreator)!!.jsonArray.last().jsonObject["response"]!!.jsonString("data")
-  
-  publish(
-    channelKey(their.keys, tokenId),
-    listOf(
-      if(amount > ZERO) "TXN_UPDATE" else "TXN_REQUEST",
-      updateTxn,
-      settleTxn
-    ).joinToString(";").also {
-      log(it)
-    }
-  )
-  
-  return (updateTxn to updateTxnId) to (settleTxn to settleTxnId)
-}
-
-suspend fun Channel.request(amount: BigDecimal) = this.send(-amount)
-
 suspend fun Channel.processRequest(updateTxText: String, settleTxText: String, onSuccess: (PaymentRequestReceived) -> Unit) {
   val updateTxId = newTxId()
   MDS.importTx(updateTxId, updateTxText)
@@ -150,12 +109,6 @@ suspend fun Channel.processRequest(updateTxText: String, settleTxText: String, o
       FIREBASE
     )
   ) else log("Stale update $newSequenceNumber received for channel $id at $sequenceNumber")
-}
-
-suspend fun Channel.acceptRequestAndReply(updateTxId: Int, settleTxId: Int, sequenceNumber: Int, channelBalance: Pair<BigDecimal, BigDecimal>) {
-  acceptRequest(updateTxId, settleTxId, sequenceNumber, channelBalance).let { (updateTx, settleTx) ->
-    publish(channelKey(their.keys, tokenId), "TXN_UPDATE_ACK;$updateTx;$settleTx")
-  }
 }
 
 suspend fun Channel.acceptRequest(updateTxId: Int, settleTxId: Int, sequenceNumber: Int, channelBalance: Pair<BigDecimal, BigDecimal>): Pair<String, String> {

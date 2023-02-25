@@ -11,7 +11,7 @@ enum class JoinChannelEvent{
   SCRIPTS_DEPLOYED, SIGS_RECEIVED, TRIGGER_TX_SIGNED, SETTLEMENT_TX_SIGNED, CHANNEL_PERSISTED, CHANNEL_PUBLISHED, CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED
 }
 
-suspend fun joinChannel(
+suspend fun ChannelService.joinChannel(
   myAddress: String,
   myKeys: Channel.Keys,
   theirKeys: Channel.Keys,
@@ -85,7 +85,7 @@ suspend fun joinChannel(
   onEvent(CHANNEL_PERSISTED, channel)
   
   val (exportedCoins, scripts) = exportedCoinsAndScripts.unzip()
-  publish(
+  transport.publish(
     channelKey(theirKeys, tokenId),
     (listOf(signedTriggerTx, signedSettlementTx, signedFundingTx) + exportedCoins + scripts).joinToString(";")
   )
