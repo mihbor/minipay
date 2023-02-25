@@ -1,49 +1,55 @@
 package ltd.mbor.minipay.common
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ONE
-import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.TEN
+import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.coroutines.test.runTest
-import ltd.mbor.minipay.common.FundChannelEvent.*
+import ltd.mbor.minipay.common.JoinChannelEvent.*
 import ltd.mbor.minipay.common.model.Channel
-import ltd.mbor.minipay.common.resources.address
+import ltd.mbor.minipay.common.resources.coinexport
+import ltd.mbor.minipay.common.resources.importTx
+import ltd.mbor.minipay.common.resources.scripts
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class FundChannelTest {
+class JoinChannelTest {
   @Test
-  fun prepareFundChannel() = runTest {
+  fun joinChannel() = runTest {
     //given
     val mds = SimulatedMDS()
-      .willReturn(address.getAddress)
+      .willReturn(importTx.createAndImportSignedTx)
+      .willReturn("""["TODO", "sign"]""")
+      .willReturn("""{"response":{"data": "TODO: exportTx"}}""")
+      .willReturn(importTx.createAndImportSignedTx)
+      .willReturn("""["TODO", "sign"]""")
+      .willReturn("""{"response":{"data": "TODO: exportTx"}}""")
+      .willReturn(importTx.createAndImportSignedTx)
       .willReturnCoins(listOf(aCoin))
       .willReturn("""{"TODO": "fundingTx"}""")
-      .willReturn("""["TODO", "signFloatingTx"]""")
-      .willReturn("""["TODO", "signFloatingTx"]""")
+      .willReturn(scripts.scripts109)
+      .willReturn("""["TODO", "sign"]""")
       .willReturn("""{"response":{"data": "TODO: exportTx"}}""")
-      .willReturn("""{"response":{"data": "TODO: exportTx"}}""")
-      .willReturn("""{"response":{"data": "TODO: exportTx"}}""")
+      .willReturn(coinexport.coinexport)
     val storage = SimulatedStorage.insertChannelWillReturn(42)
     val transport = SimulatedTransport()
     val channelService = ChannelService(mds, storage, transport, mutableListOf(), mutableListOf())
-    val events = mutableListOf<Pair<FundChannelEvent, Channel?>>()
+    val events = mutableListOf<Pair<JoinChannelEvent, Channel?>>()
     //when
-    val channel = channelService.prepareFundChannel(keys, keys, "their address", ONE, TEN, "0x00", 10, "multisig", "eltoo") { event, channel -> events.add(event to channel) }
+    val channel = channelService.joinChannel(keys, keys, "my address", ONE, "0x00", 10, "multisig", "eltoo", "triggerTx", "settlementTx", "fundingTx") { event, channel -> events.add(event to channel) }
     //then
     assertNotNull(channel)
     assertEquals(1, transport.published.size)
     val eventsIterator = events.iterator()
-    assertEquals(FUNDING_TX_CREATED to null, eventsIterator.next())
     assertEquals(TRIGGER_TX_SIGNED to null, eventsIterator.next())
     assertEquals(SETTLEMENT_TX_SIGNED to null, eventsIterator.next())
     assertEquals(CHANNEL_PERSISTED to channel, eventsIterator.next())
     assertEquals(CHANNEL_PUBLISHED to channel, eventsIterator.next())
-    assertEquals("0xB4A680430A9808AFA98D9F7E3398750AA71DD88E1A815D87C4FCC2A48C0A57D8", channel.my.address)
+    assertEquals("my address", channel.my.address)
     assertEquals(keys, channel.my.keys)
     assertEquals(ONE, channel.my.balance)
-    assertEquals("their address", channel.their.address)
+    assertEquals("0xB13D03D7FAC25552491F8E1C04120FEA67700DFB5AB576CA7DDED59D35F93A96", channel.their.address)
     assertEquals(keys, channel.their.keys)
-    assertEquals(TEN, channel.their.balance)
+    assertEquals(ZERO, channel.their.balance)
     assertEquals(10, channel.timeLock)
     assertEquals("multisig", channel.multiSigAddress)
     assertEquals("eltoo", channel.eltooAddress)

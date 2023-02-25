@@ -63,8 +63,8 @@ class ChannelService(
     val settleTxnId = newTxId()
     val settleTx = mds.importTx(settleTxnId, settleTxText)
     
-    val signedUpdateTx = if (isAck) updateTxText else signAndExportTx(updateTxnId, my.keys.update)
-    val signedSettleTx = if (isAck) settleTxText else signAndExportTx(settleTxnId, my.keys.settle)
+    val signedUpdateTx = if (isAck) updateTxText else mds.signAndExportTx(updateTxnId, my.keys.update)
+    val signedSettleTx = if (isAck) settleTxText else mds.signAndExportTx(settleTxnId, my.keys.settle)
     if (!isAck) {
       transport.publish(channelKey(their.keys, tokenId), listOf("TXN_UPDATE_ACK", signedUpdateTx, signedSettleTx).joinToString(";"))
     }

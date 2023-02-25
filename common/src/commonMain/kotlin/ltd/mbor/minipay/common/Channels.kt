@@ -40,9 +40,9 @@ suspend fun isPaymentChannelAvailable(toAddress: String, tokenId: String, amount
   return matchingChannels.isNotEmpty()
 }
 
-suspend fun signAndExportTx(id: Int, key: String): String {
-  MDS.signTx(id, key)
-  return MDS.exportTx(id)
+suspend fun MdsApi.signAndExportTx(id: Int, key: String): String {
+  signTx(id, key)
+  return exportTx(id)
 }
 
 suspend fun MdsApi.importAndPost(tx: String): JsonElement {
@@ -112,8 +112,8 @@ suspend fun Channel.processRequest(updateTxText: String, settleTxText: String, o
 }
 
 suspend fun Channel.acceptRequest(updateTxId: Int, settleTxId: Int, sequenceNumber: Int, channelBalance: Pair<BigDecimal, BigDecimal>): Pair<String, String> {
-  val signedUpdateTx = signAndExportTx(updateTxId, my.keys.update)
-  val signedSettleTx = signAndExportTx(settleTxId, my.keys.settle)
+  val signedUpdateTx = MDS.signAndExportTx(updateTxId, my.keys.update)
+  val signedSettleTx = MDS.signAndExportTx(settleTxId, my.keys.settle)
 
   updateChannel(this, channelBalance, sequenceNumber, signedUpdateTx, signedSettleTx)
 
