@@ -163,6 +163,36 @@ class ChannelService(
       transport.publish(channelKey(their.keys, tokenId), "TXN_UPDATE_ACK;$updateTx;$settleTx")
     }
   }
+
+  suspend fun Channel.commitFund(
+    triggerTx: String,
+    settlementTx: String,
+    fundingTx: String,
+    theirInputCoins: List<String>,
+    theirInputScripts: List<String>,
+    key: String = "auto"
+  ): Channel {
+    mds.importTx(newTxId(), triggerTx)
+    mds.importTx(newTxId(), settlementTx)
+    val fundingTxId = newTxId()
+    mds.importTx(fundingTxId, fundingTx).outputs
+    theirInputCoins.forEach { mds.importCoin(it) }
+    theirInputScripts.forEach { mds.newScript(it) }
+
+    val txncreator = buildString {
+      appendLine("txnsign id :$fundingTxId publickey:$key;")
+      appendLine("txnpost id :$fundingTxId auto:true;")
+      append("txndelete id :$fundingTxId;")
+    }
+    val result = mds.cmd(txncreator)!!.jsonArray
+    val status = result.first{ it.jsonString("command") == "txnpost" }.jsonString("status")
+    log("txnpost status: $status")
+
+    return if (status.toBoolean()) {
+      storage.updateChannel(this, triggerTx, settlementTx)
+    } else this
+  }
+
 }
 
 fun List<Channel>.forId(id: Int) = first { it.id == id }

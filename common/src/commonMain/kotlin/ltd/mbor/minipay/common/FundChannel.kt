@@ -2,8 +2,9 @@ package ltd.mbor.minipay.common
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.datetime.Clock
-import kotlinx.serialization.json.jsonArray
-import ltd.mbor.minimak.*
+import ltd.mbor.minimak.exportTx
+import ltd.mbor.minimak.getAddress
+import ltd.mbor.minimak.inputsWithChange
 import ltd.mbor.minipay.common.FundChannelEvent.*
 import ltd.mbor.minipay.common.model.Channel
 
@@ -84,33 +85,4 @@ suspend fun ChannelService.fundingTx(amount: BigDecimal, tokenId: String): Int {
 
   mds.cmd(txncreator)
   return txnId
-}
-
-suspend fun Channel.commitFund(
-  key: String,
-  triggerTx: String,
-  settlementTx: String,
-  fundingTx: String,
-  theirInputCoins: List<String>,
-  theirInputScripts: List<String>
-): Channel {
-  MDS.importTx(newTxId(), triggerTx)
-  MDS.importTx(newTxId(), settlementTx)
-  val fundingTxId = newTxId()
-  MDS.importTx(fundingTxId, fundingTx).outputs
-  theirInputCoins.forEach { MDS.importCoin(it) }
-  theirInputScripts.forEach { MDS.newScript(it) }
-  
-  val txncreator = buildString {
-    appendLine("txnsign id :$fundingTxId publickey:$key;")
-    appendLine("txnpost id :$fundingTxId auto:true;")
-    append("txndelete id :$fundingTxId;")
-  }
-  val result = MDS.cmd(txncreator)!!.jsonArray
-  val status = result.find{ it.jsonString("command") == "txnpost" }!!.jsonString("status")
-  log("txnpost status: $status")
-  
-  return if (status.toBoolean()) {
-    storage.updateChannel(this, triggerTx, settlementTx)
-  } else this
 }

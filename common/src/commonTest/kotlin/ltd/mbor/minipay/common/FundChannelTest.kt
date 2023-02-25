@@ -6,6 +6,8 @@ import kotlinx.coroutines.test.runTest
 import ltd.mbor.minipay.common.FundChannelEvent.*
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.resources.address
+import ltd.mbor.minipay.common.resources.coinimport
+import ltd.mbor.minipay.common.resources.importTx
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -47,5 +49,26 @@ class FundChannelTest {
     assertEquals(10, channel.timeLock)
     assertEquals("multisig", channel.multiSigAddress)
     assertEquals("eltoo", channel.eltooAddress)
+  }
+  @Test
+  fun commitFundChannel() = runTest {
+    //given
+    val mds = SimulatedMDS()
+      .willReturn(importTx.createAndImportSignedTx)
+      .willReturn(importTx.createAndImportSignedTx)
+      .willReturn(importTx.createAndImportSignedTx)
+      .willReturn(coinimport.success)
+      .willReturn(address.getAddress) // TODO: should be newscript
+      .willReturn("""[{"command": "txnpost", "status": "true", "TODO": "postFundingTx"}]""")
+    val storage = SimulatedStorage
+    val transport = SimulatedTransport()
+    val channelService = ChannelService(mds, storage, transport, mutableListOf(), mutableListOf())
+    //when
+    val channel = with(channelService) {
+      offeredChannel.commitFund("triggerTx", "settlementTx", "fundingTx", listOf(aCoin.coinId), listOf(anAddress.script))
+    }
+    //then
+    assertEquals("triggerTx", channel.triggerTx)
+    assertEquals("settlementTx", channel.settlementTx)
   }
 }

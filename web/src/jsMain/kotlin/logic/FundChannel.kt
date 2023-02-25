@@ -33,9 +33,11 @@ suspend fun fundChannel(
       .let{ it.takeUnless { it.isEmpty() }?.chunked(it.size/2) ?: listOf(emptyList(), emptyList()) }
     onEvent(SIGS_RECEIVED, channel)
     try {
-      channel.commitFund("auto", triggerTx, settlementTx, fundingTx, theirInputCoins, theirInputScripts).also {
-        onEvent(CHANNEL_FUNDED, it)
-        channels.put(it)
+      with(channelService) {
+        channel.commitFund(triggerTx, settlementTx, fundingTx, theirInputCoins, theirInputScripts, "auto").also {
+          onEvent(CHANNEL_FUNDED, it)
+          channels.put(it)
+        }
       }
     } catch (e: MinimaException) {
       window.alert("MinimaException: ${e.message}")

@@ -2,6 +2,7 @@ package ltd.mbor.minipay.common
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.datetime.Clock
+import ltd.mbor.minimak.Address
 import ltd.mbor.minimak.Coin
 import ltd.mbor.minimak.Transaction
 import ltd.mbor.minipay.common.model.Channel
@@ -33,4 +34,13 @@ val aTransaction = Transaction(
     "123",
     "123"
   )
+)
+val anAddress = Address(
+  script = "RETURN SIGNEDBY(0xB3C8B10782B90C1820111CBE33E207BDF2B7D4C4FF004E5EF38F301847EB2ED8)",
+  address = "0x3DD886A5FF072F44A576829B32019DB4DB98BF8E37FD819CA59798A3C2FDDBE9",
+  miniAddress = "MxG081TR23ABVZ75T2AATK2JCP037DKRECBV3HNVM0PP9CNJ2HS5VERT4GUC94G",
+  simple = true,
+  default = true,
+  publicKey = "0xB3C8B10782B90C1820111CBE33E207BDF2B7D4C4FF004E5EF38F301847EB2ED8",
+  track = true
 )
