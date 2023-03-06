@@ -1,18 +1,21 @@
 package ltd.mbor.minipay.common
 
+import com.benasher44.uuid.Uuid
+import com.benasher44.uuid.uuid4
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import kotlinx.datetime.Clock
 import ltd.mbor.minipay.common.model.Channel
 
 object SimulatedStorage: ChannelStorage {
   var channels = mutableListOf<Channel>()
-  var insertChannelId = 0
+  var insertChannelId = uuid4()
 
   fun getChannelsWillReturn(newChannels: List<Channel>): SimulatedStorage {
     channels = newChannels.toMutableList()
     return this
   }
 
-  fun insertChannelWillReturn(id: Int): SimulatedStorage {
+  fun insertChannelWillReturn(id: Uuid): SimulatedStorage {
     insertChannelId = id
     return this
   }
@@ -57,8 +60,19 @@ object SimulatedStorage: ChannelStorage {
     multisigScriptAddress: String,
     eltooScriptAddress: String,
     myAddress: String,
-    otherAddress: String
-  ): Int {
-    return insertChannelId
-  }
+    theirAddress: String
+  ) = Channel(
+    id = insertChannelId,
+    sequenceNumber = 0,
+    status = "OFFERED",
+    tokenId = tokenId,
+    my = Channel.Side(myAddress, myBalance, myKeys),
+    their = Channel.Side(theirAddress, theirBalance, theirKeys),
+    triggerTx = signedTriggerTx,
+    settlementTx = signedSettlementTx,
+    timeLock = timeLock,
+    eltooAddress = eltooScriptAddress,
+    multiSigAddress = multisigScriptAddress,
+    updatedAt = Clock.System.now()
+  )
 }

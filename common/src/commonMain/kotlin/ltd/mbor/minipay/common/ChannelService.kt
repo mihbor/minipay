@@ -1,5 +1,6 @@
 package ltd.mbor.minipay.common
 
+import com.benasher44.uuid.Uuid
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
@@ -82,7 +83,7 @@ class ChannelService(
     msg: String,
     onUpdate: (Channel, Boolean) -> Unit,
     onUnhandled: suspend (List<String>) -> Unit,
-    getChannelId: () -> Int,
+    getChannelId: () -> Uuid,
     onEvent: (ChannelEvent) -> Unit
   ) {
     log("tx msg: $msg")
@@ -105,7 +106,7 @@ class ChannelService(
   }
   
   fun String.subscribe(
-    getChannelId: (() -> Int),
+    getChannelId: (() -> Uuid),
     onUpdate: (Channel, Boolean) -> Unit = { _, _ -> },
     onUnhandled: suspend (List<String>) -> Unit,
     onEvent: (ChannelEvent) -> Unit
@@ -192,10 +193,9 @@ class ChannelService(
       storage.updateChannel(this, triggerTx, settlementTx)
     } else this
   }
-
 }
 
-fun List<Channel>.forId(id: Int) = first { it.id == id }
+fun List<Channel>.forId(id: Uuid) = first { it.id == id }
 
 fun MutableList<Channel>.put(channel: Channel) {
   val current = firstOrNull{ it.id == channel.id }

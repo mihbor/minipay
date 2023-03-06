@@ -1,7 +1,6 @@
 package ltd.mbor.minipay.common
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
-import kotlinx.datetime.Clock
 import ltd.mbor.minimak.exportTx
 import ltd.mbor.minimak.inputsWithChange
 import ltd.mbor.minipay.common.FundChannelEvent.*
@@ -37,30 +36,8 @@ suspend fun ChannelService.prepareFundChannel(
   val signedSettlementTx = mds.exportTx(settlementTxId)
   val unsignedFundingTx = mds.exportTx(fundingTxId)
   
-  val channelId =
-    storage.insertChannel(tokenId, myAmount, theirAmount, myKeys, theirKeys, signedTriggerTx, signedSettlementTx, timeLock, multisigScriptAddress, eltooScriptAddress, myAddress, theirAddress)
-  val channel = Channel(
-    id = channelId,
-    sequenceNumber = 0,
-    status = "OFFERED",
-    tokenId = tokenId,
-    my = Channel.Side(
-      balance = myAmount,
-      address = myAddress,
-      keys = myKeys
-    ),
-    their = Channel.Side(
-      balance = theirAmount,
-      address = theirAddress,
-      keys = theirKeys
-    ),
-    triggerTx = signedTriggerTx,
-    settlementTx = signedSettlementTx,
-    timeLock = timeLock,
-    eltooAddress = eltooScriptAddress,
-    multiSigAddress = multisigScriptAddress,
-    updatedAt = Clock.System.now()
-  )
+  val channel = storage.insertChannel(tokenId, myAmount, theirAmount, myKeys, theirKeys, signedTriggerTx, signedSettlementTx, timeLock, multisigScriptAddress, eltooScriptAddress, myAddress, theirAddress)
+
   event(CHANNEL_PERSISTED, channel)
   
   transport.publish(

@@ -1,6 +1,7 @@
 package logic
 
 import androidx.compose.runtime.*
+import com.benasher44.uuid.Uuid
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Coin
 import ltd.mbor.minipay.common.ChannelService
@@ -32,9 +33,9 @@ fun Channel.subscribe(
 
 fun String.subscribe(
   onUpdate: (Channel, Boolean) -> Unit = { _, _ -> },
-  onUnhandled: suspend (List<String>) -> Int
+  onUnhandled: suspend (List<String>) -> Uuid
 ) {
-  var channelId: Int? = null
+  var channelId: Uuid? = null
   with(channelService) {
     subscribe({ checkNotNull(channelId) }, onUpdate, {
       channelId = onUnhandled(it)

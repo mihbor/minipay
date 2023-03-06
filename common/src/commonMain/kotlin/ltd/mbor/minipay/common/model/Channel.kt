@@ -1,10 +1,11 @@
 package ltd.mbor.minipay.common.model
 
+import com.benasher44.uuid.Uuid
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.datetime.Instant
 
 data class Channel(
-  val id: Int,
+  val id: Uuid,
   val sequenceNumber: Int = 0,
   val status: String,
   val tokenId: String,

@@ -1,5 +1,6 @@
 package ltd.mbor.minipay.common
 
+import com.benasher44.uuid.uuid4
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ONE
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.coroutines.test.runTest
@@ -31,7 +32,7 @@ class JoinChannelTest {
       .willReturn("""["TODO", "sign"]""")
       .willReturn("""{"response":{"data": "TODO: exportTx"}}""")
       .willReturn(coinexport.coinexport)
-    val storage = SimulatedStorage.insertChannelWillReturn(42)
+    val storage = SimulatedStorage.insertChannelWillReturn(uuid4())
     val transport = SimulatedTransport()
     val channelService = ChannelService(mds, storage, transport, mutableListOf(), mutableListOf())
     val events = mutableListOf<Pair<JoinChannelEvent, Channel?>>()

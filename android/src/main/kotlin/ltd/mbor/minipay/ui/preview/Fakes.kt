@@ -1,5 +1,6 @@
 package ltd.mbor.minipay.ui.preview
 
+import com.benasher44.uuid.uuid4
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ONE
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
@@ -18,7 +19,7 @@ import ltd.mbor.minipay.common.model.Transport.FIREBASE
 import ltd.mbor.minipay.common.model.Transport.NFC
 
 val fakeChannelOpen = Channel(
-  id = 1,
+  id = uuid4(),
   sequenceNumber = 0,
   status = "OPEN",
   tokenId = "0x01234567890",
@@ -52,7 +53,7 @@ val fakeChannelOpen = Channel(
 val fakeChannelTriggered = fakeChannelOpen.copy(status = "TRIGGERED", sequenceNumber = 3, eltooAddress = "0x999", updateTx = "abc")
 
 val fakeMinimaChannel = Channel(
-  id = 2,
+  id = uuid4(),
   sequenceNumber = 0,
   status = "OPEN",
   tokenId = "0x00",

@@ -1,13 +1,12 @@
 package ltd.mbor.minipay.common
 
+import com.benasher44.uuid.uuid4
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ONE
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.TEN
 import kotlinx.coroutines.test.runTest
 import ltd.mbor.minipay.common.FundChannelEvent.*
 import ltd.mbor.minipay.common.model.Channel
-import ltd.mbor.minipay.common.resources.address
-import ltd.mbor.minipay.common.resources.coinimport
-import ltd.mbor.minipay.common.resources.importTx
+import ltd.mbor.minipay.common.resources.fundChannel
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -18,14 +17,15 @@ class FundChannelTest {
   fun prepareFundChannel() = runTest {
     //given
     val mds = SimulatedMDS()
-      .willReturnCoins(listOf(aCoin))
-      .willReturn("""{"TODO": "fundingTx"}""")
-      .willReturn("""["TODO", "signFloatingTx"]""")
-      .willReturn("""["TODO", "signFloatingTx"]""")
-      .willReturn("""{"response":{"data": "TODO: exportTx"}}""")
-      .willReturn("""{"response":{"data": "TODO: exportTx"}}""")
-      .willReturn("""{"response":{"data": "TODO: exportTx"}}""")
-    val storage = SimulatedStorage.insertChannelWillReturn(42)
+      .willReturn(fundChannel.coins)
+      .willReturn(fundChannel.getaddress4change)
+      .willReturn(fundChannel.fundingTx)
+      .willReturn(fundChannel.triggerTx)
+      .willReturn(fundChannel.settleTx)
+      .willReturn(fundChannel.exportTriggerTx)
+      .willReturn(fundChannel.exportSettleTx)
+      .willReturn(fundChannel.exportFundingTx)
+    val storage = SimulatedStorage.insertChannelWillReturn(uuid4())
     val transport = SimulatedTransport()
     val channelService = ChannelService(mds, storage, transport, mutableListOf(), mutableListOf())
     val events = mutableListOf<Pair<FundChannelEvent, Channel?>>()
@@ -50,16 +50,17 @@ class FundChannelTest {
     assertEquals("multisig", channel.multiSigAddress)
     assertEquals("eltoo", channel.eltooAddress)
   }
+
   @Test
   fun commitFundChannel() = runTest {
     //given
     val mds = SimulatedMDS()
-      .willReturn(importTx.createAndImportSignedTx)
-      .willReturn(importTx.createAndImportSignedTx)
-      .willReturn(importTx.createAndImportSignedTx)
-      .willReturn(coinimport.success)
-      .willReturn(address.getAddress) // TODO: should be newscript
-      .willReturn("""[{"command": "txnpost", "status": "true", "TODO": "postFundingTx"}]""")
+      .willReturn(fundChannel.importTriggerTx)
+      .willReturn(fundChannel.importSettleTx)
+      .willReturn(fundChannel.importFundingTx)
+      .willReturn(fundChannel.importFundingCoin)
+      .willReturn(fundChannel.fundingCoinScript)
+      .willReturn(fundChannel.postFundingTx)
     val storage = SimulatedStorage
     val transport = SimulatedTransport()
     val channelService = ChannelService(mds, storage, transport, mutableListOf(), mutableListOf())

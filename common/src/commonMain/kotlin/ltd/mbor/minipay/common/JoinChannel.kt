@@ -2,7 +2,6 @@ package ltd.mbor.minipay.common
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
-import kotlinx.datetime.Clock
 import ltd.mbor.minimak.*
 import ltd.mbor.minipay.common.JoinChannelEvent.*
 import ltd.mbor.minipay.common.model.Channel
@@ -59,29 +58,7 @@ suspend fun ChannelService.joinChannel(
     Pair(mds.signAndExportTx(fundingTxId, "auto"), emptyList())
   }
   
-  val channelId = storage.insertChannel(tokenId, myAmount, theirAmount, myKeys, theirKeys, signedTriggerTx, signedSettlementTx, timeLock, multisigScriptAddress, eltooScriptAddress, myAddress, theirAddress)
-  val channel = Channel(
-    id = channelId,
-    sequenceNumber = 0,
-    status = "OFFERED",
-    tokenId = tokenId,
-    my = Channel.Side(
-      balance = myAmount,
-      address = myAddress,
-      keys = myKeys
-    ),
-    their = Channel.Side(
-      balance = theirAmount,
-      address = theirAddress,
-      keys = theirKeys
-    ),
-    triggerTx = signedTriggerTx,
-    settlementTx = signedSettlementTx,
-    timeLock = timeLock,
-    eltooAddress = eltooScriptAddress,
-    multiSigAddress = multisigScriptAddress,
-    updatedAt = Clock.System.now()
-  )
+  val channel = storage.insertChannel(tokenId, myAmount, theirAmount, myKeys, theirKeys, signedTriggerTx, signedSettlementTx, timeLock, multisigScriptAddress, eltooScriptAddress, myAddress, theirAddress)
   onEvent(CHANNEL_PERSISTED, channel)
   
   val (exportedCoins, scripts) = exportedCoinsAndScripts.unzip()

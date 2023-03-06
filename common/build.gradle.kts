@@ -18,6 +18,8 @@ kotlin {
 
         api("com.ionspin.kotlin:bignum:$bignumVersion")
         api("com.ionspin.kotlin:bignum-serialization-kotlinx:$bignumVersion")
+
+        api("com.benasher44:uuid:0.7.0")
         
         api("dev.gitlive:firebase-firestore:1.6.2")
 
