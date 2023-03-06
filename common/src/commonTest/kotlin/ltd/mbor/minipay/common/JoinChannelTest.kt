@@ -12,6 +12,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class JoinChannelTest {
   @Test
   fun joinChannel() = runTest {

@@ -1,6 +1,6 @@
 package ltd.mbor.minipay.common
 
-import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.JsonPrimitive
@@ -11,6 +11,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class AdapterTest {
 
   @Test
@@ -23,14 +24,14 @@ class AdapterTest {
     assertEquals(
       listOf(
         Balance(
-        tokenId = "0x00",
-        _token = JsonPrimitive("Minima"),
-        total = "1000000000".toBigDecimal(),
-        confirmed = BigDecimal.ZERO,
-        unconfirmed = BigDecimal.ZERO,
-        sendable = BigDecimal.ZERO,
-        _coins = "0"
-      )
+          tokenId = "0x00",
+          _token = JsonPrimitive("Minima"),
+          total = "1000000000".toBigDecimal(),
+          confirmed = ZERO,
+          unconfirmed = ZERO,
+          sendable = ZERO,
+          _coins = "0"
+        )
       ),
       result
     )

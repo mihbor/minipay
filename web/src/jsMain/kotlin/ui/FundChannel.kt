@@ -102,7 +102,7 @@ fun FundChannel(
         theirAddress = it.value
       }
       style {
-        width(300.px)
+        width(500.px)
       }
     }
     Br()

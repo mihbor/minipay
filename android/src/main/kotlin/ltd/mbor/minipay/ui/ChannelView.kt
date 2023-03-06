@@ -38,6 +38,10 @@ fun ChannelView(
     }
     Divider()
     Row {
+      Text("Status: ${channel.status}")
+    }
+    Divider()
+    Row {
       Text("Sequence number: ${channel.sequenceNumber}")
     }
     Divider()

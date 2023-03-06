@@ -37,6 +37,9 @@ fun ChannelView(
       Text(channel.their.balance.toPlainString())
     }
     Div {
+      Text("Status: ${channel.status}")
+    }
+    Div {
       Text("Sequence number: ${channel.sequenceNumber}")
     }
     Div {

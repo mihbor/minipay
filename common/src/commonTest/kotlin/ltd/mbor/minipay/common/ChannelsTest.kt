@@ -8,6 +8,7 @@ import ltd.mbor.minipay.common.resources.importAndPostError
 import ltd.mbor.minipay.common.resources.three_new_keys
 import kotlin.test.*
 
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class ChannelsTest {
   @Test
   fun channelKey() {
