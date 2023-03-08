@@ -17,6 +17,7 @@ import ltd.mbor.minipay.common.storage.createDB
 import ltd.mbor.minipay.common.storage.getChannels
 import ltd.mbor.minipay.common.storage.setChannelOpen
 
+var inited by mutableStateOf(false)
 val balances = mutableStateMapOf<String, Balance>()
 val tokens = mutableStateMapOf<String, Token>()
 var blockNumber by mutableStateOf(0)
@@ -31,54 +32,54 @@ fun getParams(parameterName: String): String? {
   }.firstOrNull()
 }
 
-fun initMDS(prefs: Prefs) {
-  scope.launch {
-    MDS.init(prefs.uid, prefs.host, prefs.port) { msg: JsonElement ->
-      when (msg.jsonString("event")) {
-        "inited" -> {
-          if (MDS.logging) console.log("Connected to Minima.")
-          try {
-            blockNumber = MDS.getBlockNumber()
-            if (blockNumber <= 0) {
-              window.alert("No blockes yet?")
-              return@init
-            }
-          } catch (e: NullPointerException) {
-            window.alert("Error getting status. Wrong UID?")
+suspend fun initMDS(prefs: Prefs) {
+  inited = false
+  MDS.init(prefs.uid, prefs.host, prefs.port) { msg: JsonElement ->
+    when (msg.jsonString("event")) {
+      "inited" -> {
+        if (MDS.logging) console.log("Connected to Minima.")
+        try {
+          blockNumber = MDS.getBlockNumber()
+          if (blockNumber <= 0) {
+            window.alert("No blockes yet?")
             return@init
           }
-          balances.putAll(MDS.getBalances(confirmations = 0).associateBy { it.tokenId })
-          tokens.putAll(MDS.getTokens().associateBy { it.tokenId })
-          createDB()
-          channels.addAll(getChannels(status = "OPEN"))
-          channels.forEach(Channel::subscribe)
+        } catch (e: NullPointerException) {
+          window.alert("Error getting status. Wrong UID?")
+          return@init
         }
-      
-        "NEWBALANCE" -> {
-          val newBalances = MDS.getBalances(confirmations = 0).associateBy { it.tokenId }
-          balances.clear()
-          balances.putAll(newBalances)
-          val newTokens = MDS.getTokens().associateBy { it.tokenId }
-          tokens.clear()
-          tokens.putAll(newTokens)
-        }
-      
-        "NEWBLOCK" -> {
-          blockNumber = msg.jsonObject["data"]!!.jsonObject["txpow"]!!.jsonObject["header"]!!.jsonString("block").toInt()
-          if (multisigScriptAddress.isNotEmpty()) {
-            scope.launch {
-              val newBalances = MDS.getBalances(multisigScriptAddress, confirmations = 0)
-              if (newBalances.any { it.confirmed > ZERO } && multisigScriptBalances.none { it.confirmed > ZERO }) {
-                setChannelOpen(multisigScriptAddress)
-              }
-              multisigScriptBalances.clear()
-              multisigScriptBalances.addAll(newBalances)
+        balances.putAll(MDS.getBalances(confirmations = 0).associateBy { it.tokenId })
+        tokens.putAll(MDS.getTokens().associateBy { it.tokenId })
+        createDB()
+        channels.addAll(getChannels(status = "OPEN"))
+        channels.forEach(Channel::subscribe)
+        inited = true
+      }
+
+      "NEWBALANCE" -> {
+        val newBalances = MDS.getBalances(confirmations = 0).associateBy { it.tokenId }
+        balances.clear()
+        balances.putAll(newBalances)
+        val newTokens = MDS.getTokens().associateBy { it.tokenId }
+        tokens.clear()
+        tokens.putAll(newTokens)
+      }
+
+      "NEWBLOCK" -> {
+        blockNumber = msg.jsonObject["data"]!!.jsonObject["txpow"]!!.jsonObject["header"]!!.jsonString("block").toInt()
+        if (multisigScriptAddress.isNotEmpty()) {
+          scope.launch {
+            val newBalances = MDS.getBalances(multisigScriptAddress, confirmations = 0)
+            if (newBalances.any { it.confirmed > ZERO } && multisigScriptBalances.none { it.confirmed > ZERO }) {
+              setChannelOpen(multisigScriptAddress)
             }
+            multisigScriptBalances.clear()
+            multisigScriptBalances.addAll(newBalances)
           }
-          if (eltooScriptAddress.isNotEmpty()) {
-            scope.launch {
-              eltooScriptCoins.put(eltooScriptAddress, MDS.getCoins(address = eltooScriptAddress))
-            }
+        }
+        if (eltooScriptAddress.isNotEmpty()) {
+          scope.launch {
+            eltooScriptCoins.put(eltooScriptAddress, MDS.getCoins(address = eltooScriptAddress))
           }
         }
       }
