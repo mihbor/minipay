@@ -9,6 +9,7 @@ import kotlinx.browser.window
 import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.MDS
+import ltd.mbor.minimak.log
 import ltd.mbor.minimak.send
 import ltd.mbor.minipay.common.isPaymentChannelAvailable
 import ltd.mbor.minipay.common.scope
@@ -32,7 +33,7 @@ fun Send(balances: SnapshotStateMap<String, Balance>) {
       toAddress = it.value
     }
     style {
-      width(500.px)
+      width(550.px)
     }
   }
   Br()
@@ -55,11 +56,11 @@ fun Send(balances: SnapshotStateMap<String, Balance>) {
     if (amount <= 0 || toAddress.isEmpty() || sending) disabled()
     onClick {
       sending = true
-      console.log("post $amount [$tokenId] to $toAddress")
       scope.launch {
         if (isPaymentChannelAvailable(toAddress, tokenId, amount) && window.confirm("Found available payment channel. Send in channel instead?")) {
           //TODO: pay in channel instead
-        } else {
+        } else if (window.confirm("Send ${amount.toPlainString()} ${balances[tokenId]?.tokenName ?: "[$tokenId]"} to $toAddress?")) {
+          log("posting ${amount.toPlainString()} [$tokenId] to $toAddress")
           MDS.send(toAddress, amount, tokenId)
         }
         showCam = false

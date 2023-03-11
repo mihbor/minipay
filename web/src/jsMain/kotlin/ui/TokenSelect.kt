@@ -29,7 +29,7 @@ fun TokenSelect(
     unifiedBalances.values.sortedByDescending { it.sendable }.forEach { balance ->
       key(balance.tokenId) {
         Option(balance.tokenId, { if (balance.tokenId == tokenId) selected() }) {
-          Text("${balance.tokenName?.take(40) ?: "Minima"} (${balance.sendable.toPlainString()})")
+          Text("${balance.tokenName?.take(40) ?: "[$tokenId]"} (${balance.sendable.toPlainString()})")
         }
       }
     }

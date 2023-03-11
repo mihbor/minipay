@@ -6,6 +6,7 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import externals.QrScanner
 import kotlinx.browser.document
+import kotlinx.browser.window
 import kotlinx.coroutines.launch
 import logic.eltooScriptAddress
 import logic.fundChannel
@@ -54,6 +55,38 @@ fun FundChannel(
     eltooScriptAddress = ""
     multisigScriptBalances.clear()
   }
+
+  fun fundChannel() {
+    showFundScanner = false
+    qrScanner?.stop()
+    if (window.confirm("Fund new channel with ${myAmount.toPlainString()} ${balances[tokenId]?.tokenName ?: "[$tokenId]"}?")) scope.launch {
+      fundChannel(myKeys, theirKeys, myAddress, theirAddress, myAmount, theirAmount, tokenId, timeLock) { event, newChannel ->
+        progressStep++
+        when(event) {
+          FUNDING_TX_CREATED -> fundingTxStatus = "Funding transaction created"
+          TRIGGER_TX_SIGNED -> triggerTxStatus = "Trigger transaction created and signed"
+          SETTLEMENT_TX_SIGNED -> settlementTxStatus = "Settlement transaction created and signed"
+          CHANNEL_PUBLISHED -> {
+            triggerTxStatus += ", sent"
+            settlementTxStatus += ", sent"
+            channel = newChannel
+            console.log("channelId", channel!!.id)
+          }
+          SIGS_RECEIVED -> {
+            triggerTxStatus += " and received back."
+            settlementTxStatus += " and received back."
+          }
+          CHANNEL_FUNDED -> fundingTxStatus += ", signed and posted!"
+          CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED -> {
+            channel = newChannel
+            progressStep--
+          }
+          else -> {}
+        }
+      }
+    }
+  }
+
   Br()
   if (progressStep > 0) {
     Progress({
@@ -72,7 +105,7 @@ fun FundChannel(
         theirKeys = theirKeys.copy(trigger = it.value)
       }
       style {
-        width(500.px)
+        width(550.px)
       }
     }
     Br()
@@ -82,7 +115,7 @@ fun FundChannel(
         theirKeys = theirKeys.copy(update = it.value)
       }
       style {
-        width(500.px)
+        width(550.px)
       }
     }
     Br()
@@ -92,7 +125,7 @@ fun FundChannel(
         theirKeys = theirKeys.copy(settle = it.value)
       }
       style {
-        width(500.px)
+        width(550.px)
       }
     }
     Br()
@@ -102,7 +135,7 @@ fun FundChannel(
         theirAddress = it.value
       }
       style {
-        width(500.px)
+        width(550.px)
       }
     }
     Br()
@@ -150,34 +183,7 @@ fun FundChannel(
     Button({
       if (myAmount <= 0) disabled()
       onClick {
-        showFundScanner = false
-        qrScanner?.stop()
-        scope.launch {
-          fundChannel(myKeys, theirKeys, myAddress, theirAddress, myAmount, theirAmount, tokenId, timeLock) { event, newChannel ->
-            progressStep++
-            when(event) {
-              FUNDING_TX_CREATED -> fundingTxStatus = "Funding transaction created"
-              TRIGGER_TX_SIGNED -> triggerTxStatus = "Trigger transaction created and signed"
-              SETTLEMENT_TX_SIGNED -> settlementTxStatus = "Settlement transaction created and signed"
-              CHANNEL_PUBLISHED -> {
-                triggerTxStatus += ", sent"
-                settlementTxStatus += ", sent"
-                channel = newChannel
-                console.log("channelId", channel!!.id)
-              }
-              SIGS_RECEIVED -> {
-                triggerTxStatus += " and received back."
-                settlementTxStatus += " and received back."
-              }
-              CHANNEL_FUNDED -> fundingTxStatus += ", signed and posted!"
-              CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED -> {
-                channel = newChannel
-                progressStep--
-              }
-              else -> {}
-            }
-          }
-        }
+        fundChannel()
       }
     }) {
       Text("Initiate!")

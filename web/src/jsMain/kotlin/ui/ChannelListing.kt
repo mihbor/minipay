@@ -3,8 +3,8 @@ package ui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import kotlinx.coroutines.launch
-import logic.balances
 import logic.channelService
+import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Coin
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.scope
@@ -14,6 +14,7 @@ import org.jetbrains.compose.web.dom.*
 @Composable
 fun ChannelListing(
   channels: MutableList<Channel>,
+  balances: Map<String, Balance>,
   eltooScriptCoins: MutableMap<String, List<Coin>>,
   selectChannel: (Channel?) -> Unit,
 ) {
@@ -65,7 +66,7 @@ fun ChannelListing(
               textAlign("left")
             }
           }) {
-            ChannelActions(channel, selectChannel) {
+            ChannelActions(channel, balances, selectChannel) {
               scope.launch { channelService.reloadChannels(eltooScriptCoins) }
             }
           }

@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.browser.document
+import kotlinx.browser.window
 import logic.eltooScriptAddress
 import logic.joinChannel
 import logic.multisigScriptAddress
@@ -31,7 +32,7 @@ fun RequestChannel(
   balances: SnapshotStateMap<String, Balance>,
   tokens: SnapshotStateMap<String, Token>,
 ) {
-  var amount by remember { mutableStateOf(BigDecimal.ZERO) }
+  var myAmount by remember { mutableStateOf(BigDecimal.ZERO) }
   var tokenId by remember { mutableStateOf("0x00") }
 
   var showQR by remember { mutableStateOf(false) }
@@ -50,13 +51,14 @@ fun RequestChannel(
     multisigScriptBalances.clear()
   }
   fun requestChannel() {
+    showQR = !showQR
     val canvas = document.getElementById("joinChannelQR") as HTMLCanvasElement
     QRCode.toCanvas(
-      canvas, channelKey(myKeys, tokenId) + ";" + amount.toPlainString() + ";" + myAddress
+      canvas, channelKey(myKeys, tokenId) + ";" + myAmount.toPlainString() + ";" + myAddress
     ) { error ->
       if (error != null) console.error(error)
       else {
-        joinChannel(myAddress, myKeys, tokenId, amount) { event, newChannel ->
+        joinChannel(myAddress, myKeys, tokenId, myAmount) { event, newChannel ->
           progressStep++
           when (event) {
             SIGS_RECEIVED -> {
@@ -93,18 +95,17 @@ fun RequestChannel(
     Br()
   }
   if (triggerTxStatus.isEmpty()) {
-    DecimalNumberInput(amount, min = BigDecimal.ZERO, disabled = showQR) {
-      it?.let { amount = it }
+    DecimalNumberInput(myAmount, min = BigDecimal.ZERO, disabled = showQR) {
+      it?.let { myAmount = it }
     }
     TokenSelect(tokenId, balances, tokens, disabled = showQR) {
       tokenId = it
     }
     Br()
     if (!showQR) Button({
-      if (amount < 0 || listOf(myKeys.trigger, myKeys.update, myKeys.settle).any{ it.isBlank() }) disabled()
+      if (myAmount < 0 || listOf(myKeys.trigger, myKeys.update, myKeys.settle).any{ it.isBlank() }) disabled()
       onClick {
-        showQR = !showQR
-        requestChannel()
+        if (window.confirm("Fund new channel with ${myAmount.toPlainString()} ${balances[tokenId]?.tokenName ?: "[$tokenId]"}?")) requestChannel()
       }
     }) {
       Text("Request channel")

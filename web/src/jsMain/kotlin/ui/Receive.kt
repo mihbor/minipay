@@ -37,6 +37,7 @@ fun Receive(balances: SnapshotStateMap<String, Balance>, tokens: SnapshotStateMa
   }
   Br()
   Text("My address: $myAddress")
+  CopyToClipboard(myAddress)
   Br()
   DecimalNumberInput(amount, min = BigDecimal.ZERO) {
     it?.let {

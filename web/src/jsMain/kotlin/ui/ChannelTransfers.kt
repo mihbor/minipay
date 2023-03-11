@@ -2,9 +2,11 @@ package ui
 
 import androidx.compose.runtime.*
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
+import kotlinx.browser.window
 import kotlinx.coroutines.launch
 import logic.channelService
 import logic.events
+import ltd.mbor.minimak.Balance
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.model.PaymentRequestSent
 import ltd.mbor.minipay.common.model.Transport.FIREBASE
@@ -16,7 +18,7 @@ import org.jetbrains.compose.web.dom.Text
 import view
 
 @Composable
-fun ChannelTransfers(channel: Channel) {
+fun ChannelTransfers(channel: Channel, balances: Map<String, Balance>) {
   if (channel.my.balance > ZERO) Div{
     var amount by remember { mutableStateOf(ZERO) }
     DecimalNumberInput(amount, min = ZERO, max = channel.my.balance) { it?.let { amount = it } }
@@ -24,11 +26,13 @@ fun ChannelTransfers(channel: Channel) {
     Button({
       if (isSending) disabled()
       onClick {
-        isSending = true
-        scope.launch {
-          with(channelService) { channel.send(amount) }
-          amount = ZERO
-          isSending = false
+        if (window.confirm("Send ${amount.toPlainString()} ${balances[channel.tokenId]?.tokenName ?: "[${channel.tokenId}]"}?")) {
+          isSending = true
+          scope.launch {
+            with(channelService) { channel.send(amount) }
+            amount = ZERO
+            isSending = false
+          }
         }
       }
     }) {

@@ -47,7 +47,7 @@ fun main() {
       "Send" -> Send(balances)
       "Fund channel" -> CreateChannel(isFunding = true, balances, tokens)
       "Request channel" -> CreateChannel(isFunding = false, balances, tokens)
-      "Channels" -> ChannelListing(channels, eltooScriptCoins, ::selectChannel)
+      "Channels" -> ChannelListing(channels, balances, eltooScriptCoins, ::selectChannel)
       "Channel events" -> ChannelEvents(events, tokens)
       "Channel details" -> channel?.let{
         ChannelDetails(it, balances, ::selectChannel) {}

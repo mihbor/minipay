@@ -55,7 +55,7 @@ fun ChannelView(
       CopyToClipboard(channel.eltooAddress)
     }
     if (channel.status == "OPEN") {
-      ChannelTransfers(channel)
+      ChannelTransfers(channel, balances)
     }
     Settlement(channel, blockNumber, eltooScriptCoins[channel.eltooAddress] ?: emptyList(), updateChannel)
     if (channel.status in setOf("OFFERED", "SETTLED")) {

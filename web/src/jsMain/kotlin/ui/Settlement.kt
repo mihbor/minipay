@@ -28,14 +28,16 @@ fun Settlement(channel: Channel, blockNumber: Int, eltooScriptCoins: List<Coin>,
     if (channel.status == "OPEN") {
       Button({
         onClick {
-          settlementTriggering = true
-          scope.launch {
-            try {
-              updateChannel(channel.triggerSettlement())
-            } catch (e: MinimaException) {
-              e.message?.let(window::alert)
+          if (window.confirm("Initiate channel settlement on-chain?")) {
+            settlementTriggering = true
+            scope.launch {
+              try {
+                updateChannel(channel.triggerSettlement())
+              } catch (e: MinimaException) {
+                e.message?.let(window::alert)
+              }
+              settlementTriggering = false
             }
-            settlementTriggering = false
           }
         }
         if (settlementTriggering) disabled()
@@ -75,14 +77,16 @@ fun Settlement(channel: Channel, blockNumber: Int, eltooScriptCoins: List<Coin>,
         Button({
           if (settlementCompleting || updatePosting || eltooScriptCoins.any { it.created + channel.timeLock > blockNumber }) disabled()
           onClick {
-            settlementCompleting = true
-            scope.launch {
-              try {
-                updateChannel(channel.completeSettlement())
-              } catch (e: MinimaException) {
-                e.message?.let(window::alert)
+            if (window.confirm("Finalize channel settlement on-chain?")) {
+              settlementCompleting = true
+              scope.launch {
+                try {
+                  updateChannel(channel.completeSettlement())
+                } catch (e: MinimaException) {
+                  e.message?.let(window::alert)
+                }
+                settlementCompleting = false
               }
-              settlementCompleting = false
             }
           }
         }) {

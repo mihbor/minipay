@@ -39,7 +39,7 @@ fun TokenSelect(
           setTokenId(it.tokenId)
           expanded = false
         }) {
-          Text(it.tokenName ?: "Minima")
+          Text(it.tokenName ?: "[$tokenId]")
           Text(" [${it.sendable.toPlainString()}]")
         }
       }
