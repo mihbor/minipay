@@ -2,13 +2,11 @@ package ltd.mbor.minipay.common
 
 import com.benasher44.uuid.uuid4
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ONE
-import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
+import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlinx.coroutines.test.runTest
 import ltd.mbor.minipay.common.JoinChannelEvent.*
 import ltd.mbor.minipay.common.model.Channel
-import ltd.mbor.minipay.common.resources.coinexport
-import ltd.mbor.minipay.common.resources.importTx
-import ltd.mbor.minipay.common.resources.scripts
+import ltd.mbor.minipay.common.resources.joinChannel
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -19,19 +17,20 @@ class JoinChannelTest {
   fun joinChannel() = runTest {
     //given
     val mds = SimulatedMDS()
-      .willReturn(importTx.createAndImportSignedTx)
-      .willReturn("""["TODO", "sign"]""")
-      .willReturn("""{"response":{"data": "TODO: exportTx"}}""")
-      .willReturn(importTx.createAndImportSignedTx)
-      .willReturn("""["TODO", "sign"]""")
-      .willReturn("""{"response":{"data": "TODO: exportTx"}}""")
-      .willReturn(importTx.createAndImportSignedTx)
-      .willReturnCoins(listOf(aCoin))
-      .willReturn("""{"TODO": "fundingTx"}""")
-      .willReturn(scripts.scripts109)
-      .willReturn("""["TODO", "sign"]""")
-      .willReturn("""{"response":{"data": "TODO: exportTx"}}""")
-      .willReturn(coinexport.coinexport)
+      .willReturn(joinChannel.importTriggerTx)
+      .willReturn(joinChannel.signTriggerTx)
+      .willReturn(joinChannel.exportTriggerTx)
+      .willReturn(joinChannel.importSettleTx)
+      .willReturn(joinChannel.signSettleTx)
+      .willReturn(joinChannel.exportSettleTx)
+      .willReturn(joinChannel.importFundingTx)
+      .willReturn(joinChannel.coinsForFunding)
+      .willReturn(joinChannel.addressForChange)
+      .willReturn(joinChannel.fundingTx)
+      .willReturn(joinChannel.scriptsForFundingCoins)
+      .willReturn(joinChannel.signFundingTx)
+      .willReturn(joinChannel.exportFundingTx)
+      .willReturn(joinChannel.exportFundingCoin)
     val storage = SimulatedStorage.insertChannelWillReturn(uuid4())
     val transport = SimulatedTransport()
     val channelService = ChannelService(mds, storage, transport, mutableListOf(), mutableListOf())
@@ -49,9 +48,9 @@ class JoinChannelTest {
     assertEquals("my address", channel.my.address)
     assertEquals(keys, channel.my.keys)
     assertEquals(ONE, channel.my.balance)
-    assertEquals("0xB13D03D7FAC25552491F8E1C04120FEA67700DFB5AB576CA7DDED59D35F93A96", channel.their.address)
+    assertEquals("0xB8EBBA8A3A5F202C2C2BD8B5585F83898BAD317F6FA552A0177CB01331673523", channel.their.address)
     assertEquals(keys, channel.their.keys)
-    assertEquals(ZERO, channel.their.balance)
+    assertEquals(50.toBigDecimal(), channel.their.balance)
     assertEquals(10, channel.timeLock)
     assertEquals("multisig", channel.multiSigAddress)
     assertEquals("eltoo", channel.eltooAddress)
