@@ -42,7 +42,7 @@ suspend fun ChannelService.prepareFundChannel(
   
   transport.publish(
     channelKey(theirKeys, tokenId),
-    listOf(timeLock, myKeys.trigger, myKeys.update, myKeys.settle, signedTriggerTx, signedSettlementTx, unsignedFundingTx).joinToString(";")
+    listOf(timeLock, myKeys.trigger, myKeys.update, myKeys.settle, signedTriggerTx, signedSettlementTx, unsignedFundingTx, myAddress).joinToString(";")
   )
   event(CHANNEL_PUBLISHED, channel)
   

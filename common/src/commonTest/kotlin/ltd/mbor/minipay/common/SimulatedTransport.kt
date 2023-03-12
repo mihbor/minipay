@@ -10,6 +10,6 @@ class SimulatedTransport(var published: MutableList<Pair<String, String>> = muta
   }
 
   override suspend fun publish(id: String, content: String) {
-    published += content to id
+    published += id to content
   }
 }

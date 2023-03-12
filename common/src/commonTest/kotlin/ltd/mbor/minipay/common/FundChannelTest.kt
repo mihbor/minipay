@@ -34,6 +34,11 @@ class FundChannelTest {
     //then
     assertNotNull(channel)
     assertEquals(1, transport.published.size)
+    assertEquals(channelKey(keys, "0x00"), transport.published.first().first)
+    assertEquals(
+      listOf(10, keys.trigger, keys.update, keys.settle, fundChannel.exportTriggerTxData, fundChannel.exportSettleTxData, fundChannel.exportFundingTxData, "my address").joinToString(";"),
+      transport.published.first().second
+    )
     val eventsIterator = events.iterator()
     assertEquals(FUNDING_TX_CREATED to null, eventsIterator.next())
     assertEquals(TRIGGER_TX_SIGNED to null, eventsIterator.next())

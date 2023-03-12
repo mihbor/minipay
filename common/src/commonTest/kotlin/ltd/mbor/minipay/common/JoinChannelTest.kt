@@ -36,7 +36,7 @@ class JoinChannelTest {
     val channelService = ChannelService(mds, storage, transport, mutableListOf(), mutableListOf())
     val events = mutableListOf<Pair<JoinChannelEvent, Channel?>>()
     //when
-    val channel = channelService.joinChannel(keys, keys, "my address", ONE, "0x00", 10, "multisig", "eltoo", "triggerTx", "settlementTx", "fundingTx") { event, channel -> events.add(event to channel) }
+    val channel = channelService.joinChannel(keys, keys, "my address", "their address", ONE, "0x00", 10, "multisig", "eltoo", "triggerTx", "settlementTx", "fundingTx") { event, channel -> events.add(event to channel) }
     //then
     assertNotNull(channel)
     assertEquals(1, transport.published.size)
@@ -48,7 +48,7 @@ class JoinChannelTest {
     assertEquals("my address", channel.my.address)
     assertEquals(keys, channel.my.keys)
     assertEquals(ONE, channel.my.balance)
-    assertEquals("0xB8EBBA8A3A5F202C2C2BD8B5585F83898BAD317F6FA552A0177CB01331673523", channel.their.address)
+    assertEquals("their address", channel.their.address)
     assertEquals(keys, channel.their.keys)
     assertEquals(50.toBigDecimal(), channel.their.balance)
     assertEquals(10, channel.timeLock)

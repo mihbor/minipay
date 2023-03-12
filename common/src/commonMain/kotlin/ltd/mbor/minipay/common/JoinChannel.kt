@@ -14,6 +14,7 @@ suspend fun ChannelService.joinChannel(
   myKeys: Channel.Keys,
   theirKeys: Channel.Keys,
   myAddress: String,
+  theirAddress: String,
   myAmount: BigDecimal,
   tokenId: String,
   timeLock: Int,
@@ -32,7 +33,6 @@ suspend fun ChannelService.joinChannel(
   
   val settlementTxId = newTxId()
   val importedSettlementTx = mds.importTx(settlementTxId, settlementTx)
-  val theirAddress = importedSettlementTx.outputs.first().address
   val signedSettlementTx = mds.signAndExportTx(settlementTxId, myKeys.settle)
   onEvent(SETTLEMENT_TX_SIGNED, null)
   
