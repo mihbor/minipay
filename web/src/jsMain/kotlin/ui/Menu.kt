@@ -87,21 +87,11 @@ fun Menu(view: String, setView: (String) -> Unit) {
       Div({
         classes(StyleSheets.clickable)
         onClick {
-          setView("Request channel")
+          setView("Create channel")
           showMenu = false
         }
       }) {
-        Text("Request Channel")
-      }
-      Hr()
-      Div({
-        classes(StyleSheets.clickable)
-        onClick {
-          setView("Fund channel")
-          showMenu = false
-        }
-      }) {
-        Text("Fund Channel")
+        Text("Create Channel")
       }
       Hr()
       Div({

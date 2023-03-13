@@ -143,7 +143,7 @@ fun FundChannel(
     DecimalNumberInput(theirAmount, min = ZERO) {
       it?.let { theirAmount = it }
     }
-    TokenSelect(tokenId, balances, tokens) {
+    TokenSelect(tokenId, balances, tokens, showBalances = false) {
       tokenId = it
     }
     Br()

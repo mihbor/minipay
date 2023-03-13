@@ -8,16 +8,20 @@ import ltd.mbor.minimak.Token
 import ltd.mbor.minimak.getAddress
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.newKeys
+import org.jetbrains.compose.web.css.LineStyle.Companion.Inset
+import org.jetbrains.compose.web.css.LineStyle.Companion.Outset
+import org.jetbrains.compose.web.css.border
 import org.jetbrains.compose.web.dom.Br
+import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Text
 
 @Composable
 fun CreateChannel(
-  isFunding: Boolean,
   balances: SnapshotStateMap<String, Balance>,
   tokens: SnapshotStateMap<String, Token>
 ) {
 
+  var isInviting by remember { mutableStateOf(true) }
   var myKeys by remember { mutableStateOf(Channel.Keys("", "", "")) }
   var myAddress by remember { mutableStateOf("") }
 
@@ -40,6 +44,24 @@ fun CreateChannel(
   Text("Address: $myAddress")
   CopyToClipboard(myAddress)
   Br()
-  if (isFunding) FundChannel(myKeys, myAddress, balances, tokens)
-  else RequestChannel(myKeys, myAddress, balances, tokens)
+  Br()
+  Button({
+    onClick { isInviting = !isInviting }
+    style {
+      border(style = if (isInviting) Inset else Outset)
+    }
+  }){
+    Text("Invite")
+  }
+  Button({
+    onClick { isInviting = !isInviting }
+    style {
+      border(style = if (isInviting) Outset else Inset)
+    }
+  }){
+    Text("Join")
+  }
+  Br()
+  if (isInviting) RequestChannel(myKeys, myAddress, balances, tokens)
+  else FundChannel(myKeys, myAddress, balances, tokens)
 }

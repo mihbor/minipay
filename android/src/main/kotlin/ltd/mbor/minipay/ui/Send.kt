@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
@@ -29,59 +30,82 @@ import ltd.mbor.minipay.ui.theme.MiniPayTheme
 @Composable
 fun Send(
   balances: Map<String, Balance>,
-  address: String,
+  toAddress: String,
   setAddress: (String) -> Unit,
   tokenId: String,
   setTokenId: (String) -> Unit,
   amount: BigDecimal,
   setAmount: (BigDecimal?) -> Unit
 ) {
+  var sending by remember { mutableStateOf(false) }
   val context = LocalContext.current
-  OutlinedTextField(address, setAddress, enabled = true, modifier = Modifier.fillMaxWidth())
-  Row {
-    TokenSelect(tokenId, balances, enabled = true, setTokenId = setTokenId)
-    TokenIcon(tokenId, balances, size = 50)
-  }
-  Row{
-    DecimalNumberField(amount, enabled = true, setValue = setAmount)
-    var sending by remember { mutableStateOf(false) }
-    Button(
-      enabled = !sending && address.isNotBlank() && amount > BigDecimal.ZERO && balances[tokenId]?.sendable?.let{ it >= amount } ?: false,
-      onClick = {
-        sending = true
-        scope.launch {
-          val result = MDS.send(address, amount, tokenId)
-          sending = false
-          Toast.makeText(context, "Sending result: $result", Toast.LENGTH_LONG).show()
-          if (result.isSuccessful) {
-            setAmount(BigDecimal.ZERO)
-          }
-        }
+  fun send() {
+    scope.launch {
+      val result = MDS.send(toAddress, amount, tokenId)
+      sending = false
+      Toast.makeText(context, "Sending result: $result", Toast.LENGTH_LONG).show()
+      if (result.isSuccessful) {
+        setAmount(BigDecimal.ZERO)
       }
-    ) {
-      Text("Send!")
     }
   }
-  Row{
-    val scanLauncher = rememberLauncherForActivityResult(
-      contract = ScanContract(),
-      onResult = { result ->
-        Log.i(TAG, "scanned code: ${result.contents}")
-        result.contents?.split(";")?.apply {
-          setAddress(getOrNull(0) ?: "")
-          setTokenId(getOrNull(1) ?: "")
-          setAmount(getOrNull(2)?.toBigDecimal())
-        }
+  if (sending) AlertDialog(
+    onDismissRequest = { sending = false },
+    title = {
+      Text("Sending confirmation")
+    },
+    text = {
+      Text("Send ${amount.toPlainString()} ${balances[tokenId]?.tokenName ?: "[$tokenId]"} to $toAddress?")
+    },
+    confirmButton = {
+      Button(::send) {
+        Text("Send")
       }
-    )
-    Button(onClick = {
-      scanLauncher.launch(ScanOptions().apply {
-        setOrientationLocked(false)
-        setPrompt("")
-        setBeepEnabled(false)
-      })
-    }) {
-      Text(text = "Scan QR")
+    },
+    dismissButton = {
+      Button({ sending = false }) {
+        Text("Cancel")
+      }
+    }
+  )
+  else {
+    OutlinedTextField(toAddress, setAddress, enabled = true, modifier = Modifier.fillMaxWidth())
+    Row {
+      TokenSelect(tokenId, balances, enabled = true, setTokenId = setTokenId)
+      TokenIcon(tokenId, balances, size = 50)
+    }
+    Row {
+      DecimalNumberField(amount, enabled = true, setValue = setAmount)
+      Button(
+        enabled = !sending && toAddress.isNotBlank() && amount > BigDecimal.ZERO && balances[tokenId]?.sendable?.let { it >= amount } ?: false,
+        onClick = {
+          sending = true
+        }
+      ) {
+        Text("Send!")
+      }
+    }
+    Row {
+      val scanLauncher = rememberLauncherForActivityResult(
+        contract = ScanContract(),
+        onResult = { result ->
+          Log.i(TAG, "scanned code: ${result.contents}")
+          result.contents?.split(";")?.apply {
+            setAddress(getOrNull(0) ?: "")
+            setTokenId(getOrNull(1) ?: "")
+            setAmount(getOrNull(2)?.toBigDecimal())
+          }
+        }
+      )
+      Button(onClick = {
+        scanLauncher.launch(ScanOptions().apply {
+          setOrientationLocked(false)
+          setPrompt("")
+          setBeepEnabled(false)
+        })
+      }) {
+        Text(text = "Scan QR")
+      }
     }
   }
 }

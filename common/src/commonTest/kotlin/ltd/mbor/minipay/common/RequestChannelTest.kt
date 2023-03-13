@@ -4,39 +4,39 @@ import com.benasher44.uuid.uuid4
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ONE
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlinx.coroutines.test.runTest
-import ltd.mbor.minipay.common.JoinChannelEvent.*
+import ltd.mbor.minipay.common.RequestChannelEvent.*
 import ltd.mbor.minipay.common.model.Channel
-import ltd.mbor.minipay.common.resources.joinChannel
+import ltd.mbor.minipay.common.resources.requestChannel
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-class JoinChannelTest {
+class RequestChannelTest {
   @Test
   fun joinChannel() = runTest {
     //given
     val mds = SimulatedMDS()
-      .willReturn(joinChannel.importTriggerTx)
-      .willReturn(joinChannel.signTriggerTx)
-      .willReturn(joinChannel.exportTriggerTx)
-      .willReturn(joinChannel.importSettleTx)
-      .willReturn(joinChannel.signSettleTx)
-      .willReturn(joinChannel.exportSettleTx)
-      .willReturn(joinChannel.importFundingTx)
-      .willReturn(joinChannel.coinsForFunding)
-      .willReturn(joinChannel.addressForChange)
-      .willReturn(joinChannel.fundingTx)
-      .willReturn(joinChannel.scriptsForFundingCoins)
-      .willReturn(joinChannel.signFundingTx)
-      .willReturn(joinChannel.exportFundingTx)
-      .willReturn(joinChannel.exportFundingCoin)
+      .willReturn(requestChannel.importTriggerTx)
+      .willReturn(requestChannel.signTriggerTx)
+      .willReturn(requestChannel.exportTriggerTx)
+      .willReturn(requestChannel.importSettleTx)
+      .willReturn(requestChannel.signSettleTx)
+      .willReturn(requestChannel.exportSettleTx)
+      .willReturn(requestChannel.importFundingTx)
+      .willReturn(requestChannel.coinsForFunding)
+      .willReturn(requestChannel.addressForChange)
+      .willReturn(requestChannel.fundingTx)
+      .willReturn(requestChannel.scriptsForFundingCoins)
+      .willReturn(requestChannel.signFundingTx)
+      .willReturn(requestChannel.exportFundingTx)
+      .willReturn(requestChannel.exportFundingCoin)
     val storage = SimulatedStorage.insertChannelWillReturn(uuid4())
     val transport = SimulatedTransport()
     val channelService = ChannelService(mds, storage, transport, mutableListOf(), mutableListOf())
-    val events = mutableListOf<Pair<JoinChannelEvent, Channel?>>()
+    val events = mutableListOf<Pair<RequestChannelEvent, Channel?>>()
     //when
-    val channel = channelService.joinChannel(keys, keys, "my address", "their address", ONE, "0x00", 10, "multisig", "eltoo", "triggerTx", "settlementTx", "fundingTx") { event, channel -> events.add(event to channel) }
+    val channel = channelService.requestChannel(keys, keys, "my address", "their address", ONE, "0x00", 10, "multisig", "eltoo", "triggerTx", "settlementTx", "fundingTx") { event, channel -> events.add(event to channel) }
     //then
     assertNotNull(channel)
     assertEquals(1, transport.published.size)

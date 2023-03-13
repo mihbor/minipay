@@ -4,15 +4,15 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.newScript
 import ltd.mbor.minipay.common.*
-import ltd.mbor.minipay.common.JoinChannelEvent.*
+import ltd.mbor.minipay.common.RequestChannelEvent.*
 import ltd.mbor.minipay.common.model.Channel
 
-fun joinChannel(
+fun requestChannel(
   myAddress: String,
   myKeys: Channel.Keys,
   tokenId: String,
   amount: BigDecimal,
-  onEvent: (JoinChannelEvent, Channel?) -> Unit = { _, _ -> }
+  onEvent: (RequestChannelEvent, Channel?) -> Unit = { _, _ -> }
 ) {
   channelKey(myKeys, tokenId).subscribe({ channel, isAck ->
     onEvent(if (isAck) CHANNEL_UPDATED_ACKED else CHANNEL_UPDATED, channel)
@@ -27,7 +27,7 @@ fun joinChannel(
     multisigScriptAddress = MDS.newScript(triggerScript(theirKeys.trigger, myKeys.trigger)).address
     eltooScriptAddress = MDS.newScript(eltooScript(timeLock, theirKeys.update, myKeys.update, theirKeys.settle, myKeys.settle)).address
     onEvent(SCRIPTS_DEPLOYED, null)
-    val channel = channelService.joinChannel(myKeys, theirKeys, myAddress, theirAddress, amount, tokenId, timeLock, multisigScriptAddress, eltooScriptAddress, triggerTx, settlementTx, fundingTx, onEvent)
+    val channel = channelService.requestChannel(myKeys, theirKeys, myAddress, theirAddress, amount, tokenId, timeLock, multisigScriptAddress, eltooScriptAddress, triggerTx, settlementTx, fundingTx, onEvent)
     channels.put(channel)
     channel.id
   }

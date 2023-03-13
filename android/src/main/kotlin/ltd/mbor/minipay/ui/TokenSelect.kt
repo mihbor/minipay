@@ -17,13 +17,19 @@ fun TokenSelect(
   balances: Map<String, Balance>,
   tokens: Map<String, Token>? = null,
   enabled: Boolean = true,
+  showBalances: Boolean = true,
   setTokenId: (String) -> Unit
 ) {
   var expanded by remember { mutableStateOf(false) }
   val unifiedBalances = (tokens?.asBalances(balances) ?: balances)
   ExposedDropdownMenuBox(expanded, { expanded = !expanded }) {
     OutlinedTextField(
-      value = unifiedBalances[tokenId]?.let { (it.tokenName ?: "[$tokenId]") + " [${it.sendable.toPlainString().take(12)}]" } ?: "",
+      value = unifiedBalances[tokenId]?.let {
+        buildString {
+          append(it.tokenName ?: "[$tokenId]")
+          if (showBalances) append(" [${it.sendable.toPlainString().take(12)}]")
+        }
+      } ?: "",
       { },
       readOnly = true,
       enabled = enabled,
@@ -40,7 +46,7 @@ fun TokenSelect(
           expanded = false
         }) {
           Text(it.tokenName ?: "[$tokenId]")
-          Text(" [${it.sendable.toPlainString()}]")
+          if (showBalances) Text(" [${it.sendable.toPlainString()}]")
         }
       }
     }

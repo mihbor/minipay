@@ -74,8 +74,7 @@ fun MainView(
         "Receive" -> Receive(balances, tokens, address, setAddress, tokenId, setTokenId, amount, setAmount)
         "Send" -> Send(balances, address, setAddress, tokenId, setTokenId, amount, setAmount)
         "Channels" -> ChannelListing(channels, balances, eltooScriptCoins, activity, ::setChannel)
-        "Request channel" -> CreateChannel(isFunding = false, balances, tokens, activity)
-        "Fund channel" -> CreateChannel(isFunding = true, balances, tokens, activity)
+        "Create channel" -> CreateChannel(balances, tokens, activity)
         "Channel events" -> ChannelEvents(events, tokens, activity)
         "Channel details" -> channel?.let{
           ChannelDetails(it, balances, activity, ::setChannel)

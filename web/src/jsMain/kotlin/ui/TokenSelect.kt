@@ -17,6 +17,7 @@ fun TokenSelect(
   balances: Map<String, Balance>,
   tokens: Map<String, Token>? = null,
   disabled: Boolean = false,
+  showBalances: Boolean = true,
   setTokenId: (String) -> Unit
 ) {
   val unifiedBalances = (tokens?.asBalances(balances) ?: balances)
@@ -29,7 +30,10 @@ fun TokenSelect(
     unifiedBalances.values.sortedByDescending { it.sendable }.forEach { balance ->
       key(balance.tokenId) {
         Option(balance.tokenId, { if (balance.tokenId == tokenId) selected() }) {
-          Text("${balance.tokenName?.take(40) ?: "[$tokenId]"} (${balance.sendable.toPlainString()})")
+          Text(buildString {
+            append(balance.tokenName?.take(40) ?: "[$tokenId]")
+            if (showBalances) append(" (${balance.sendable.toPlainString()})")
+          })
         }
       }
     }

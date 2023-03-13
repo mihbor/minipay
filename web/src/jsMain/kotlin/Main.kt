@@ -45,8 +45,7 @@ fun main() {
       "MiniPay" -> Welcome { view = it }
       "Receive" -> Receive(balances, tokens)
       "Send" -> Send(balances)
-      "Fund channel" -> CreateChannel(isFunding = true, balances, tokens)
-      "Request channel" -> CreateChannel(isFunding = false, balances, tokens)
+      "Create channel" -> CreateChannel(balances, tokens)
       "Channels" -> ChannelListing(channels, balances, eltooScriptCoins, ::selectChannel)
       "Channel events" -> ChannelEvents(events, tokens)
       "Channel details" -> channel?.let{

@@ -105,7 +105,7 @@ fun FundChannel(
         DecimalNumberField(theirAmount, min = ZERO, modifier = Modifier.fillMaxWidth(0.5f)) {
           it?.let { theirAmount = it }
         }
-        TokenSelect(tokenId = tokenId, balances = balances, tokens = tokens) {
+        TokenSelect(tokenId = tokenId, balances = balances, showBalances = false, tokens = tokens) {
           tokenId = it
         }
       }

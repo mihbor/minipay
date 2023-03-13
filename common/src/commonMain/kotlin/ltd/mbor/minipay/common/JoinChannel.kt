@@ -3,14 +3,14 @@ package ltd.mbor.minipay.common
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import ltd.mbor.minimak.*
-import ltd.mbor.minipay.common.JoinChannelEvent.*
+import ltd.mbor.minipay.common.RequestChannelEvent.*
 import ltd.mbor.minipay.common.model.Channel
 
-enum class JoinChannelEvent{
+enum class RequestChannelEvent{
   SCRIPTS_DEPLOYED, SIGS_RECEIVED, TRIGGER_TX_SIGNED, SETTLEMENT_TX_SIGNED, CHANNEL_PERSISTED, CHANNEL_PUBLISHED, CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED
 }
 
-suspend fun ChannelService.joinChannel(
+suspend fun ChannelService.requestChannel(
   myKeys: Channel.Keys,
   theirKeys: Channel.Keys,
   myAddress: String,
@@ -23,7 +23,7 @@ suspend fun ChannelService.joinChannel(
   triggerTx: String,
   settlementTx: String,
   fundingTx: String,
-  onEvent: (JoinChannelEvent, Channel?) -> Unit = { _, _ -> }
+  onEvent: (RequestChannelEvent, Channel?) -> Unit = { _, _ -> }
 ): Channel {
   
   val triggerTxId = newTxId()

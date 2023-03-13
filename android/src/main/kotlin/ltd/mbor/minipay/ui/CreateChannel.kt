@@ -4,8 +4,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ProvideTextStyle
+import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,8 +24,9 @@ import ltd.mbor.minipay.ui.preview.previewTokens
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
 
 @Composable
-fun CreateChannel(isFunding: Boolean, balances: Map<String, Balance>, tokens: Map<String, Token>, activity: MainActivity?) {
+fun CreateChannel(balances: Map<String, Balance>, tokens: Map<String, Token>, activity: MainActivity?) {
 
+  var isInviting by remember { mutableStateOf(true) }
   var myKeys by remember { mutableStateOf(Channel.Keys("", "", "")) }
   var myAddress by remember { mutableStateOf("") }
 
@@ -53,23 +56,21 @@ fun CreateChannel(isFunding: Boolean, balances: Map<String, Balance>, tokens: Ma
           Text("Address: $myAddress", Modifier.fillMaxWidth(0.8f))
           CopyToClipboard(myAddress)
         }
-        if (isFunding) FundChannel(myKeys, myAddress, balances, tokens, activity)
-        else RequestChannel(myKeys, myAddress, balances, tokens, activity)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+          Text("Invite")
+          Switch(checked = !isInviting, onCheckedChange = { isInviting = !it })
+          Text("Join")
+        }
+        if (isInviting) RequestChannel(myKeys, myAddress, balances, tokens, activity)
+        else FundChannel(myKeys, myAddress, balances, tokens, activity)
       }
     }
   }
 }
 
 @Composable @Preview
-fun PreviewCreateChannelFund() {
+fun PreviewCreateChannel() {
   MiniPayTheme {
-    CreateChannel(true, previewBalances, previewTokens, null)
-  }
-}
-
-@Composable @Preview
-fun PreviewCreateChannelJoin() {
-  MiniPayTheme {
-    CreateChannel(false, previewBalances, previewTokens, null)
+    CreateChannel(previewBalances, previewTokens, null)
   }
 }

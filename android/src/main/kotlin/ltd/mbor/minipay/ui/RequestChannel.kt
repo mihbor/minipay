@@ -15,13 +15,13 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Token
 import ltd.mbor.minipay.MainActivity
-import ltd.mbor.minipay.common.JoinChannelEvent.*
+import ltd.mbor.minipay.common.RequestChannelEvent.*
 import ltd.mbor.minipay.common.channelKey
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.logic.eltooScriptAddress
-import ltd.mbor.minipay.logic.joinChannel
 import ltd.mbor.minipay.logic.multisigScriptAddress
 import ltd.mbor.minipay.logic.multisigScriptBalances
+import ltd.mbor.minipay.logic.requestChannel
 import ltd.mbor.minipay.ui.preview.previewBalances
 import ltd.mbor.minipay.ui.preview.previewKeys
 import ltd.mbor.minipay.ui.preview.previewTokens
@@ -58,7 +58,7 @@ fun RequestChannel(
   fun requestChannel() {
     bitmap = encodeAsBitmap(channelKey(myKeys, tokenId) + ";" + amount.toPlainString() + ";" + myAddress).asImageBitmap()
 
-    joinChannel(myAddress, myKeys, tokenId, amount) { event, newChannel ->
+    requestChannel(myAddress, myKeys, tokenId, amount) { event, newChannel ->
       progressStep++
       when (event) {
         SIGS_RECEIVED -> {

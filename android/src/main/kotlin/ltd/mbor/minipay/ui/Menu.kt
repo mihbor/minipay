@@ -37,16 +37,10 @@ fun Menu(inited: Boolean, showNavMenu: Boolean, setView: (String) -> Unit, start
         }
         Divider()
         DropdownMenuItem(onClick = {
-          setView("Request channel")
+          setView("Create channel")
           setShowNavMenu(false)
         }, enabled = inited) {
-          Text("Request Channel")
-        }
-        DropdownMenuItem(onClick = {
-          setView("Fund channel")
-          setShowNavMenu(false)
-        }, enabled = inited) {
-          Text("Fund Channel")
+          Text("Create Channel")
         }
         DropdownMenuItem(onClick = {
           setView("Channels")
