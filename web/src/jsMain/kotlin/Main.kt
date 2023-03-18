@@ -51,6 +51,7 @@ fun main() {
       "Channel Details" -> channel?.let{
         ChannelDetails(it, balances, ::selectChannel) {}
       }
+      "Contacts" -> Contacts()
       "Settings" -> Settings(prefs) {
         prefs = it
         scope.launch {

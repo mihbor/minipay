@@ -10,6 +10,7 @@ import logic.multisigScriptAddress
 import logic.multisigScriptBalances
 import logic.requestChannel
 import ltd.mbor.minimak.Balance
+import ltd.mbor.minimak.Contact
 import ltd.mbor.minimak.Token
 import ltd.mbor.minipay.common.RequestChannelEvent.*
 import ltd.mbor.minipay.common.channelKey
@@ -31,6 +32,8 @@ fun RequestChannel(
   myAddress: String,
   balances: SnapshotStateMap<String, Balance>,
   tokens: SnapshotStateMap<String, Token>,
+  useMaxima: Boolean,
+  maximaContact: Contact?,
 ) {
   var myAmount by remember { mutableStateOf(BigDecimal.ZERO) }
   var tokenId by remember { mutableStateOf("0x00") }
@@ -50,6 +53,7 @@ fun RequestChannel(
     eltooScriptAddress = ""
     multisigScriptBalances.clear()
   }
+
   fun requestChannel() {
     showQR = !showQR
     val canvas = document.getElementById("joinChannelQR") as HTMLCanvasElement
@@ -86,6 +90,13 @@ fun RequestChannel(
       }
     };Unit
   }
+  fun requestMaximaChannel(contact: Contact) {
+
+  }
+  fun requestChannel(contact: Contact?) {
+    if (contact != null) requestMaximaChannel(contact)
+    else requestChannel()
+  }
   Br()
   if (progressStep > 0) {
     Progress({
@@ -107,8 +118,9 @@ fun RequestChannel(
     Br()
     if (!showQR) Button({
       if (myAmount < 0 || listOf(myKeys.trigger, myKeys.update, myKeys.settle).any{ it.isBlank() }) disabled()
+      if (useMaxima && maximaContact == null) disabled()
       onClick {
-        if (window.confirm("Fund new channel with ${myAmount.toPlainString()} ${balances[tokenId]?.tokenName ?: "[$tokenId]"}?")) requestChannel()
+        if (window.confirm("Fund new channel with ${myAmount.toPlainString()} ${balances[tokenId]?.tokenName ?: "[$tokenId]"}?")) requestChannel(maximaContact)
       }
     }) {
       Text("Request channel")

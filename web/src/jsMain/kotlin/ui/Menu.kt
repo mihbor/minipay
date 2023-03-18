@@ -87,6 +87,8 @@ fun Menu(view: String, setView: (String) -> Unit) {
       Hr()
       MenuItem("Channel Events")
       Hr()
+      MenuItem("Contacts")
+      Hr()
       MenuItem("Settings")
     }
   }
