@@ -25,6 +25,19 @@ fun Menu(view: String, setView: (String) -> Unit) {
       showMenu = false
     }
   }
+
+  @Composable
+  fun MenuItem(view: String, label: String = view) {
+    Div({
+      classes(StyleSheets.clickable)
+      onClick {
+        setView(view)
+        showMenu = false
+      }
+    }) {
+      Text(label)
+    }
+  }
   H1({
     style {
       margin(0.px)
@@ -64,65 +77,17 @@ fun Menu(view: String, setView: (String) -> Unit) {
         property("z-index", 1)
       }
     }) {
-      Div({
-        classes(StyleSheets.clickable)
-        onClick {
-          setView("Receive")
-          showMenu = false
-        }
-      }) {
-        Text("Receive")
-      }
+      MenuItem("Receive")
       Hr()
-      Div({
-        classes(StyleSheets.clickable)
-        onClick {
-          setView("Send")
-          showMenu = false
-        }
-      }) {
-        Text("Send")
-      }
+      MenuItem("Send")
       Hr()
-      Div({
-        classes(StyleSheets.clickable)
-        onClick {
-          setView("Create channel")
-          showMenu = false
-        }
-      }) {
-        Text("Create Channel")
-      }
+      MenuItem("Create Channel")
       Hr()
-      Div({
-        classes(StyleSheets.clickable)
-        onClick {
-          setView("Channels")
-          showMenu = false
-        }
-      }) {
-        Text("Channel Listing")
-      }
+      MenuItem("Channels", "Channel Listing")
       Hr()
-      Div({
-        classes(StyleSheets.clickable)
-        onClick {
-          setView("Channel events")
-          showMenu = false
-        }
-      }) {
-        Text("Channel Events")
-      }
+      MenuItem("Channel Events")
       Hr()
-      Div({
-        classes(StyleSheets.clickable)
-        onClick {
-          setView("Settings")
-          showMenu = false
-        }
-      }) {
-        Text("Settings")
-      }
+      MenuItem("Settings")
     }
   }
 }

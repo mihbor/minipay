@@ -26,7 +26,7 @@ fun Channel.subscribe(
 ) {
   with(channelService) {
     channelKey(my.keys, tokenId).subscribe({ id }, onUpdate, onUnhandled) {
-      view = "Channel events"
+      view = "Channel Events"
     }
   }
 }
@@ -40,7 +40,7 @@ fun String.subscribe(
     subscribe({ checkNotNull(channelId) }, onUpdate, {
       channelId = onUnhandled(it)
     }, {
-      view = "Channel events"
+      view = "Channel Events"
     })
   }
 }

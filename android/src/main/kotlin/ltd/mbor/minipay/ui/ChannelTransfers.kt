@@ -80,7 +80,7 @@ fun ChannelTransfers(channel: Channel, activity: MainActivity?) {
               )
             )
             preparingRequest = false
-            view = "Channel events"
+            view = "Channel Events"
           }
         },
         enabled = !preparingRequest
@@ -106,7 +106,7 @@ fun ChannelTransfers(channel: Channel, activity: MainActivity?) {
                 )
               )
               preparingRequest = false
-              view = "Channel events"
+              view = "Channel Events"
             }
           }
         },

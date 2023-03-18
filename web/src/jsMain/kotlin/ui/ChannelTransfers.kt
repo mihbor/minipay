@@ -58,7 +58,7 @@ fun ChannelTransfers(channel: Channel, balances: Map<String, Balance>) {
             FIREBASE
           )
           isSending = false
-          view = "Channel events"
+          view = "Channel Events"
         }
       }
     }) {

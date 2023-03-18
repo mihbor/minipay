@@ -51,7 +51,7 @@ fun ChannelListing(
       channels.forEach { channel ->
         Tr({
           style { property("border-top", "1px solid black") }
-        })  {
+        }) {
           Td{ Text(channel.id.toString()) }
           Td{ Text(channel.status) }
           Td{ Text(channel.sequenceNumber.toString()) }

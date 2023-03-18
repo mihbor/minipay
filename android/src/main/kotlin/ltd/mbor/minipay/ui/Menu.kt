@@ -13,6 +13,17 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun Menu(inited: Boolean, showNavMenu: Boolean, setView: (String) -> Unit, startEmitting: () -> Unit, stopEmitting: () -> Unit, setShowNavMenu: (Boolean) -> Unit) {
+
+  @Composable
+  fun MenuItem(view: String, label: String = view) {
+    DropdownMenuItem(onClick = {
+      setView(view)
+      startEmitting()
+      setShowNavMenu(false)
+    }, enabled = inited) {
+      Text(label)
+    }
+  }
   if (showNavMenu) {
     Box(modifier = Modifier
       .fillMaxSize()
@@ -21,46 +32,14 @@ fun Menu(inited: Boolean, showNavMenu: Boolean, setView: (String) -> Unit, start
         expanded = showNavMenu,
         onDismissRequest = { setShowNavMenu(false) }
       ) {
-        DropdownMenuItem(onClick = {
-          setView("Receive")
-          startEmitting()
-          setShowNavMenu(false)
-        }, enabled = inited) {
-          Text("Receive")
-        }
-        DropdownMenuItem(onClick = {
-          setView("Send")
-          stopEmitting()
-          setShowNavMenu(false)
-        }, enabled = inited) {
-          Text("Send")
-        }
+        MenuItem("Receive")
+        MenuItem("Send")
         Divider()
-        DropdownMenuItem(onClick = {
-          setView("Create channel")
-          setShowNavMenu(false)
-        }, enabled = inited) {
-          Text("Create Channel")
-        }
-        DropdownMenuItem(onClick = {
-          setView("Channels")
-          setShowNavMenu(false)
-        }, enabled = inited) {
-          Text("Channel Listing")
-        }
-        DropdownMenuItem(onClick = {
-          setView("Channel events")
-          setShowNavMenu(false)
-        }, enabled = inited) {
-          Text("Channel Events")
-        }
+        MenuItem("Create Channel")
+        MenuItem("Channels", "Channel Listing")
+        MenuItem("Channel Events")
         Divider()
-        DropdownMenuItem(onClick = {
-          setView("Settings")
-          setShowNavMenu(false)
-        }) {
-          Text("Settings")
-        }
+        MenuItem("Settings")
       }
     }
   }
