@@ -6,9 +6,9 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.browser.document
 import kotlinx.browser.window
 import logic.eltooScriptAddress
-import logic.joinChannel
 import logic.multisigScriptAddress
 import logic.multisigScriptBalances
+import logic.requestChannel
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Token
 import ltd.mbor.minipay.common.RequestChannelEvent.*
@@ -58,7 +58,7 @@ fun RequestChannel(
     ) { error ->
       if (error != null) console.error(error)
       else {
-        joinChannel(myAddress, myKeys, tokenId, myAmount) { event, newChannel ->
+        requestChannel(myAddress, myKeys, tokenId, myAmount) { event, newChannel ->
           progressStep++
           when (event) {
             SIGS_RECEIVED -> {
@@ -66,6 +66,7 @@ fun RequestChannel(
               settlementTxStatus = "Settlement transaction received"
               showQR = false
             }
+
             TRIGGER_TX_SIGNED -> triggerTxStatus += " and signed"
             SETTLEMENT_TX_SIGNED -> settlementTxStatus += " and signed"
             CHANNEL_PUBLISHED -> {
@@ -73,10 +74,12 @@ fun RequestChannel(
               triggerTxStatus += " and sent back."
               settlementTxStatus += " and sent back."
             }
+
             CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED -> {
               channel = newChannel
               progressStep--
             }
+
             else -> {}
           }
         }

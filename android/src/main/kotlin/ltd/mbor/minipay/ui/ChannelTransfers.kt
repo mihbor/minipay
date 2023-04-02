@@ -2,6 +2,7 @@ package ltd.mbor.minipay.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
@@ -15,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.coroutines.launch
+import ltd.mbor.minimak.Balance
 import ltd.mbor.minipay.MainActivity
 import ltd.mbor.minipay.R
 import ltd.mbor.minipay.common.model.Channel
@@ -25,17 +27,47 @@ import ltd.mbor.minipay.common.scope
 import ltd.mbor.minipay.logic.channelService
 import ltd.mbor.minipay.logic.events
 import ltd.mbor.minipay.sendDataToService
+import ltd.mbor.minipay.ui.preview.fakeBalances
 import ltd.mbor.minipay.ui.preview.fakeChannelOpen
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
 import ltd.mbor.minipay.view
 
 @Composable
-fun ChannelTransfers(channel: Channel, activity: MainActivity?) {
+fun ChannelTransfers(channel: Channel, balances: Map<String, Balance>, activity: MainActivity?) {
   val fontSize = 10.sp
   ProvideTextStyle(value = TextStyle(fontSize = fontSize, textAlign = TextAlign.Right)) {
     if (channel.my.balance > ZERO) Row {
       var amount by remember { mutableStateOf(ZERO) }
       var isSending by remember { mutableStateOf(false) }
+      var confirmSending by remember { mutableStateOf(false) }
+      fun send() {
+        isSending = true
+        confirmSending = false
+        scope.launch {
+          with(channelService) { channel.send(amount) }
+          isSending = false
+          amount = ZERO
+        }
+      }
+      if (confirmSending) AlertDialog(
+        onDismissRequest = { confirmSending = false },
+        title = {
+          Text("Sending confirmation")
+        },
+        text = {
+          Text("Send ${amount.toPlainString()} ${balances[channel.tokenId]?.tokenName ?: "[${channel.tokenId}]"}?")
+        },
+        confirmButton = {
+          Button(::send) {
+            Text("Send")
+          }
+        },
+        dismissButton = {
+          Button({ confirmSending = false }) {
+            Text("Cancel")
+          }
+        }
+      )
       DecimalNumberField(
         amount,
         Modifier.width(100.dp).height(45.dp),
@@ -44,15 +76,11 @@ fun ChannelTransfers(channel: Channel, activity: MainActivity?) {
       ) { it?.let { amount = it } }
       Button(
         onClick = {
-          isSending = true
-          scope.launch {
-            with(channelService) { channel.send(amount) }
-            isSending = false
-          }
+          confirmSending = true
         },
-        enabled = !isSending
+        enabled = !isSending && amount > ZERO
       ) {
-        Text("Send", Modifier.width(65.dp))
+        Text(if (isSending) "Sending" else "Send", Modifier.width(65.dp))
       }
     }
     if (channel.their.balance > ZERO) Row {
@@ -83,7 +111,7 @@ fun ChannelTransfers(channel: Channel, activity: MainActivity?) {
             view = "Channel Events"
           }
         },
-        enabled = !preparingRequest
+        enabled = !preparingRequest && amount > ZERO
       ) {
         Text(if (preparingRequest) "Preparing..." else "Request", Modifier.width(65.dp))
       }
@@ -124,7 +152,7 @@ fun ChannelTransfers(channel: Channel, activity: MainActivity?) {
 fun PreviewTransfers() {
   MiniPayTheme {
     Column(Modifier.width(350.dp)) {
-      ChannelTransfers(fakeChannelOpen, null)
+      ChannelTransfers(fakeChannelOpen, fakeBalances, null)
     }
   }
 }

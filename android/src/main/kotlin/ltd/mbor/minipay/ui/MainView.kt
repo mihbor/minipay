@@ -51,7 +51,7 @@ fun MainView(
   var channel by remember { mutableStateOf<Channel?>(null) }
   fun setChannel(newChannel: Channel?) {
     channel = newChannel
-    setView(if (newChannel != null) "Channel details" else "Channels")
+    setView(if (newChannel != null) "Channel Details" else "Channels")
   }
 
   Scaffold(

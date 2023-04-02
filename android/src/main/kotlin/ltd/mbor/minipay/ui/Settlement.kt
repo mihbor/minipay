@@ -4,6 +4,7 @@ import android.util.Log
 import android.widget.Toast
 import android.widget.Toast.LENGTH_LONG
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
@@ -36,25 +37,63 @@ fun Settlement(
   
   val context = LocalContext.current
   var settlementTriggering by remember { mutableStateOf(false) }
+  var confirmTriggering by remember { mutableStateOf(false) }
   var updatePosting by remember { mutableStateOf(false) }
   var settlementCompleting by remember { mutableStateOf(false) }
+  var confirmCompleting by remember { mutableStateOf(false) }
+
+  fun triggerSettlement() {
+    settlementTriggering = true
+    confirmTriggering = false
+    scope.launch {
+      try {
+        updateChannel(channel.triggerSettlement())
+      } catch (e: MinimaException) {
+        e.message?.let { Toast.makeText(context, it, LENGTH_LONG).show() }
+      }
+      settlementTriggering = false
+    }
+  }
+  fun completeSettlement() {
+    settlementCompleting = true
+    confirmCompleting = false
+    scope.launch {
+      try {
+        updateChannel(channel.completeSettlement())
+      } catch (e: MinimaException) {
+        e.message?.let { Toast.makeText(context, it, LENGTH_LONG).show() }
+      }
+      settlementCompleting = false
+    }
+  }
   Log.i(TAG, "Channel status: " + channel.status)
   
   val fontSize = 10.sp
   ProvideTextStyle(value = TextStyle(fontSize = fontSize)) {
     Column {
       if (channel.status == "OPEN") {
+        if (confirmTriggering) AlertDialog(
+          onDismissRequest = { confirmTriggering = false },
+          title = {
+            Text("Sending confirmation")
+          },
+          text = {
+            Text("Initiate channel settlement on-chain?")
+          },
+          confirmButton = {
+            Button(::triggerSettlement) {
+              Text("Initiate")
+            }
+          },
+          dismissButton = {
+            Button({ confirmTriggering = false }) {
+              Text("Cancel")
+            }
+          }
+        )
         Button(
           onClick = {
-            settlementTriggering = true
-            scope.launch {
-              try {
-                updateChannel(channel.triggerSettlement())
-              } catch (e: MinimaException) {
-                e.message?.let { Toast.makeText(context, it, LENGTH_LONG).show() }
-              }
-              settlementTriggering = false
-            }
+            confirmTriggering = true
           },
           enabled = !settlementTriggering
         ) {
@@ -87,18 +126,29 @@ fun Settlement(
           }
         }
         if (channel.status in listOf("TRIGGERED", "UPDATED")) {
+          if (confirmCompleting) AlertDialog(
+            onDismissRequest = { confirmCompleting = false },
+            title = {
+              Text("Sending confirmation")
+            },
+            text = {
+              Text("Finalize channel settlement on-chain?")
+            },
+            confirmButton = {
+              Button(::completeSettlement) {
+                Text("Complete")
+              }
+            },
+            dismissButton = {
+              Button({ confirmCompleting = false }) {
+                Text("Cancel")
+              }
+            }
+          )
           Button(
             enabled = !settlementCompleting && !updatePosting && eltooScriptCoins.none { it.created + channel.timeLock > blockNumber },
             onClick = {
-              settlementCompleting = true
-              scope.launch {
-                try {
-                  updateChannel(channel.completeSettlement())
-                } catch (e: MinimaException) {
-                  e.message?.let { Toast.makeText(context, it, LENGTH_LONG).show() }
-                }
-                settlementCompleting = false
-              }
+              confirmCompleting = true
             }
           ) {
             Text("Complete settlement!")

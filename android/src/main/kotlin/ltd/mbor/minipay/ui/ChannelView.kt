@@ -62,7 +62,7 @@ fun ChannelView(
     }
     Divider()
     if (channel.status == "OPEN") {
-      ChannelTransfers(channel, activity)
+      ChannelTransfers(channel, balances, activity)
       Divider()
     }
     Row(Modifier.fillMaxWidth()) {

@@ -7,7 +7,7 @@ import ltd.mbor.minipay.common.*
 import ltd.mbor.minipay.common.RequestChannelEvent.*
 import ltd.mbor.minipay.common.model.Channel
 
-fun joinChannel(
+fun requestChannel(
   myAddress: String,
   myKeys: Channel.Keys,
   tokenId: String,

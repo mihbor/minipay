@@ -35,7 +35,7 @@ fun main() {
   var channel by mutableStateOf<Channel?>(null)
   fun selectChannel(newChannel: Channel?) {
     channel = newChannel
-    view = if (newChannel != null) "Channel details" else "Channels"
+    view = if (newChannel != null) "Channel Details" else "Channels"
   }
 
   renderComposableInBody {

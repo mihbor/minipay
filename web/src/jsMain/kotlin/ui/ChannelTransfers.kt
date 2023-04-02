@@ -24,7 +24,7 @@ fun ChannelTransfers(channel: Channel, balances: Map<String, Balance>) {
     DecimalNumberInput(amount, min = ZERO, max = channel.my.balance) { it?.let { amount = it } }
     var isSending by remember { mutableStateOf(false) }
     Button({
-      if (isSending) disabled()
+      if (isSending || amount <= ZERO) disabled()
       onClick {
         if (window.confirm("Send ${amount.toPlainString()} ${balances[channel.tokenId]?.tokenName ?: "[${channel.tokenId}]"}?")) {
           isSending = true
@@ -44,7 +44,7 @@ fun ChannelTransfers(channel: Channel, balances: Map<String, Balance>) {
     DecimalNumberInput(amount, min = ZERO, max = channel.their.balance) { it?.let { amount = it } }
     var isSending by remember { mutableStateOf(false) }
     Button({
-      if (isSending) disabled()
+      if (isSending || amount <= ZERO) disabled()
       onClick {
         isSending = true
         scope.launch {

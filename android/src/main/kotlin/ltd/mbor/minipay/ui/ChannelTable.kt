@@ -69,7 +69,7 @@ fun ChannelTable(
           }
         }
         if (showActions) Row(Modifier.fillMaxWidth()){
-          ChannelActions(channel, activity, selectChannel) {
+          ChannelActions(channel, balances, activity, selectChannel) {
             scope.launch { channelService.reloadChannels(eltooScriptCoins) }
           }
         }
