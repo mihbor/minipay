@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.tooling.preview.Preview
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import ltd.mbor.minimak.Balance
+import ltd.mbor.minimak.Contact
 import ltd.mbor.minimak.Token
 import ltd.mbor.minipay.MainActivity
 import ltd.mbor.minipay.common.RequestChannelEvent.*
@@ -33,6 +34,7 @@ fun RequestChannel(
   myAddress: String,
   balances: Map<String, Balance>,
   tokens: Map<String, Token>,
+  maximaContact: Contact?,
   activity: MainActivity?,
 ) {
   var amount by remember { mutableStateOf(ZERO) }
@@ -58,7 +60,7 @@ fun RequestChannel(
   fun requestChannel() {
     bitmap = encodeAsBitmap(channelKey(myKeys, tokenId) + ";" + amount.toPlainString() + ";" + myAddress).asImageBitmap()
 
-    requestChannel(myAddress, myKeys, tokenId, amount) { event, newChannel ->
+    requestChannel(myAddress, myKeys, tokenId, amount, maximaContact) { event, newChannel ->
       progressStep++
       when (event) {
         SIGS_RECEIVED -> {
@@ -130,7 +132,7 @@ fun RequestChannel(
 fun PreviewRequestChannel() {
   MiniPayTheme {
     Column {
-      RequestChannel(previewKeys, "abc", previewBalances, previewTokens, null)
+      RequestChannel(previewKeys, "abc", previewBalances, previewTokens, null, null)
     }
   }
 }

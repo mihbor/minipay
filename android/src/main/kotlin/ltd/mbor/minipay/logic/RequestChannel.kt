@@ -1,6 +1,7 @@
 package ltd.mbor.minipay.logic
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import ltd.mbor.minimak.Contact
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.newScript
 import ltd.mbor.minipay.common.*
@@ -12,6 +13,7 @@ fun requestChannel(
   myKeys: Channel.Keys,
   tokenId: String,
   amount: BigDecimal,
+  maximaContact: Contact?,
   onEvent: (RequestChannelEvent, Channel?) -> Unit = { _, _ -> }
 ) {
   channelKey(myKeys, tokenId).subscribe({ channel, isAck ->
@@ -27,7 +29,7 @@ fun requestChannel(
     multisigScriptAddress = MDS.newScript(triggerScript(theirKeys.trigger, myKeys.trigger)).address
     eltooScriptAddress = MDS.newScript(eltooScript(timeLock, theirKeys.update, myKeys.update, theirKeys.settle, myKeys.settle)).address
     onEvent(SCRIPTS_DEPLOYED, null)
-    val channel = channelService.requestChannel(myKeys, theirKeys, myAddress, theirAddress, amount, tokenId, timeLock, multisigScriptAddress, eltooScriptAddress, triggerTx, settlementTx, fundingTx, onEvent)
+    val channel = channelService.requestChannel(myKeys, theirKeys, myAddress, theirAddress, amount, tokenId, timeLock, multisigScriptAddress, eltooScriptAddress, triggerTx, settlementTx, fundingTx, maximaContact, onEvent)
     channels.put(channel)
     channel.id
   }

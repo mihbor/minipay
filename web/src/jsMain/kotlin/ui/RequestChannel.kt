@@ -62,7 +62,7 @@ fun RequestChannel(
     ) { error ->
       if (error != null) console.error(error)
       else {
-        requestChannel(myAddress, myKeys, tokenId, myAmount) { event, newChannel ->
+        requestChannel(myAddress, myKeys, tokenId, myAmount, maximaContact) { event, newChannel ->
           progressStep++
           when (event) {
             SIGS_RECEIVED -> {
@@ -90,13 +90,6 @@ fun RequestChannel(
       }
     };Unit
   }
-  fun requestMaximaChannel(contact: Contact) {
-
-  }
-  fun requestChannel(contact: Contact?) {
-    if (contact != null) requestMaximaChannel(contact)
-    else requestChannel()
-  }
   Br()
   if (progressStep > 0) {
     Progress({
@@ -120,7 +113,7 @@ fun RequestChannel(
       if (myAmount < 0 || listOf(myKeys.trigger, myKeys.update, myKeys.settle).any{ it.isBlank() }) disabled()
       if (useMaxima && maximaContact == null) disabled()
       onClick {
-        if (window.confirm("Fund new channel with ${myAmount.toPlainString()} ${balances[tokenId]?.tokenName ?: "[$tokenId]"}?")) requestChannel(maximaContact)
+        if (window.confirm("Fund new channel with ${myAmount.toPlainString()} ${balances[tokenId]?.tokenName ?: "[$tokenId]"}?")) requestChannel()
       }
     }) {
       Text("Request channel")

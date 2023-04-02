@@ -23,6 +23,7 @@ suspend fun ChannelService.requestChannel(
   triggerTx: String,
   settlementTx: String,
   fundingTx: String,
+  maximaContact: Contact?,
   onEvent: (RequestChannelEvent, Channel?) -> Unit = { _, _ -> }
 ): Channel {
   
