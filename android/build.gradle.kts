@@ -6,19 +6,19 @@ plugins {
 
 dependencies {
   implementation(project(":common"))
-  implementation("androidx.core:core-ktx:1.9.0")
+  implementation("androidx.core:core-ktx:1.9.0") // 1.10.0 breaks compose previews
   implementation("androidx.compose.material:material:$composeVersion")
   implementation("androidx.compose.ui:ui:$composeVersion")
   implementation("androidx.compose.ui:ui-tooling:$composeVersion")
   implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
-  implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
-  implementation("androidx.activity:activity-compose:1.6.0")
+  implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+  implementation("androidx.activity:activity-compose:1.7.0")
   implementation("androidx.datastore:datastore-preferences:1.0.0")
 
   implementation("com.google.zxing:core:3.5.1")
   implementation("com.journeyapps:zxing-android-embedded:4.3.0")
-  implementation("com.google.firebase:firebase-common:20.1.0")
-  implementation("com.google.firebase:firebase-firestore:24.1.0")
+  implementation("com.google.firebase:firebase-common:20.3.2")
+  implementation("com.google.firebase:firebase-firestore:24.5.0")
   implementation("io.coil-kt:coil-compose:$coilVersion")
   implementation("io.coil-kt:coil-svg:$coilVersion")
 }
