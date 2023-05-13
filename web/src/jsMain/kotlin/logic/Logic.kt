@@ -16,6 +16,8 @@ import ltd.mbor.minipay.common.scope
 import ltd.mbor.minipay.common.storage.createDB
 import ltd.mbor.minipay.common.storage.getChannels
 import ltd.mbor.minipay.common.storage.setChannelOpen
+import ltd.mbor.minipay.common.transport.APP
+import ltd.mbor.minipay.common.transport.onMessage
 
 var inited by mutableStateOf(false)
 val balances = mutableStateMapOf<String, Balance>()
@@ -82,6 +84,10 @@ suspend fun initMDS(prefs: Prefs) {
             eltooScriptCoins.put(eltooScriptAddress, MDS.getCoins(address = eltooScriptAddress))
           }
         }
+      }
+
+      "MAXIMA" -> if (msg.jsonObject["data"]!!.jsonString("application") == APP) {
+        onMessage(msg.jsonObject["data"]!!)
       }
     }
   }

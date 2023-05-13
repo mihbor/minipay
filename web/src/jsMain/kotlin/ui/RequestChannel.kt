@@ -54,42 +54,50 @@ fun RequestChannel(
     multisigScriptBalances.clear()
   }
 
-  fun requestChannel() {
-    showQR = !showQR
+  fun requestChannel(maximaContact: Contact?) {
+    requestChannel(myAddress, myKeys, tokenId, myAmount, maximaContact) { event, newChannel ->
+      progressStep++
+      when (event) {
+        SIGS_RECEIVED -> {
+          triggerTxStatus = "Trigger transaction received"
+          settlementTxStatus = "Settlement transaction received"
+          showQR = false
+        }
+
+        TRIGGER_TX_SIGNED -> triggerTxStatus += " and signed"
+        SETTLEMENT_TX_SIGNED -> settlementTxStatus += " and signed"
+        CHANNEL_PUBLISHED -> {
+          channel = newChannel
+          triggerTxStatus += " and sent back."
+          settlementTxStatus += " and sent back."
+        }
+
+        CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED -> {
+          channel = newChannel
+          progressStep--
+        }
+
+        else -> {}
+      }
+    }
+  }
+
+  fun showQR() {
+    showQR = true
     val canvas = document.getElementById("joinChannelQR") as HTMLCanvasElement
     QRCode.toCanvas(
       canvas, channelKey(myKeys, tokenId) + ";" + myAmount.toPlainString() + ";" + myAddress
     ) { error ->
       if (error != null) console.error(error)
-      else {
-        requestChannel(myAddress, myKeys, tokenId, myAmount, maximaContact) { event, newChannel ->
-          progressStep++
-          when (event) {
-            SIGS_RECEIVED -> {
-              triggerTxStatus = "Trigger transaction received"
-              settlementTxStatus = "Settlement transaction received"
-              showQR = false
-            }
-
-            TRIGGER_TX_SIGNED -> triggerTxStatus += " and signed"
-            SETTLEMENT_TX_SIGNED -> settlementTxStatus += " and signed"
-            CHANNEL_PUBLISHED -> {
-              channel = newChannel
-              triggerTxStatus += " and sent back."
-              settlementTxStatus += " and sent back."
-            }
-
-            CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED -> {
-              channel = newChannel
-              progressStep--
-            }
-
-            else -> {}
-          }
-        }
-      }
+      else requestChannel(null)
     };Unit
   }
+
+  fun requestChannel() {
+    if (useMaxima) requestChannel(maximaContact)
+    else showQR()
+  }
+
   Br()
   if (progressStep > 0) {
     Progress({
@@ -119,7 +127,7 @@ fun RequestChannel(
       Text("Request channel")
     } else Button({
       onClick {
-        showQR = !showQR
+        showQR = false
       }
     }) {
       Text("Cancel")

@@ -50,7 +50,7 @@ suspend fun MdsApi.importAndPost(tx: String): JsonElement {
   val txncreator = buildString{
     appendLine("txncreate id:$txId;")
     appendLine("txnimport id:$txId data:$tx;")
-    append("txnpost id:$txId auto:true;")
+    append("txnpost id:$txId auto:true txndelete:true;")
   }
   val lastCmd = cmd(txncreator)!!.jsonArray.last()
   if (logging) log("importAndPost: ${lastCmd.jsonString("command")} ${lastCmd.jsonBoolean("status")}")
