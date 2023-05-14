@@ -1,4 +1,4 @@
-package ltd.mbor.minipay.ui
+package ltd.mbor.minipay.ui.channels
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Divider
@@ -12,6 +12,10 @@ import ltd.mbor.minipay.MainActivity
 import ltd.mbor.minipay.blockNumber
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.logic.eltooScriptCoins
+import ltd.mbor.minipay.ui.CopyToClipboard
+import ltd.mbor.minipay.ui.DeleteChannel
+import ltd.mbor.minipay.ui.Settlement
+import ltd.mbor.minipay.ui.TokenIcon
 import ltd.mbor.minipay.ui.preview.fakeBalances
 import ltd.mbor.minipay.ui.preview.fakeChannelOpen
 import ltd.mbor.minipay.ui.preview.fakeChannelTriggered

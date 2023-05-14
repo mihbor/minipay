@@ -1,4 +1,4 @@
-package ltd.mbor.minipay.ui
+package ltd.mbor.minipay.ui.channels
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -23,6 +23,9 @@ import ltd.mbor.minipay.logic.eltooScriptAddress
 import ltd.mbor.minipay.logic.multisigScriptAddress
 import ltd.mbor.minipay.logic.multisigScriptBalances
 import ltd.mbor.minipay.logic.requestChannel
+import ltd.mbor.minipay.ui.DecimalNumberField
+import ltd.mbor.minipay.ui.TokenSelect
+import ltd.mbor.minipay.ui.encodeAsBitmap
 import ltd.mbor.minipay.ui.preview.previewBalances
 import ltd.mbor.minipay.ui.preview.previewKeys
 import ltd.mbor.minipay.ui.preview.previewTokens

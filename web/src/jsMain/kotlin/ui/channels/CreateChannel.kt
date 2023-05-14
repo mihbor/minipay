@@ -1,4 +1,4 @@
-package ui
+package ui.channels
 
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateMap
@@ -9,13 +9,13 @@ import org.jetbrains.compose.web.css.LineStyle.Companion.Inset
 import org.jetbrains.compose.web.css.LineStyle.Companion.Outset
 import org.jetbrains.compose.web.css.border
 import org.jetbrains.compose.web.dom.*
+import ui.CopyToClipboard
 
 @Composable
 fun CreateChannel(
   balances: SnapshotStateMap<String, Balance>,
   tokens: SnapshotStateMap<String, Token>,
 ) {
-
   var isInviting by remember { mutableStateOf(true) }
   var useMaxima by remember { mutableStateOf(false) }
   var myKeys by remember { mutableStateOf(Channel.Keys("", "", "")) }

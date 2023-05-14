@@ -1,4 +1,4 @@
-package ltd.mbor.minipay.ui
+package ltd.mbor.minipay.ui.channels
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minipay.MainActivity
 import ltd.mbor.minipay.common.model.Channel
+import ltd.mbor.minipay.ui.DeleteChannel
 import ltd.mbor.minipay.ui.preview.fakeBalances
 import ltd.mbor.minipay.ui.preview.fakeChannelOpen
 import ltd.mbor.minipay.ui.preview.fakeChannelTriggered

@@ -1,4 +1,4 @@
-package ui
+package ui.channels
 
 import androidx.compose.runtime.*
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
@@ -15,6 +15,7 @@ import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
+import ui.DecimalNumberInput
 import view
 
 @Composable

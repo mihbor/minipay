@@ -1,4 +1,4 @@
-package ui
+package ui.channels
 
 import androidx.compose.runtime.Composable
 import ltd.mbor.minimak.Balance

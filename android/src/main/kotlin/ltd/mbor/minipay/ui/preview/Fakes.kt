@@ -11,12 +11,8 @@ import kotlinx.serialization.json.JsonPrimitive
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Coin
 import ltd.mbor.minimak.Token
-import ltd.mbor.minipay.common.model.Channel
-import ltd.mbor.minipay.common.model.PaymentRequestReceived
-import ltd.mbor.minipay.common.model.PaymentRequestSent
-import ltd.mbor.minipay.common.model.Prefs
-import ltd.mbor.minipay.common.model.Transport.FIREBASE
-import ltd.mbor.minipay.common.model.Transport.NFC
+import ltd.mbor.minipay.common.model.*
+import ltd.mbor.minipay.common.model.Transport.*
 
 val fakeChannelOpen = Channel(
   id = uuid4(),
@@ -123,4 +119,5 @@ val previewEvents = mutableListOf(
   PaymentRequestSent(fakeChannelOpen, 1, 2, 3, ZERO to ONE, FIREBASE),
   PaymentRequestReceived(fakeChannelOpen, 1, 2, 3, ZERO to ONE, NFC),
   PaymentRequestReceived(fakeChannelOpen, 1, 2, 3, ZERO to ONE, FIREBASE),
+  ChannelInviteReceived(ZERO to ONE, MAXIMA)
 )

@@ -1,4 +1,4 @@
-package ui
+package ui.channels
 
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateMap
@@ -25,6 +25,10 @@ import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Progress
 import org.jetbrains.compose.web.dom.Text
 import org.w3c.dom.HTMLCanvasElement
+import ui.Canvas
+import ui.DecimalNumberInput
+import ui.QRCode
+import ui.TokenSelect
 
 @Composable
 fun RequestChannel(

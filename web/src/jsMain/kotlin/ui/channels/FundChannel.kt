@@ -1,26 +1,24 @@
-package ui
+package ui.channels
 
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
-import com.ionspin.kotlin.bignum.decimal.toBigDecimal
-import externals.QrScanner
-import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.launch
 import logic.eltooScriptAddress
-import logic.fundChannel
 import logic.multisigScriptAddress
 import logic.multisigScriptBalances
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Token
-import ltd.mbor.minipay.common.FundChannelEvent.*
+import ltd.mbor.minipay.common.FundChannelEvent
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.scope
 import org.jetbrains.compose.web.attributes.disabled
-import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.css.width
 import org.jetbrains.compose.web.dom.*
-import org.w3c.dom.HTMLVideoElement
+import ui.DecimalNumberInput
+import ui.TokenSelect
 
 @Composable
 fun FundChannel(
@@ -40,9 +38,8 @@ fun FundChannel(
   var fundingTxStatus by remember { mutableStateOf("") }
   var triggerTxStatus by remember { mutableStateOf("") }
   var settlementTxStatus by remember { mutableStateOf("") }
-  
+
   var showFundScanner by remember { mutableStateOf(false) }
-  var qrScanner: QrScanner? by remember { mutableStateOf(null) }
   var progressStep: Int by remember { mutableStateOf(0) }
   
   var channel by remember { mutableStateOf<Channel?>(null) }
@@ -57,34 +54,43 @@ fun FundChannel(
   }
 
   fun fundChannel() {
-    showFundScanner = false
-    qrScanner?.stop()
-    if (window.confirm("Fund new channel with ${myAmount.toPlainString()} ${balances[tokenId]?.tokenName ?: "[$tokenId]"}?")) scope.launch {
-      fundChannel(myKeys, theirKeys, myAddress, theirAddress, myAmount, theirAmount, tokenId, timeLock) { event, newChannel ->
+    if (
+      window.confirm("Fund new channel with ${myAmount.toPlainString()} ${balances[tokenId]?.tokenName ?: "[$tokenId]"}?")
+    ) scope.launch {
+      logic.fundChannel(myKeys, theirKeys, myAddress, theirAddress, myAmount, theirAmount, tokenId, timeLock) { event, newChannel ->
         progressStep++
-        when(event) {
-          FUNDING_TX_CREATED -> fundingTxStatus = "Funding transaction created"
-          TRIGGER_TX_SIGNED -> triggerTxStatus = "Trigger transaction created and signed"
-          SETTLEMENT_TX_SIGNED -> settlementTxStatus = "Settlement transaction created and signed"
-          CHANNEL_PUBLISHED -> {
+        when (event) {
+          FundChannelEvent.FUNDING_TX_CREATED -> fundingTxStatus = "Funding transaction created"
+          FundChannelEvent.TRIGGER_TX_SIGNED -> triggerTxStatus = "Trigger transaction created and signed"
+          FundChannelEvent.SETTLEMENT_TX_SIGNED -> settlementTxStatus = "Settlement transaction created and signed"
+          FundChannelEvent.CHANNEL_PUBLISHED -> {
             triggerTxStatus += ", sent"
             settlementTxStatus += ", sent"
             channel = newChannel
             console.log("channelId", channel!!.id)
           }
-          SIGS_RECEIVED -> {
+
+          FundChannelEvent.SIGS_RECEIVED -> {
             triggerTxStatus += " and received back."
             settlementTxStatus += " and received back."
           }
-          CHANNEL_FUNDED -> fundingTxStatus += ", signed and posted!"
-          CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED -> {
+
+          FundChannelEvent.CHANNEL_FUNDED -> fundingTxStatus += ", signed and posted!"
+          FundChannelEvent.CHANNEL_UPDATED, FundChannelEvent.CHANNEL_UPDATED_ACKED -> {
             channel = newChannel
             progressStep--
           }
+
           else -> {}
         }
       }
     }
+  }
+
+  fun fundChannelQR() {
+    showFundScanner = false
+//    qrScanner?.stop()
+    fundChannel()
   }
 
   Br()
@@ -183,51 +189,16 @@ fun FundChannel(
     Button({
       if (myAmount <= 0) disabled()
       onClick {
-        fundChannel()
+        fundChannelQR()
       }
     }) {
       Text("Initiate!")
     }
   }
-  if (progressStep == 0) {
-    Br()
-    Button({
-      onClick {
-        showFundScanner = !showFundScanner
-      }
-      style {
-        if (showFundScanner) border(style = LineStyle.Inset)
-      }
-    }) {
-      Text("Scan QR code")
-    }
-  }
-  Br()
-  if (showFundScanner) {
-    Video({
-      id("fundChannelVideo")
-      style {
-        width(500.px)
-        height(500.px)
-        property("pointer-events", "none")
-      }
-    })
-    DisposableEffect("fundChannelVideo") {
-      val video = document.getElementById("fundChannelVideo").also { console.log("video", it) } as HTMLVideoElement
-      qrScanner = QrScanner(video) { result ->
-        console.log("decoded qr code: $result")
-        result.split(';').apply {
-          theirKeys = Channel.Keys(this[0], this[1], this[2])
-          tokenId = this[3]
-          theirAmount = this[4].toBigDecimal()
-          theirAddress = this[5]
-        }
-        qrScanner!!.stop()
-        showFundScanner = false
-      }.also { it.start() }
-      onDispose {
-        qrScanner?.stop()
-      }
-    }
+  if (showFundScanner) FundChannelQR(progressStep == 0) { keys, token, amount, address ->
+    theirKeys = keys
+    tokenId = token
+    theirAmount = amount
+    theirAddress = address
   }
 }

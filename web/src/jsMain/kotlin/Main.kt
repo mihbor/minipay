@@ -16,6 +16,10 @@ import org.jetbrains.compose.web.renderComposableInBody
 import org.w3c.dom.get
 import org.w3c.dom.set
 import ui.*
+import ui.channels.ChannelDetails
+import ui.channels.ChannelEvents
+import ui.channels.ChannelListing
+import ui.channels.CreateChannel
 
 external fun require(module: String): dynamic
 

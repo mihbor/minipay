@@ -1,4 +1,4 @@
-package ltd.mbor.minipay.ui
+package ltd.mbor.minipay.ui.channels
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -27,6 +27,7 @@ import ltd.mbor.minipay.common.scope
 import ltd.mbor.minipay.logic.channelService
 import ltd.mbor.minipay.logic.events
 import ltd.mbor.minipay.sendDataToService
+import ltd.mbor.minipay.ui.DecimalNumberField
 import ltd.mbor.minipay.ui.preview.fakeBalances
 import ltd.mbor.minipay.ui.preview.fakeChannelOpen
 import ltd.mbor.minipay.ui.theme.MiniPayTheme

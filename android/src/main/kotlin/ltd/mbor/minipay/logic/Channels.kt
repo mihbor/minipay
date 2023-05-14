@@ -39,7 +39,7 @@ suspend fun channelUpdateAck(updateTxText: String, settleTxText: String) {
   with(channelService) {
     channel.update(updateTxText, settleTxText, settleTx) {
       channels.put(it)
-      events.removeIf { it.channel.id == channel.id && it is PaymentRequestSent }
+      events.removeIf { it is PaymentRequestSent && it.channel.id == channel.id }
     }
   }
 }

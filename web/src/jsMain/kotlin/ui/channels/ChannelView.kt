@@ -1,4 +1,4 @@
-package ui
+package ui.channels
 
 import androidx.compose.runtime.Composable
 import logic.blockNumber
@@ -12,6 +12,8 @@ import org.jetbrains.compose.web.dom.Br
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
+import ui.CopyToClipboard
+import ui.TokenIcon
 
 @Composable
 fun ChannelView(

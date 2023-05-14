@@ -17,7 +17,6 @@ import ltd.mbor.minipay.common.storage.createDB
 import ltd.mbor.minipay.common.storage.getChannels
 import ltd.mbor.minipay.common.storage.setChannelOpen
 import ltd.mbor.minipay.common.transport.APP
-import ltd.mbor.minipay.common.transport.onMessage
 
 var inited by mutableStateOf(false)
 val balances = mutableStateMapOf<String, Balance>()

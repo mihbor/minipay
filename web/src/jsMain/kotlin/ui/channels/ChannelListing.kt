@@ -1,4 +1,4 @@
-package ui
+package ui.channels
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -10,6 +10,7 @@ import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.scope
 import org.jetbrains.compose.web.css.textAlign
 import org.jetbrains.compose.web.dom.*
+import ui.TokenIcon
 
 @Composable
 fun ChannelListing(

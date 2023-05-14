@@ -75,7 +75,7 @@ class ChannelService(
   suspend fun Channel.processUpdate(isAck: Boolean, updateTxText: String, settleTxText: String): Channel {
     return processUpdate(isAck, updateTxText, settleTxText)  {
       channels.put(it)
-      if (isAck) events.removeIf { it.channel.id == id && it is PaymentRequestSent }
+      if (isAck) events.removeIf { it is PaymentRequestSent && it.channel.id == id }
     }
   }
 

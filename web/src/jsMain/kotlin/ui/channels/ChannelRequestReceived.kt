@@ -1,4 +1,4 @@
-package ui
+package ui.channels
 
 import androidx.compose.runtime.*
 import com.ionspin.kotlin.bignum.decimal.BigDecimal

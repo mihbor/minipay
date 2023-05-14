@@ -1,4 +1,4 @@
-package ltd.mbor.minipay.ui
+package ltd.mbor.minipay.ui.channels
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Button

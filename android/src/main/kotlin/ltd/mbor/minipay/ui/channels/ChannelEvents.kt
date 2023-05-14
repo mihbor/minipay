@@ -1,4 +1,4 @@
-package ltd.mbor.minipay.ui
+package ltd.mbor.minipay.ui.channels
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -8,6 +8,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import ltd.mbor.minimak.Token
 import ltd.mbor.minipay.MainActivity
 import ltd.mbor.minipay.common.model.ChannelEvent
+import ltd.mbor.minipay.common.model.ChannelInviteReceived
 import ltd.mbor.minipay.common.model.PaymentRequestReceived
 import ltd.mbor.minipay.common.model.PaymentRequestSent
 import ltd.mbor.minipay.common.model.Transport.NFC
@@ -35,7 +36,7 @@ fun ChannelEvents(
               tokens,
               activity
             ) {
-              events.remove(it)
+              events -= it
             }
           } else {
             ChannelRequestReceived(
@@ -46,7 +47,7 @@ fun ChannelEvents(
               it.channelBalance,
               tokens,
             ) {
-              events.remove(it)
+              events -= it
             }
           }
         }
@@ -57,8 +58,13 @@ fun ChannelEvents(
             }
           } else {
             ChannelRequestSent {
-              events.remove(it)
+              events -= it
             }
+          }
+        }
+        it is ChannelInviteReceived -> {
+          InviteReceived {
+            events -= it
           }
         }
       }

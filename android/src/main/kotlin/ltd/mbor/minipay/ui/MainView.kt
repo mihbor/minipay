@@ -18,6 +18,10 @@ import ltd.mbor.minipay.common.model.Prefs
 import ltd.mbor.minipay.logic.channels
 import ltd.mbor.minipay.logic.eltooScriptCoins
 import ltd.mbor.minipay.logic.events
+import ltd.mbor.minipay.ui.channels.ChannelDetails
+import ltd.mbor.minipay.ui.channels.ChannelEvents
+import ltd.mbor.minipay.ui.channels.ChannelListing
+import ltd.mbor.minipay.ui.channels.CreateChannel
 import ltd.mbor.minipay.ui.preview.previewBalances
 import ltd.mbor.minipay.ui.preview.previewPrefs
 import ltd.mbor.minipay.ui.preview.previewTokens

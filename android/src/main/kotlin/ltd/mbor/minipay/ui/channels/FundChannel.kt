@@ -1,7 +1,5 @@
-package ltd.mbor.minipay.ui
+package ltd.mbor.minipay.ui.channels
 
-import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,14 +11,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
-import com.journeyapps.barcodescanner.ScanContract
-import com.journeyapps.barcodescanner.ScanOptions
 import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Token
 import ltd.mbor.minimak.log
 import ltd.mbor.minipay.MainActivity
-import ltd.mbor.minipay.TAG
 import ltd.mbor.minipay.common.FundChannelEvent.*
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.scope
@@ -28,6 +23,8 @@ import ltd.mbor.minipay.logic.eltooScriptAddress
 import ltd.mbor.minipay.logic.fundChannel
 import ltd.mbor.minipay.logic.multisigScriptAddress
 import ltd.mbor.minipay.logic.multisigScriptBalances
+import ltd.mbor.minipay.ui.DecimalNumberField
+import ltd.mbor.minipay.ui.TokenSelect
 import ltd.mbor.minipay.ui.preview.previewBalances
 import ltd.mbor.minipay.ui.preview.previewKeys
 import ltd.mbor.minipay.ui.preview.previewTokens
@@ -178,28 +175,11 @@ fun FundChannel(
       }
     }
   }
-  if (showFundScanner) {
-    val scanLauncher = rememberLauncherForActivityResult(
-      contract = ScanContract(),
-      onResult = { result ->
-        Log.i(TAG, "scanned code: ${result.contents}")
-        result.contents?.split(';')?.apply {
-          theirKeys = Channel.Keys(this[0], this[1], this[2])
-          tokenId = this[3]
-          theirAmount = this[4].toBigDecimal()
-          theirAddress = this[5]
-        }
-      }
-    )
-    Button(onClick = {
-      scanLauncher.launch(ScanOptions().apply {
-        setOrientationLocked(false)
-        setPrompt("")
-        setBeepEnabled(false)
-      })
-    }) {
-      Text(text = "Scan QR")
-    }
+  if (showFundScanner) FundChannelQR(progressStep == 0) { keys, token, amount, address ->
+    theirKeys = keys
+    tokenId = token
+    theirAmount = amount
+    theirAddress = address
   }
 }
 

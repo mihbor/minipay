@@ -1,4 +1,4 @@
-package ui
+package ui.channels
 
 import androidx.compose.runtime.*
 import kotlinx.browser.window
@@ -16,6 +16,7 @@ import org.jetbrains.compose.web.dom.Br
 import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
+import ui.TokenIcon
 
 @Composable
 fun Settlement(channel: Channel, blockNumber: Int, eltooScriptCoins: List<Coin>, updateChannel: (Channel) -> Unit) {

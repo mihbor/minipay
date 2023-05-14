@@ -1,11 +1,13 @@
-package ui
+package ui.channels
 
 import androidx.compose.runtime.Composable
 import ltd.mbor.minimak.Token
 import ltd.mbor.minipay.common.model.ChannelEvent
+import ltd.mbor.minipay.common.model.ChannelInviteReceived
 import ltd.mbor.minipay.common.model.PaymentRequestReceived
 import ltd.mbor.minipay.common.model.PaymentRequestSent
 import org.jetbrains.compose.web.dom.Div
+import ui.StyleSheets
 
 @Composable
 fun ChannelEvents(
@@ -27,6 +29,10 @@ fun ChannelEvents(
         }
       
         is PaymentRequestSent -> ChannelRequestSent {
+          events -= it
+        }
+
+        is ChannelInviteReceived -> InviteReceived{
           events -= it
         }
       }

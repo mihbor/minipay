@@ -1,4 +1,4 @@
-package ltd.mbor.minipay.ui
+package ltd.mbor.minipay.ui.channels
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +16,7 @@ import ltd.mbor.minimak.*
 import ltd.mbor.minipay.MainActivity
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.newKeys
+import ltd.mbor.minipay.ui.CopyToClipboard
 import ltd.mbor.minipay.ui.preview.previewBalances
 import ltd.mbor.minipay.ui.preview.previewTokens
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
