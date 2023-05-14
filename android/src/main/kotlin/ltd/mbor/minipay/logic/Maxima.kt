@@ -1,4 +1,4 @@
-package logic
+package ltd.mbor.minipay.logic
 
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlinx.serialization.json.JsonElement
@@ -9,7 +9,7 @@ import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.model.ChannelInvite
 import ltd.mbor.minipay.common.model.ChannelInviteReceived
 import ltd.mbor.minipay.common.model.Transport.MAXIMA
-import view
+import ltd.mbor.minipay.view
 
 fun onMessage(msg: JsonElement) {
   val data = msg.jsonString("data").substring(2).decodeHex().decodeToString()

@@ -114,10 +114,17 @@ val previewTokens = listOf(
   Token("0x0999", JsonPrimitive("test2"), ONE, 1, null, null, null, JsonNull),
 ).associateBy { it.tokenId }
 
+val previewInvite = ChannelInvite(
+  tokenId = "0x00",
+  address = "",
+  balance = ZERO,
+  keys = Channel.Keys("", "", "")
+)
+
 val previewEvents = mutableListOf(
   PaymentRequestSent(fakeChannelOpen, 1, 2, 3, ZERO to ONE, NFC),
   PaymentRequestSent(fakeChannelOpen, 1, 2, 3, ZERO to ONE, FIREBASE),
   PaymentRequestReceived(fakeChannelOpen, 1, 2, 3, ZERO to ONE, NFC),
   PaymentRequestReceived(fakeChannelOpen, 1, 2, 3, ZERO to ONE, FIREBASE),
-  ChannelInviteReceived(ZERO to ONE, MAXIMA)
+  ChannelInviteReceived(previewInvite, MAXIMA)
 )

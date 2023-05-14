@@ -15,17 +15,26 @@ import androidx.compose.ui.unit.sp
 import ltd.mbor.minimak.*
 import ltd.mbor.minipay.MainActivity
 import ltd.mbor.minipay.common.model.Channel
+import ltd.mbor.minipay.common.model.ChannelInvite
+import ltd.mbor.minipay.common.model.ChannelInvite.Companion.EMPTY
 import ltd.mbor.minipay.common.newKeys
 import ltd.mbor.minipay.ui.CopyToClipboard
 import ltd.mbor.minipay.ui.preview.previewBalances
+import ltd.mbor.minipay.ui.preview.previewInvite
 import ltd.mbor.minipay.ui.preview.previewTokens
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
 
 @Composable
-fun CreateChannel(balances: Map<String, Balance>, tokens: Map<String, Token>, activity: MainActivity?) {
+fun CreateChannel(
+  balances: Map<String, Balance>,
+  tokens: Map<String, Token>,
+  activity: MainActivity?,
+  invite: ChannelInvite,
+  setInvite: (ChannelInvite) -> Unit
+) {
 
-  var isInviting by remember { mutableStateOf(true) }
-  var useMaxima by remember { mutableStateOf(false) }
+  var isInviting by remember { mutableStateOf(invite == EMPTY) }
+  var useMaxima by remember { mutableStateOf(invite != EMPTY) }
   var myKeys by remember { mutableStateOf(Channel.Keys("", "", "")) }
   var myAddress by remember { mutableStateOf("") }
   var maximaContact by remember { mutableStateOf<Contact?>(null) }
@@ -68,7 +77,7 @@ fun CreateChannel(balances: Map<String, Balance>, tokens: Map<String, Token>, ac
           Text("Join")
         }
         if (isInviting) RequestChannel(myKeys, myAddress, balances, tokens, if(useMaxima) maximaContact else null, activity)
-        else FundChannel(myKeys, myAddress, balances, tokens, activity)
+        else FundChannel(myKeys, myAddress, balances, tokens, activity, invite, setInvite)
       }
     }
   }
@@ -77,6 +86,6 @@ fun CreateChannel(balances: Map<String, Balance>, tokens: Map<String, Token>, ac
 @Composable @Preview
 fun PreviewCreateChannel() {
   MiniPayTheme {
-    CreateChannel(previewBalances, previewTokens, null)
+    CreateChannel(previewBalances, previewTokens, null, previewInvite, {})
   }
 }

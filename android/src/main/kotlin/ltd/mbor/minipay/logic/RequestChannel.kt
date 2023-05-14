@@ -1,21 +1,27 @@
 package ltd.mbor.minipay.logic
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Contact
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.newScript
+import ltd.mbor.minimak.sendMessage
 import ltd.mbor.minipay.common.*
 import ltd.mbor.minipay.common.RequestChannelEvent.*
 import ltd.mbor.minipay.common.model.Channel
+import ltd.mbor.minipay.common.transport.APP
 
 fun requestChannel(
   myAddress: String,
   myKeys: Channel.Keys,
   tokenId: String,
-  amount: BigDecimal,
+  myAmount: BigDecimal,
   maximaContact: Contact?,
   onEvent: (RequestChannelEvent, Channel?) -> Unit = { _, _ -> }
 ) {
+  if (maximaContact != null) scope.launch{
+    MDS.sendMessage(APP, maximaContact.publicKey, "invite:${channelKey(myKeys, tokenId) + ";" + myAmount.toPlainString() + ";" + myAddress}")
+  }
   channelKey(myKeys, tokenId).subscribe({ channel, isAck ->
     onEvent(if (isAck) CHANNEL_UPDATED_ACKED else CHANNEL_UPDATED, channel)
   }) {
@@ -29,7 +35,21 @@ fun requestChannel(
     multisigScriptAddress = MDS.newScript(triggerScript(theirKeys.trigger, myKeys.trigger)).address
     eltooScriptAddress = MDS.newScript(eltooScript(timeLock, theirKeys.update, myKeys.update, theirKeys.settle, myKeys.settle)).address
     onEvent(SCRIPTS_DEPLOYED, null)
-    val channel = channelService.requestChannel(myKeys, theirKeys, myAddress, theirAddress, amount, tokenId, timeLock, multisigScriptAddress, eltooScriptAddress, triggerTx, settlementTx, fundingTx, maximaContact, onEvent)
+    val channel = channelService.requestChannel(
+      myKeys,
+      theirKeys,
+      myAddress,
+      theirAddress,
+      myAmount,
+      tokenId,
+      timeLock,
+      multisigScriptAddress,
+      eltooScriptAddress,
+      triggerTx,
+      settlementTx,
+      fundingTx,
+      onEvent
+    )
     channels.put(channel)
     channel.id
   }

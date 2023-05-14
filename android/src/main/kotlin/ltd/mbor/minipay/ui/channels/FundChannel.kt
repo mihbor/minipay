@@ -18,6 +18,7 @@ import ltd.mbor.minimak.log
 import ltd.mbor.minipay.MainActivity
 import ltd.mbor.minipay.common.FundChannelEvent.*
 import ltd.mbor.minipay.common.model.Channel
+import ltd.mbor.minipay.common.model.ChannelInvite
 import ltd.mbor.minipay.common.scope
 import ltd.mbor.minipay.logic.eltooScriptAddress
 import ltd.mbor.minipay.logic.fundChannel
@@ -26,6 +27,7 @@ import ltd.mbor.minipay.logic.multisigScriptBalances
 import ltd.mbor.minipay.ui.DecimalNumberField
 import ltd.mbor.minipay.ui.TokenSelect
 import ltd.mbor.minipay.ui.preview.previewBalances
+import ltd.mbor.minipay.ui.preview.previewInvite
 import ltd.mbor.minipay.ui.preview.previewKeys
 import ltd.mbor.minipay.ui.preview.previewTokens
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
@@ -36,14 +38,12 @@ fun FundChannel(
   myAddress: String,
   balances: Map<String, Balance>,
   tokens: Map<String, Token>,
-  activity: MainActivity?
+  activity: MainActivity?,
+  invite: ChannelInvite,
+  setInvite: (ChannelInvite) -> Unit
 ) {
   var myAmount by remember { mutableStateOf(ZERO) }
-  var theirAmount by remember { mutableStateOf(ZERO) }
-  var theirAddress by remember { mutableStateOf("") }
-  var tokenId by remember { mutableStateOf("0x00") }
 
-  var theirKeys by remember { mutableStateOf(Channel.Keys("", "", "")) }
   var timeLock by remember { mutableStateOf(10) }
 
   var fundingTxStatus by remember { mutableStateOf("") }
@@ -75,35 +75,35 @@ fun FundChannel(
     if (fundingTxStatus.isEmpty()) {
       Text("Counterparty trigger key:")
       OutlinedTextField(
-        theirKeys.trigger,
-        { theirKeys = theirKeys.copy(trigger = it) },
+        invite.keys.trigger,
+        { setInvite(invite.copy(keys = invite.keys.copy(trigger = it))) },
         Modifier.fillMaxWidth()
       )
       Text("Counterparty update key:")
       OutlinedTextField(
-        theirKeys.update,
-        { theirKeys = theirKeys.copy(update = it) },
+        invite.keys.update,
+        { setInvite(invite.copy(keys = invite.keys.copy(update = it))) },
         Modifier.fillMaxWidth()
       )
       Text("Counterparty settlement key:")
       OutlinedTextField(
-        theirKeys.settle,
-        { theirKeys = theirKeys.copy(settle = it) },
+        invite.keys.settle,
+        { setInvite(invite.copy(keys = invite.keys.copy(settle = it))) },
         Modifier.fillMaxWidth()
       )
       Text("Counterparty address:")
       OutlinedTextField(
-        theirAddress,
-        { theirAddress = it },
+        invite.address,
+        { setInvite(invite.copy(address = it)) },
         Modifier.fillMaxWidth()
       )
       Text("Counterparty contribution to channel:")
       Row {
-        DecimalNumberField(theirAmount, min = ZERO, modifier = Modifier.fillMaxWidth(0.5f)) {
-          it?.let { theirAmount = it }
+        DecimalNumberField(invite.balance, min = ZERO, modifier = Modifier.fillMaxWidth(0.5f)) {
+          it?.let { setInvite(invite.copy(balance = it)) }
         }
-        TokenSelect(tokenId = tokenId, balances = balances, showBalances = false, tokens = tokens) {
-          tokenId = it
+        TokenSelect(tokenId = invite.tokenId, balances = balances, showBalances = false, tokens = tokens) {
+          setInvite(invite.copy(tokenId = it))
         }
       }
     }
@@ -121,7 +121,7 @@ fun FundChannel(
         channel = it
       }
     }
-    if (listOf(myKeys.trigger, myKeys.update, myKeys.settle, theirKeys.trigger, theirKeys.update, theirKeys.settle, theirAddress).all(String::isNotEmpty)
+    if (listOf(myKeys.trigger, myKeys.update, myKeys.settle, invite.keys.trigger, invite.keys.update, invite.keys.settle, invite.address).all(String::isNotEmpty)
       && fundingTxStatus.isEmpty()
     ) {
       Text("My contribution to channel:")
@@ -129,9 +129,7 @@ fun FundChannel(
         DecimalNumberField(myAmount, min = ZERO, modifier = Modifier.fillMaxWidth(0.5f)) {
           it?.let { myAmount = it }
         }
-        TokenSelect(tokenId, balances, enabled = false) {
-          tokenId = it
-        }
+        TokenSelect(invite.tokenId, balances, enabled = false) {}
       }
       Row {
         Text("Update only time lock (block diff)")
@@ -144,7 +142,7 @@ fun FundChannel(
         onClick = {
           showFundScanner = false
           scope.launch {
-            fundChannel(myKeys, theirKeys, myAddress, theirAddress, myAmount, theirAmount, tokenId, timeLock) { event, newChannel ->
+            fundChannel(myKeys, invite.keys, myAddress, invite.address, myAmount, invite.balance, invite.tokenId, timeLock) { event, newChannel ->
               progressStep++
               when (event) {
                 FUNDING_TX_CREATED -> fundingTxStatus = "Funding transaction created"
@@ -175,19 +173,14 @@ fun FundChannel(
       }
     }
   }
-  if (showFundScanner) FundChannelQR(progressStep == 0) { keys, token, amount, address ->
-    theirKeys = keys
-    tokenId = token
-    theirAmount = amount
-    theirAddress = address
-  }
+  if (showFundScanner) FundChannelQR(progressStep == 0, setInvite)
 }
 
 @Composable @Preview(showBackground = true)
 fun PreviewFundChannel() {
   MiniPayTheme {
     Column {
-      FundChannel(previewKeys, "abc", previewBalances, previewTokens, null)
+      FundChannel(previewKeys, "abc", previewBalances, previewTokens, null, previewInvite, {})
     }
   }
 }

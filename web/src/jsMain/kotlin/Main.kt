@@ -8,6 +8,7 @@ import logic.*
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minipay.common.ChannelService
 import ltd.mbor.minipay.common.model.Channel
+import ltd.mbor.minipay.common.model.ChannelInvite
 import ltd.mbor.minipay.common.model.Prefs
 import ltd.mbor.minipay.common.scope
 import ltd.mbor.minipay.common.storage
@@ -24,6 +25,7 @@ import ui.channels.CreateChannel
 external fun require(module: String): dynamic
 
 var view by mutableStateOf("MiniPay")
+var channelInvite by mutableStateOf(ChannelInvite.EMPTY)
 
 fun main() {
   var prefs by mutableStateOf(Prefs(
@@ -49,7 +51,7 @@ fun main() {
       "MiniPay" -> Welcome { view = it }
       "Receive" -> Receive(balances, tokens)
       "Send" -> Send(balances)
-      "Create Channel" -> CreateChannel(balances, tokens)
+      "Create Channel" -> CreateChannel(balances, tokens, channelInvite) { channelInvite = it }
       "Channels" -> ChannelListing(channels, balances, eltooScriptCoins, ::selectChannel)
       "Channel Events" -> ChannelEvents(events, tokens)
       "Channel Details" -> channel?.let{

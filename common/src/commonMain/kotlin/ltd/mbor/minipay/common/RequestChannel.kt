@@ -5,7 +5,6 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import ltd.mbor.minimak.*
 import ltd.mbor.minipay.common.RequestChannelEvent.*
 import ltd.mbor.minipay.common.model.Channel
-import ltd.mbor.minipay.common.transport.APP
 
 enum class RequestChannelEvent{
   SCRIPTS_DEPLOYED, SIGS_RECEIVED, TRIGGER_TX_SIGNED, SETTLEMENT_TX_SIGNED, CHANNEL_PERSISTED, CHANNEL_PUBLISHED, CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED
@@ -24,7 +23,6 @@ suspend fun ChannelService.requestChannel(
   triggerTx: String,
   settlementTx: String,
   fundingTx: String,
-  maximaContact: Contact?,
   onEvent: (RequestChannelEvent, Channel?) -> Unit = { _, _ -> }
 ): Channel {
   
@@ -62,10 +60,6 @@ suspend fun ChannelService.requestChannel(
   
   val channel = storage.insertChannel(tokenId, myAmount, theirAmount, myKeys, theirKeys, signedTriggerTx, signedSettlementTx, timeLock, multisigScriptAddress, eltooScriptAddress, myAddress, theirAddress)
   onEvent(CHANNEL_PERSISTED, channel)
-
-  if (maximaContact != null) {
-    mds.sendMessage(APP, maximaContact.publicKey, "invite:${channelKey(myKeys, tokenId) + ";" + myAmount.toPlainString() + ";" + myAddress}")
-  }
 
   val (exportedCoins, scripts) = exportedCoinsAndScripts.unzip()
   transport.publish(

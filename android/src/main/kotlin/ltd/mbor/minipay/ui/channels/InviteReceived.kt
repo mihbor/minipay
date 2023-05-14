@@ -4,10 +4,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import ltd.mbor.minipay.channelInvite
+import ltd.mbor.minipay.common.model.ChannelInvite
 import ltd.mbor.minipay.view
 
 @Composable
-fun InviteReceived(dismiss: () -> Unit) {
+fun InviteReceived(invite: ChannelInvite, dismiss: () -> Unit) {
 
   Column {
     Text("Request received to join payment channel")
@@ -17,6 +19,7 @@ fun InviteReceived(dismiss: () -> Unit) {
       Text("Reject")
     }
     Button(onClick = {
+      channelInvite = invite
       view = "Create Channel"
     }) {
       Text("Review")

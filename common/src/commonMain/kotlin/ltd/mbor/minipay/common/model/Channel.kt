@@ -30,3 +30,19 @@ data class Channel(
     val settle: String
   )
 }
+
+data class ChannelInvite(
+  val tokenId: String,
+  val address: String,
+  val balance: BigDecimal,
+  val keys: Channel.Keys
+) {
+  companion object{
+    val EMPTY = ChannelInvite(
+      tokenId = "0x00",
+      address = "",
+      balance = BigDecimal.ZERO,
+      Channel.Keys("", "", "")
+    )
+  }
+}

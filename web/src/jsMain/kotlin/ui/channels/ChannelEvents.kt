@@ -32,7 +32,7 @@ fun ChannelEvents(
           events -= it
         }
 
-        is ChannelInviteReceived -> InviteReceived{
+        is ChannelInviteReceived -> InviteReceived(it.invite) {
           events -= it
         }
       }

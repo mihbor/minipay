@@ -9,7 +9,6 @@ enum class Transport {
 }
 
 interface ChannelEvent {
-  val channelBalance: Pair<BigDecimal, BigDecimal>
 }
 
 interface ChannelPaymentEvent: ChannelEvent {
@@ -17,11 +16,12 @@ interface ChannelPaymentEvent: ChannelEvent {
   val updateTxId: Int
   val settleTxId: Int
   val sequenceNumber: Int
+  val channelBalance: Pair<BigDecimal, BigDecimal>
   val transport: Transport
 }
 
 data class ChannelInviteReceived(
-  override val channelBalance: Pair<BigDecimal, BigDecimal>,
+  val invite: ChannelInvite,
   val transport: Transport
 ): ChannelEvent
 

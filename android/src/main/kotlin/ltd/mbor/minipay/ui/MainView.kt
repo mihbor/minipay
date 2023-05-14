@@ -13,7 +13,9 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Token
 import ltd.mbor.minipay.MainActivity
+import ltd.mbor.minipay.channelInvite
 import ltd.mbor.minipay.common.model.Channel
+import ltd.mbor.minipay.common.model.ChannelInvite
 import ltd.mbor.minipay.common.model.Prefs
 import ltd.mbor.minipay.logic.channels
 import ltd.mbor.minipay.logic.eltooScriptCoins
@@ -44,7 +46,9 @@ fun MainView(
   stopEmitting: () -> Unit,
   activity: MainActivity?,
   view: String,
-  setView: (String) -> Unit
+  setView: (String) -> Unit,
+  channelInvite: ChannelInvite,
+  setChannelInvite: (ChannelInvite) -> Unit
 ) {
   var showNavMenu by remember{ mutableStateOf(false) }
 
@@ -78,7 +82,7 @@ fun MainView(
         "Receive" -> Receive(balances, tokens, address, setAddress, tokenId, setTokenId, amount, setAmount)
         "Send" -> Send(balances, address, setAddress, tokenId, setTokenId, amount, setAmount)
         "Channels" -> ChannelListing(channels, balances, eltooScriptCoins, activity, ::setChannel)
-        "Create Channel" -> CreateChannel(balances, tokens, activity)
+        "Create Channel" -> CreateChannel(balances, tokens, activity, channelInvite, setChannelInvite)
         "Channel Events" -> ChannelEvents(events, tokens, activity)
         "Channel Details" -> channel?.let{
           ChannelDetails(it, balances, activity, ::setChannel)
@@ -91,27 +95,27 @@ fun MainView(
 @Composable @Preview(showBackground = true)
 fun PreviewMainViewSend() {
   MiniPayTheme {
-    MainView(true, previewPrefs, {}, previewBalances, previewTokens, "", {}, ZERO, {}, "0x00", {}, {}, {}, null, "Send", {})
+    MainView(true, previewPrefs, {}, previewBalances, previewTokens, "", {}, ZERO, {}, "0x00", {}, {}, {}, null, "Send", {}, channelInvite) { channelInvite = it }
   }
 }
 
 @Composable @Preview(showBackground = true)
 fun PreviewMainViewReceive() {
   MiniPayTheme {
-    MainView(true, previewPrefs, {}, previewBalances, previewTokens, "address", {}, BigDecimal.ONE, {}, "0x01234567890", {}, {}, {}, null, "Receive", {})
+    MainView(true, previewPrefs, {}, previewBalances, previewTokens, "address", {}, BigDecimal.ONE, {}, "0x01234567890", {}, {}, {}, null, "Receive", {}, channelInvite) { channelInvite = it }
   }
 }
 
 @Composable @Preview(showBackground = true)
 fun PreviewMainViewChannels() {
   MiniPayTheme {
-    MainView(true, previewPrefs, {}, previewBalances, previewTokens, "address", {}, BigDecimal.ONE, {}, "0x01234567890", {}, {}, {}, null, "Channels", {})
+    MainView(true, previewPrefs, {}, previewBalances, previewTokens, "address", {}, BigDecimal.ONE, {}, "0x01234567890", {}, {}, {}, null, "Channels", {}, channelInvite) { channelInvite = it }
   }
 }
 
 @Composable @Preview(showBackground = true)
 fun PreviewMainViewWelcome() {
   MiniPayTheme {
-    MainView(false, previewPrefs, {}, previewBalances, previewTokens, "address", {}, BigDecimal.ONE, {}, "0x01234567890", {}, {}, {}, null, "MiniPay", {})
+    MainView(false, previewPrefs, {}, previewBalances, previewTokens, "address", {}, BigDecimal.ONE, {}, "0x01234567890", {}, {}, {}, null, "MiniPay", {}, channelInvite) { channelInvite = it }
   }
 }

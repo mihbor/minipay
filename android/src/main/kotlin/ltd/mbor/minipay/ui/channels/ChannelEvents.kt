@@ -63,7 +63,7 @@ fun ChannelEvents(
           }
         }
         it is ChannelInviteReceived -> {
-          InviteReceived {
+          InviteReceived(it.invite) {
             events -= it
           }
         }

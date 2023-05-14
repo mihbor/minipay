@@ -38,7 +38,7 @@ suspend fun initMDS(prefs: Prefs) {
   MDS.init(prefs.uid, prefs.host, prefs.port) { msg: JsonElement ->
     when (msg.jsonString("event")) {
       "inited" -> {
-        if (MDS.logging) console.log("Connected to Minima.")
+        if (MDS.logging) log("Connected to Minima.")
         try {
           blockNumber = MDS.getBlockNumber()
           if (blockNumber <= 0) {

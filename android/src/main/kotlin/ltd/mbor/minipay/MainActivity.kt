@@ -32,6 +32,7 @@ import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.getAddress
 import ltd.mbor.minimak.importTx
 import ltd.mbor.minipay.common.ChannelService
+import ltd.mbor.minipay.common.model.ChannelInvite
 import ltd.mbor.minipay.common.model.PaymentRequestReceived
 import ltd.mbor.minipay.common.model.Prefs
 import ltd.mbor.minipay.common.model.Transport.NFC
@@ -55,6 +56,7 @@ val HOST_KEY = stringPreferencesKey("host")
 val PORT_KEY = intPreferencesKey("port")
 
 var view by mutableStateOf("MiniPay")
+var channelInvite by mutableStateOf(ChannelInvite.EMPTY)
 
 class MainActivity : ComponentActivity(), CardReader.DataCallback {
   var isReaderModeOn by mutableStateOf(true)
@@ -125,7 +127,9 @@ class MainActivity : ComponentActivity(), CardReader.DataCallback {
             stopEmitting = ::enableReaderMode,
             activity = this,
             view = view,
-            setView = { view = it }
+            setView = { view = it },
+            channelInvite = channelInvite,
+            setChannelInvite = { channelInvite = it }
           )
         }
       }

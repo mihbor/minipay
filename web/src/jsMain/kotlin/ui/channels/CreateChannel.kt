@@ -4,6 +4,8 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import ltd.mbor.minimak.*
 import ltd.mbor.minipay.common.model.Channel
+import ltd.mbor.minipay.common.model.ChannelInvite
+import ltd.mbor.minipay.common.model.ChannelInvite.Companion.EMPTY
 import ltd.mbor.minipay.common.newKeys
 import org.jetbrains.compose.web.css.LineStyle.Companion.Inset
 import org.jetbrains.compose.web.css.LineStyle.Companion.Outset
@@ -15,9 +17,11 @@ import ui.CopyToClipboard
 fun CreateChannel(
   balances: SnapshotStateMap<String, Balance>,
   tokens: SnapshotStateMap<String, Token>,
+  invite: ChannelInvite,
+  setInvite: (ChannelInvite) -> Unit
 ) {
-  var isInviting by remember { mutableStateOf(true) }
-  var useMaxima by remember { mutableStateOf(false) }
+  var isInviting by remember { mutableStateOf(invite == EMPTY) }
+  var useMaxima by remember { mutableStateOf(invite != EMPTY) }
   var myKeys by remember { mutableStateOf(Channel.Keys("", "", "")) }
   var myAddress by remember { mutableStateOf("") }
   var maximaContact by remember { mutableStateOf<Contact?>(null) }
@@ -59,7 +63,7 @@ fun CreateChannel(
   }){
     Text("Maxima")
   }
-  if (useMaxima) {
+  if (useMaxima && isInviting) {
     val contacts = remember { mutableStateListOf<Contact>() }
     LaunchedEffect("contacts") {
       contacts.addAll(MDS.getContacts())
@@ -98,5 +102,5 @@ fun CreateChannel(
   }
   Br()
   if (isInviting) RequestChannel(myKeys, myAddress, balances, tokens, useMaxima, if(useMaxima) maximaContact else null)
-  else FundChannel(myKeys, myAddress, balances, tokens)
+  else FundChannel(myKeys, myAddress, balances, tokens, invite, setInvite)
 }
