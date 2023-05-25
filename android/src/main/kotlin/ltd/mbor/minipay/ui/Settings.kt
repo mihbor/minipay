@@ -11,7 +11,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import kotlinx.coroutines.launch
+import ltd.mbor.minimak.MDS
+import ltd.mbor.minimak.MaximaInfo
+import ltd.mbor.minimak.getMaximaInfo
+import ltd.mbor.minimak.setMaximaName
 import ltd.mbor.minipay.common.model.Prefs
+import ltd.mbor.minipay.common.scope
+import ltd.mbor.minipay.inited
+import ltd.mbor.minipay.ui.preview.previewMaximaInfo
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
 
 @Composable
@@ -55,6 +63,44 @@ fun Settings(prefs: Prefs, setPrefs: (Prefs) -> Unit) {
       Text("Update")
     }
   }
+  if (inited) {
+    var maximaInfo by remember { mutableStateOf<MaximaInfo?>(null) }
+    LaunchedEffect("maxima") {
+      maximaInfo = MDS.getMaximaInfo()
+    }
+    maximaInfo?.let{ MaximaSettings(it) { maximaInfo = MDS.getMaximaInfo() } }
+  }
+}
+
+@Composable
+fun MaximaSettings(maximaInfo: MaximaInfo, refresh: suspend () -> Unit) {
+  var maximaName by remember { mutableStateOf(maximaInfo.name) }
+    Row{
+      Text("My maxima contact:")
+    }
+    Row{
+      OutlinedTextField(maximaInfo.contact, {}, Modifier.fillMaxWidth(), enabled = false)
+    }
+    Row{
+      CopyToClipboard(maximaInfo.contact)
+    }
+    Row{
+      Text("My maxima name:")
+    }
+    Row{
+      OutlinedTextField(maximaName, { maximaName = it })
+      Button(
+        enabled = maximaName != maximaInfo.name,
+        onClick = {
+          scope.launch {
+            MDS.setMaximaName(maximaName)
+            refresh()
+          }
+        }
+      ) {
+        Text("Update")
+      }
+    }
 }
 
 @Preview(showBackground = true)
@@ -63,6 +109,16 @@ fun PreviewSettings() {
   MiniPayTheme {
     Column {
       Settings(Prefs("", "localhost", 9004)) {}
+    }
+  }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewMaximaSettings() {
+  MiniPayTheme {
+    Column {
+      MaximaSettings(previewMaximaInfo) {}
     }
   }
 }

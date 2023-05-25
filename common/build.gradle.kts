@@ -19,7 +19,7 @@ kotlin {
         
         api("dev.gitlive:firebase-firestore:1.6.2")
 
-        api("ltd.mbor:minimak:0.3.3")
+        api("ltd.mbor:minimak:0.3.4")
       }
     }
     val commonTest by getting {

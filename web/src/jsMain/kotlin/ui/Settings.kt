@@ -2,7 +2,16 @@ package ui
 
 import androidx.compose.runtime.*
 import kotlinx.browser.window
+import kotlinx.coroutines.launch
+import logic.inited
+import ltd.mbor.minimak.MDS
+import ltd.mbor.minimak.MaximaInfo
+import ltd.mbor.minimak.getMaximaInfo
+import ltd.mbor.minimak.setMaximaName
 import ltd.mbor.minipay.common.model.Prefs
+import ltd.mbor.minipay.common.scope
+import org.jetbrains.compose.web.attributes.disabled
+import org.jetbrains.compose.web.css.height
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.width
 import org.jetbrains.compose.web.dom.*
@@ -67,6 +76,49 @@ fun Settings(prefs: Prefs, setPrefs: (Prefs) -> Unit) {
     }
   }) {
     Text("Update")
+  }
+  if (inited) MaximaSettings()
+}
+
+@Composable
+fun MaximaSettings() {
+  var maximaInfo by remember { mutableStateOf<MaximaInfo?>(null) }
+  var maximaName by remember { mutableStateOf("") }
+  LaunchedEffect("maxima") {
+    maximaInfo = MDS.getMaximaInfo().also {
+      maximaName = it.name
+    }
+  }
+  maximaInfo?.let { maxima ->
+    Br()
+    Text("My maxima contact:")
+    Br()
+    TextArea(maxima.contact) {
+      disabled()
+      style {
+        width(500.px)
+        height(80.px)
+      }
+    }
+    CopyToClipboard(maxima.contact)
+    Br()
+    Text("My maxima name:")
+    TextInput(maximaName) {
+      onInput {
+        maximaName = it.value
+      }
+    }
+    Button({
+      if (maximaName == maxima.name) disabled()
+      onClick {
+        scope.launch{
+          MDS.setMaximaName(maximaName)
+          maximaInfo = MDS.getMaximaInfo()
+        }
+      }
+    }) {
+      Text("Update")
+    }
   }
 }
 
