@@ -1,9 +1,6 @@
 package ui
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import ltd.mbor.minimak.Contact
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.getContacts
@@ -16,8 +13,9 @@ fun Contacts() {
   LaunchedEffect("contacts") {
     contacts.addAll(MDS.getContacts())
   }
-
-  Table({
+  AddContact()
+  if (contacts.isEmpty()) Text("No contacts yet")
+  else Table({
     style {
       textAlign("right")
       property("border-collapse", "collapse")
@@ -32,13 +30,15 @@ fun Contacts() {
     }
     Tbody {
       contacts.forEach { contact ->
-        Tr({
-          style { property("border-top", "1px solid black") }
-        }) {
-          Td{ Text(contact.id.toString()) }
-          Td{ Text(contact.extraData.name) }
-          Td{
-            ContactActions(contact)
+        key(contact.id) {
+          Tr({
+            style { property("border-top", "1px solid black") }
+          }) {
+            Td { Text(contact.id.toString()) }
+            Td { Text(contact.extraData.name) }
+            Td {
+              ContactActions(contact)
+            }
           }
         }
       }

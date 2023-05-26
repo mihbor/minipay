@@ -8,10 +8,7 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
-import ltd.mbor.minimak.Balance
-import ltd.mbor.minimak.Coin
-import ltd.mbor.minimak.MaximaInfo
-import ltd.mbor.minimak.Token
+import ltd.mbor.minimak.*
 import ltd.mbor.minipay.common.model.*
 import ltd.mbor.minipay.common.model.Transport.*
 
@@ -141,3 +138,41 @@ val previewMaximaInfo = MaximaInfo(
   contact = "MxG18HGG6FJ038614Y8CW46US6G20810K0070CD00Z83282G60G1DEE5WAUAA01612RB3P6JM44DHTSDNT8G2E8ZFEP4AMHCTG6C5VSWQGHD6GDJ6YQ5031YMMAVR7K2404QSYP1CC6RD7GJT95P81QPCZCKVV5ARBQ21YQ55JY2S93TT8Y6FCWCEK94G5S37MG82ENJZSDS054KRMJTNEZ4NJSBM2D8VB254W9QHSB0A2W00GGJC3B4MSE0F3VRC10608006EBQHYM@172.25.144.1:11001",
   poll = 0
 )
+
+val alice = Contact(
+  id = 1,
+  publicKey = "0x0123",
+  currentAddress = "0x0987",
+  myAddress = "0x0000",
+  lastSeen = 1234,
+  date = "",
+  _chainTip = "0",
+  sameChain = true,
+  extraData = ExtraData(
+    name = "Alice",
+    minimaAddress = "0x0987",
+    _topBlock = "123",
+    _checkBlock = "0",
+    checkHash = "",
+    mls = ""
+  )
+)
+val bob = Contact(
+  id = 2,
+  publicKey = "0x0123",
+  currentAddress = "0x0987",
+  myAddress = "0x0000",
+  lastSeen = 1234,
+  date = "",
+  _chainTip = "0",
+  sameChain = false,
+  extraData = ExtraData(
+    name = "Bob",
+    minimaAddress = "0x0987",
+    _topBlock = "123",
+    _checkBlock = "0",
+    checkHash = "",
+    mls = ""
+  )
+)
+val previewContacts = listOf(alice, bob)
