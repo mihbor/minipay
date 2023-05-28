@@ -104,14 +104,14 @@ fun RequestChannel(
     if (!showQR) Button(
       enabled = amount >= 0 && listOf(myKeys.trigger, myKeys.update, myKeys.settle).none{ it.isBlank() },
       onClick = {
-        showQR = !showQR
+        showQR = maximaContact == null
         requestChannel()
       }
     ) {
       Text("Request channel")
     } else Button(
       onClick = {
-        showQR = !showQR
+        showQR = false
       }
     ) {
       Text("Cancel")

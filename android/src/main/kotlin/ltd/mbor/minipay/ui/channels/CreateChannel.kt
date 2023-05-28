@@ -18,6 +18,7 @@ import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.model.ChannelInvite
 import ltd.mbor.minipay.common.model.ChannelInvite.Companion.EMPTY
 import ltd.mbor.minipay.common.newKeys
+import ltd.mbor.minipay.ui.ContactSelect
 import ltd.mbor.minipay.ui.CopyToClipboard
 import ltd.mbor.minipay.ui.preview.previewBalances
 import ltd.mbor.minipay.ui.preview.previewInvite
@@ -68,9 +69,10 @@ fun CreateChannel(
         Row(verticalAlignment = Alignment.CenterVertically) {
           Text("Transport:  ")
           Text("Firebase")
-          Switch(checked = !isInviting, onCheckedChange = { isInviting = !it })
+          Switch(checked = useMaxima, onCheckedChange = { useMaxima = it })
           Text("Maxima")
         }
+        if (useMaxima && isInviting) ContactSelect(maximaContact) { maximaContact = it }
         Row(verticalAlignment = Alignment.CenterVertically) {
           Text("Invite")
           Switch(checked = !isInviting, onCheckedChange = { isInviting = !it })

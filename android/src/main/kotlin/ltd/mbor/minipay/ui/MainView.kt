@@ -78,15 +78,16 @@ fun MainView(
     Column(Modifier.padding(it)) {
       when (view) {
         "MiniPay" -> Welcome(inited, setView)
-        "Settings" -> Settings(prefs, setPrefs)
         "Receive" -> Receive(balances, tokens, address, setAddress, tokenId, setTokenId, amount, setAmount)
         "Send" -> Send(balances, address, setAddress, tokenId, setTokenId, amount, setAmount)
-        "Channels" -> ChannelListing(channels, balances, eltooScriptCoins, activity, ::setChannel)
         "Create Channel" -> CreateChannel(balances, tokens, activity, channelInvite, setChannelInvite)
+        "Channels" -> ChannelListing(channels, balances, eltooScriptCoins, activity, ::setChannel)
         "Channel Events" -> ChannelEvents(events, tokens, activity)
         "Channel Details" -> channel?.let{
           ChannelDetails(it, balances, activity, ::setChannel)
         }
+        "Contacts" -> Contacts()
+        "Settings" -> Settings(prefs, setPrefs)
       }
     }
   }

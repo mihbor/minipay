@@ -39,6 +39,8 @@ fun Menu(inited: Boolean, showNavMenu: Boolean, setView: (String) -> Unit, start
         MenuItem("Channels", "Channel Listing")
         MenuItem("Channel Events")
         Divider()
+        MenuItem("Contacts")
+        Divider()
         MenuItem("Settings")
       }
     }

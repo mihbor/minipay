@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
@@ -25,50 +26,54 @@ import ltd.mbor.minipay.ui.theme.MiniPayTheme
 @Composable
 fun Settings(prefs: Prefs, setPrefs: (Prefs) -> Unit) {
   var prefsInput by remember { mutableStateOf(prefs) }
-  Row{
-    Text("MiniDApp UID:")
-  }
-  Row{
-    OutlinedTextField(
-      value = prefsInput.uid,
-      modifier = Modifier.fillMaxWidth(),
-      onValueChange = { prefsInput = prefsInput.copy(uid = it) }
-    )
-  }
-  Row(verticalAlignment = Alignment.CenterVertically) {
-    Spacer(Modifier.weight(1f))
-    Text("Host: ")
-    OutlinedTextField(
-      value = prefsInput.host,
-      onValueChange = { prefsInput = prefsInput.copy(host = it) }
-    )
-  }
-  Row(verticalAlignment = Alignment.CenterVertically) {
-    Spacer(Modifier.weight(1f))
-    Text("Port: ")
-    OutlinedTextField(
-      value = prefsInput.port.toString(),
-      onValueChange = {
-        it.toIntOrNull()?.takeIf { it in 1..65535 }?.let {
-          prefsInput = prefsInput.copy(port = it)
+  LazyColumn {
+    item {
+      Row {
+        Text("MiniDApp UID:")
+      }
+      Row {
+        OutlinedTextField(
+          value = prefsInput.uid,
+          modifier = Modifier.fillMaxWidth(),
+          onValueChange = { prefsInput = prefsInput.copy(uid = it) }
+        )
+      }
+      Row(verticalAlignment = Alignment.CenterVertically) {
+        Spacer(Modifier.weight(1f))
+        Text("Host: ")
+        OutlinedTextField(
+          value = prefsInput.host,
+          onValueChange = { prefsInput = prefsInput.copy(host = it) }
+        )
+      }
+      Row(verticalAlignment = Alignment.CenterVertically) {
+        Spacer(Modifier.weight(1f))
+        Text("Port: ")
+        OutlinedTextField(
+          value = prefsInput.port.toString(),
+          onValueChange = {
+            it.toIntOrNull()?.takeIf { it in 1..65535 }?.let {
+              prefsInput = prefsInput.copy(port = it)
+            }
+          }
+        )
+      }
+      Row {
+        Spacer(Modifier.weight(1f))
+        Button(onClick = {
+          setPrefs(prefsInput)
+        }) {
+          Text("Update")
         }
       }
-    )
-  }
-  Row{
-    Spacer(Modifier.weight(1f))
-    Button(onClick = {
-      setPrefs(prefsInput)
-    }){
-      Text("Update")
+      if (inited) {
+        var maximaInfo by remember { mutableStateOf<MaximaInfo?>(null) }
+        LaunchedEffect("maxima") {
+          maximaInfo = MDS.getMaximaInfo()
+        }
+        maximaInfo?.let { MaximaSettings(it) { maximaInfo = MDS.getMaximaInfo() } }
+      }
     }
-  }
-  if (inited) {
-    var maximaInfo by remember { mutableStateOf<MaximaInfo?>(null) }
-    LaunchedEffect("maxima") {
-      maximaInfo = MDS.getMaximaInfo()
-    }
-    maximaInfo?.let{ MaximaSettings(it) { maximaInfo = MDS.getMaximaInfo() } }
   }
 }
 
@@ -88,7 +93,7 @@ fun MaximaSettings(maximaInfo: MaximaInfo, refresh: suspend () -> Unit) {
       Text("My maxima name:")
     }
     Row{
-      OutlinedTextField(maximaName, { maximaName = it })
+      OutlinedTextField(maximaName, { maximaName = it }, Modifier.weight(1f))
       Button(
         enabled = maximaName != maximaInfo.name,
         onClick = {

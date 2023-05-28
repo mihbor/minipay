@@ -10,7 +10,10 @@ import ltd.mbor.minipay.common.newKeys
 import org.jetbrains.compose.web.css.LineStyle.Companion.Inset
 import org.jetbrains.compose.web.css.LineStyle.Companion.Outset
 import org.jetbrains.compose.web.css.border
-import org.jetbrains.compose.web.dom.*
+import org.jetbrains.compose.web.dom.Br
+import org.jetbrains.compose.web.dom.Button
+import org.jetbrains.compose.web.dom.Text
+import ui.ContactSelect
 import ui.CopyToClipboard
 
 @Composable
@@ -48,7 +51,7 @@ fun CreateChannel(
   Br()
   Text("Transport:")
   Button({
-    onClick { useMaxima = !useMaxima }
+    onClick { useMaxima = false }
     style {
       border(style = if (useMaxima) Outset else Inset)
     }
@@ -56,36 +59,17 @@ fun CreateChannel(
     Text("Firebase")
   }
   Button({
-    onClick { useMaxima = !useMaxima }
+    onClick { useMaxima = true }
     style {
       border(style = if (useMaxima) Inset else Outset)
     }
   }){
     Text("Maxima")
   }
-  if (useMaxima && isInviting) {
-    val contacts = remember { mutableStateListOf<Contact>() }
-    LaunchedEffect("contacts") {
-      contacts.addAll(MDS.getContacts())
-    }
-    Select({
-      onChange {
-        maximaContact = it.value?.toIntOrNull()?.let { contactId -> contacts.find { it.id == contactId } }
-      }
-    }) {
-      Option("") {
-        Text("Please select:")
-      }
-      contacts.forEach { contact ->
-        Option(contact.id.toString()) {
-          Text(contact.extraData.name)
-        }
-      }
-    }
-  }
+  if (useMaxima && isInviting) ContactSelect(maximaContact) { maximaContact = it }
   Br()
   Button({
-    onClick { isInviting = !isInviting }
+    onClick { isInviting = true }
     style {
       border(style = if (isInviting) Inset else Outset)
     }
@@ -93,7 +77,7 @@ fun CreateChannel(
     Text("Invite")
   }
   Button({
-    onClick { isInviting = !isInviting }
+    onClick { isInviting = false }
     style {
       border(style = if (isInviting) Outset else Inset)
     }
