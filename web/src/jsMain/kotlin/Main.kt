@@ -1,6 +1,5 @@
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import kotlinx.browser.localStorage
 import kotlinx.browser.window
@@ -28,7 +27,7 @@ external fun require(module: String): dynamic
 
 var view by mutableStateOf("MiniPay")
 var channelInvite by mutableStateOf(ChannelInvite.EMPTY)
-var maximaContact by remember { mutableStateOf<Contact?>(null) }
+var maximaContact by mutableStateOf<Contact?>(null)
 
 fun main() {
   var prefs by mutableStateOf(Prefs(
