@@ -8,7 +8,7 @@ import org.jetbrains.compose.web.css.textAlign
 import org.jetbrains.compose.web.dom.*
 
 @Composable
-fun Contacts() {
+fun Contacts(selectContact: (Contact) -> Unit) {
   val contacts = remember { mutableStateListOf<Contact>() }
   LaunchedEffect("contacts") {
     contacts.addAll(MDS.getContacts())
@@ -37,7 +37,7 @@ fun Contacts() {
             Td { Text(contact.id.toString()) }
             Td { Text(contact.extraData.name) }
             Td {
-              ContactActions(contact)
+              ContactActions(contact, selectContact)
             }
           }
         }

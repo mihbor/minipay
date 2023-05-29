@@ -20,12 +20,12 @@ import ltd.mbor.minipay.ui.preview.previewContacts
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
 
 @Composable
-fun Contacts() {
+fun Contacts(selectContact: (Contact) -> Unit) {
   val contacts = remember { mutableStateListOf<Contact>() }
   LaunchedEffect("contacts") {
     contacts.addAll(MDS.getContacts())
   }
-  ContactsTable(contacts) {
+  ContactsTable(contacts, selectContact) {
     scope.launch {
       val newContacts = MDS.getContacts()
       contacts.clear()
@@ -35,7 +35,7 @@ fun Contacts() {
 }
 
 @Composable
-fun ContactsTable(contacts: List<Contact>, refresh: () -> Unit) {
+fun ContactsTable(contacts: List<Contact>, selectContact: (Contact) -> Unit, refresh: () -> Unit) {
   Column{
     Row {
       RefreshContacts(refresh)
@@ -56,7 +56,7 @@ fun ContactsTable(contacts: List<Contact>, refresh: () -> Unit) {
           Text(contact.id.toString(), Modifier.width(30.dp))
           Text(contact.extraData.name)
           Spacer(Modifier.weight(1f))
-          ContactActions(contact)
+          ContactActions(contact, selectContact)
         }
         Divider()
       }
@@ -74,13 +74,13 @@ fun RefreshContacts(refresh: () -> Unit) {
 @Composable @Preview
 fun PreviewContactsTable() {
   MiniPayTheme {
-    ContactsTable(previewContacts) {}
+    ContactsTable(previewContacts, {}) {}
   }
 }
 
 @Composable @Preview
 fun PreviewEmptyContactsTable() {
   MiniPayTheme {
-    ContactsTable(emptyList()) {}
+    ContactsTable(emptyList(), {}) {}
   }
 }

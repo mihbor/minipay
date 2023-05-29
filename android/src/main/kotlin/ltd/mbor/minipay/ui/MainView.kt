@@ -11,6 +11,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import ltd.mbor.minimak.Balance
+import ltd.mbor.minimak.Contact
 import ltd.mbor.minimak.Token
 import ltd.mbor.minipay.MainActivity
 import ltd.mbor.minipay.channelInvite
@@ -51,6 +52,7 @@ fun MainView(
   setChannelInvite: (ChannelInvite) -> Unit
 ) {
   var showNavMenu by remember{ mutableStateOf(false) }
+  var maximaContact by remember { mutableStateOf<Contact?>(null) }
 
   fun toggleNavMenu() {
     showNavMenu = !showNavMenu
@@ -80,13 +82,16 @@ fun MainView(
         "MiniPay" -> Welcome(inited, setView)
         "Receive" -> Receive(balances, tokens, address, setAddress, tokenId, setTokenId, amount, setAmount)
         "Send" -> Send(balances, address, setAddress, tokenId, setTokenId, amount, setAmount)
-        "Create Channel" -> CreateChannel(balances, tokens, activity, channelInvite, setChannelInvite)
+        "Create Channel" -> CreateChannel(balances, tokens, activity, channelInvite, setChannelInvite, maximaContact) { maximaContact = it }
         "Channels" -> ChannelListing(channels, balances, eltooScriptCoins, activity, ::setChannel)
         "Channel Events" -> ChannelEvents(events, tokens, activity)
         "Channel Details" -> channel?.let{
           ChannelDetails(it, balances, activity, ::setChannel)
         }
-        "Contacts" -> Contacts()
+        "Contacts" -> Contacts {
+          maximaContact = it
+          setView("Create Channel")
+        }
         "Settings" -> Settings(prefs, setPrefs)
       }
     }

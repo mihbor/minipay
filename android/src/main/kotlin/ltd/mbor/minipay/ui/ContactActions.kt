@@ -6,8 +6,8 @@ import androidx.compose.runtime.Composable
 import ltd.mbor.minimak.Contact
 
 @Composable
-fun ContactActions(contact: Contact) {
-  Button({}) {
-    Text("Create Channel")
+fun ContactActions(contact: Contact, selectContact: (Contact) -> Unit) {
+  Button({ selectContact(contact) }, enabled = contact.sameChain) {
+    Text(if (contact.sameChain) "Create Channel" else "Not same chain!")
   }
 }

@@ -20,6 +20,7 @@ import ltd.mbor.minipay.common.model.ChannelInvite.Companion.EMPTY
 import ltd.mbor.minipay.common.newKeys
 import ltd.mbor.minipay.ui.ContactSelect
 import ltd.mbor.minipay.ui.CopyToClipboard
+import ltd.mbor.minipay.ui.preview.alice
 import ltd.mbor.minipay.ui.preview.previewBalances
 import ltd.mbor.minipay.ui.preview.previewInvite
 import ltd.mbor.minipay.ui.preview.previewTokens
@@ -31,14 +32,15 @@ fun CreateChannel(
   tokens: Map<String, Token>,
   activity: MainActivity?,
   invite: ChannelInvite,
-  setInvite: (ChannelInvite) -> Unit
+  setInvite: (ChannelInvite) -> Unit,
+  maximaContact: Contact?,
+  selectContact: (Contact?) -> Unit
 ) {
 
   var isInviting by remember { mutableStateOf(invite == EMPTY) }
-  var useMaxima by remember { mutableStateOf(invite != EMPTY) }
+  var useMaxima by remember { mutableStateOf(maximaContact != null || invite != EMPTY) }
   var myKeys by remember { mutableStateOf(Channel.Keys("", "", "")) }
   var myAddress by remember { mutableStateOf("") }
-  var maximaContact by remember { mutableStateOf<Contact?>(null) }
 
   LaunchedEffect("createChannel") {
     MDS.newKeys(3).apply {
@@ -72,7 +74,7 @@ fun CreateChannel(
           Switch(checked = useMaxima, onCheckedChange = { useMaxima = it })
           Text("Maxima")
         }
-        if (useMaxima && isInviting) ContactSelect(maximaContact) { maximaContact = it }
+        if (useMaxima && isInviting) ContactSelect(maximaContact, selectContact)
         Row(verticalAlignment = Alignment.CenterVertically) {
           Text("Invite")
           Switch(checked = !isInviting, onCheckedChange = { isInviting = !it })
@@ -88,6 +90,20 @@ fun CreateChannel(
 @Composable @Preview
 fun PreviewCreateChannel() {
   MiniPayTheme {
-    CreateChannel(previewBalances, previewTokens, null, previewInvite, {})
+    CreateChannel(previewBalances, previewTokens, null, EMPTY, {}, null, {})
+  }
+}
+
+@Composable @Preview
+fun PreviewCreateChannelWithInvite() {
+  MiniPayTheme {
+    CreateChannel(previewBalances, previewTokens, null, previewInvite, {}, null, {})
+  }
+}
+
+@Composable @Preview
+fun PreviewCreateChannelWithContact() {
+  MiniPayTheme {
+    CreateChannel(previewBalances, previewTokens, null, EMPTY, {}, alice, {})
   }
 }

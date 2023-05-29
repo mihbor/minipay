@@ -114,9 +114,9 @@ val previewTokens = listOf(
 
 val previewInvite = ChannelInvite(
   tokenId = "0x00",
-  address = "",
-  balance = ZERO,
-  keys = Channel.Keys("", "", "")
+  address = "0x123",
+  balance = ONE,
+  keys = Channel.Keys("0x111", "0x222", "0x333")
 )
 
 val previewEvents = mutableListOf(

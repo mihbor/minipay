@@ -1,10 +1,12 @@
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import kotlinx.browser.localStorage
 import kotlinx.browser.window
 import kotlinx.coroutines.launch
 import logic.*
+import ltd.mbor.minimak.Contact
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minipay.common.ChannelService
 import ltd.mbor.minipay.common.model.Channel
@@ -26,6 +28,7 @@ external fun require(module: String): dynamic
 
 var view by mutableStateOf("MiniPay")
 var channelInvite by mutableStateOf(ChannelInvite.EMPTY)
+var maximaContact by remember { mutableStateOf<Contact?>(null) }
 
 fun main() {
   var prefs by mutableStateOf(Prefs(
@@ -51,13 +54,16 @@ fun main() {
       "MiniPay" -> Welcome { view = it }
       "Receive" -> Receive(balances, tokens)
       "Send" -> Send(balances)
-      "Create Channel" -> CreateChannel(balances, tokens, channelInvite) { channelInvite = it }
+      "Create Channel" -> CreateChannel(balances, tokens, channelInvite, { channelInvite = it }, maximaContact) { maximaContact = it }
       "Channels" -> ChannelListing(channels, balances, eltooScriptCoins, ::selectChannel)
       "Channel Events" -> ChannelEvents(events, tokens)
       "Channel Details" -> channel?.let{
         ChannelDetails(it, balances, ::selectChannel) {}
       }
-      "Contacts" -> Contacts()
+      "Contacts" -> Contacts {
+        maximaContact = it
+        view = "Create Channel"
+      }
       "Settings" -> Settings(prefs) {
         prefs = it
         scope.launch {

@@ -21,13 +21,14 @@ fun CreateChannel(
   balances: SnapshotStateMap<String, Balance>,
   tokens: SnapshotStateMap<String, Token>,
   invite: ChannelInvite,
-  setInvite: (ChannelInvite) -> Unit
+  setInvite: (ChannelInvite) -> Unit,
+  maximaContact: Contact?,
+  selectContact: (Contact?) -> Unit
 ) {
   var isInviting by remember { mutableStateOf(invite == EMPTY) }
-  var useMaxima by remember { mutableStateOf(invite != EMPTY) }
+  var useMaxima by remember { mutableStateOf(maximaContact != null || invite != EMPTY) }
   var myKeys by remember { mutableStateOf(Channel.Keys("", "", "")) }
   var myAddress by remember { mutableStateOf("") }
-  var maximaContact by remember { mutableStateOf<Contact?>(null) }
 
   LaunchedEffect("createChannel") {
     MDS.newKeys(3).apply {
@@ -66,7 +67,7 @@ fun CreateChannel(
   }){
     Text("Maxima")
   }
-  if (useMaxima && isInviting) ContactSelect(maximaContact) { maximaContact = it }
+  if (useMaxima && isInviting) ContactSelect(maximaContact, selectContact)
   Br()
   Button({
     onClick { isInviting = true }
