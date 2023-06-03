@@ -77,7 +77,7 @@ suspend fun ChannelService.requestChannel(
   val (exportedCoins, scripts) = exportedCoinsAndScripts.unzip()
   transport.publish(
     channelKey(theirKeys, tokenId),
-    (listOf(signedTriggerTx, signedSettlementTx, signedFundingTx) + exportedCoins + scripts).joinToString(";")
+    (listOf("CONFIRMED", signedTriggerTx, signedSettlementTx, signedFundingTx) + exportedCoins + scripts).joinToString(";")
   )
   onEvent(CHANNEL_PUBLISHED, channel)
   

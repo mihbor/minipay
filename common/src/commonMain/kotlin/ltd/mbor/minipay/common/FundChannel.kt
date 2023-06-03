@@ -6,6 +6,7 @@ import ltd.mbor.minimak.inputsWithChange
 import ltd.mbor.minipay.common.FundChannelEvent.*
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.model.ChannelInvite
+import ltd.mbor.minipay.common.transport.MaximaTransport
 
 enum class FundChannelEvent{
   SCRIPTS_DEPLOYED,
@@ -60,10 +61,10 @@ suspend fun ChannelService.prepareFundChannel(
   )
 
   event(CHANNEL_PERSISTED, channel)
-  
+  val transport = invite.maximaPK?.let(::MaximaTransport) ?: this.transport
   transport.publish(
     channelKey(invite.keys, invite.tokenId),
-    listOf(timeLock, myKeys.trigger, myKeys.update, myKeys.settle, signedTriggerTx, signedSettlementTx, unsignedFundingTx, myAddress).joinToString(";")
+    listOf("ACCEPTED", timeLock, myKeys.trigger, myKeys.update, myKeys.settle, signedTriggerTx, signedSettlementTx, unsignedFundingTx, myAddress).joinToString(";")
   )
   event(CHANNEL_PUBLISHED, channel)
   

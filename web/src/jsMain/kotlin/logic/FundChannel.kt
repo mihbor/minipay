@@ -27,19 +27,21 @@ suspend fun fundChannel(
   channel.subscribe({ it, isAck ->
     onEvent(if (isAck) CHANNEL_UPDATED_ACKED else CHANNEL_UPDATED, it)
   }) {
-    val (triggerTx, settlementTx, fundingTx) = it
-    val (theirInputCoins, theirInputScripts) = it.subList(3, it.size)
-      .let{ it.takeUnless { it.isEmpty() }?.chunked(it.size/2) ?: listOf(emptyList(), emptyList()) }
-    onEvent(SIGS_RECEIVED, channel)
-    try {
-      with(channelService) {
-        channel.commitFund(triggerTx, settlementTx, fundingTx, theirInputCoins, theirInputScripts, "auto").also {
-          onEvent(CHANNEL_FUNDED, it)
-          channels.put(it)
+    if (it.first() == "CONFIRMED") {
+      val (_, triggerTx, settlementTx, fundingTx) = it
+      val (theirInputCoins, theirInputScripts) = it.subList(3, it.size)
+        .let { it.takeUnless { it.isEmpty() }?.chunked(it.size / 2) ?: listOf(emptyList(), emptyList()) }
+      onEvent(SIGS_RECEIVED, channel)
+      try {
+        with(channelService) {
+          channel.commitFund(triggerTx, settlementTx, fundingTx, theirInputCoins, theirInputScripts, "auto").also {
+            onEvent(CHANNEL_FUNDED, it)
+            channels.put(it)
+          }
         }
+      } catch (e: MinimaException) {
+        window.alert("MinimaException: ${e.message}")
       }
-    } catch (e: MinimaException) {
-      window.alert("MinimaException: ${e.message}")
     }
   }
 }

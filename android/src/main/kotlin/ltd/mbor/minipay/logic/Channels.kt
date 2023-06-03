@@ -57,12 +57,12 @@ fun Channel.subscribe(
 
 fun String.subscribe(
   onUpdate: (Channel, Boolean) -> Unit = { _, _ -> },
-  onUnhandled: suspend (List<String>) -> Uuid
+  onUnhandled: suspend (List<String>) -> Uuid?
 ) {
   var channelId: Uuid? = null
   with(channelService) {
     subscribe({ checkNotNull(channelId) }, onUpdate, {
-      channelId = onUnhandled(it)
+      onUnhandled(it)?.let{ channelId = it }
     }, {
       view = "Channel Events"
     })
