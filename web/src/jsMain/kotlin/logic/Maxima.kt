@@ -13,14 +13,15 @@ import view
 
 fun onMessage(msg: JsonElement) {
   val data = msg.jsonString("data").substring(2).decodeHex().decodeToString()
-  val sender = msg.jsonString("from")
-  log("received: $data from $sender")
+  val senderPK = msg.jsonString("from")
+  log("received: $data from $senderPK")
   val (command, payload) = data.split(":")
   payload.split(";").apply {
     when (command) {
       "invite" -> {
         events += ChannelInviteReceived(
-          ChannelInvite(keys = Channel.Keys(this[0], this[1], this[2]), tokenId = this[3], balance = this[4].toBigDecimal(), address = this[5]), MAXIMA
+          ChannelInvite(keys = Channel.Keys(this[0], this[1], this[2]), tokenId = this[3], balance = this[4].toBigDecimal(), address = this[5], maximaPK = senderPK),
+          transport = MAXIMA
         )
         view = "Channel Events"
       }

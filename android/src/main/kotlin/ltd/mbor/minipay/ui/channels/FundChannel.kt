@@ -50,7 +50,7 @@ fun FundChannel(
   var triggerTxStatus by remember { mutableStateOf("") }
   var settlementTxStatus by remember { mutableStateOf("") }
 
-  var showFundScanner by remember { mutableStateOf(true) }
+  var showFundScannerOption by remember { mutableStateOf(true) }
   var progressStep: Int by remember { mutableStateOf(0) }
 
   var channel by remember { mutableStateOf<Channel?>(null) }
@@ -138,11 +138,11 @@ fun FundChannel(
         }
       }
       Button(
-        enabled = showFundScanner,
+        enabled = showFundScannerOption,
         onClick = {
-          showFundScanner = false
+          showFundScannerOption = false
           scope.launch {
-            fundChannel(myKeys, invite.keys, myAddress, invite.address, myAmount, invite.balance, invite.tokenId, timeLock) { event, newChannel ->
+            fundChannel(invite, myKeys, myAddress,  myAmount, timeLock) { event, newChannel ->
               progressStep++
               when (event) {
                 FUNDING_TX_CREATED -> fundingTxStatus = "Funding transaction created"
@@ -173,7 +173,7 @@ fun FundChannel(
       }
     }
   }
-  if (showFundScanner) FundChannelQR(progressStep == 0, setInvite)
+  if (showFundScannerOption) FundChannelQR(progressStep == 0, setInvite)
 }
 
 @Composable @Preview(showBackground = true)

@@ -14,11 +14,11 @@ import org.jetbrains.compose.web.dom.Video
 import org.w3c.dom.HTMLVideoElement
 
 @Composable
-fun FundChannelQR(noProgressYet: Boolean, onScan: (ChannelInvite) -> Unit) {
+fun FundChannelQR(show: Boolean, onScan: (ChannelInvite) -> Unit) {
   var showFundScanner by remember { mutableStateOf(false) }
   var qrScanner: QrScanner? by remember { mutableStateOf(null) }
 
-  if (noProgressYet) {
+  if (show) {
     Br()
     Button({
       onClick {
@@ -46,7 +46,7 @@ fun FundChannelQR(noProgressYet: Boolean, onScan: (ChannelInvite) -> Unit) {
       qrScanner = QrScanner(video) { result ->
         console.log("decoded qr code: $result")
         result.split(';').apply {
-          onScan(ChannelInvite(keys = Channel.Keys(this[0], this[1], this[2]), tokenId = this[3], balance = this[4].toBigDecimal(), address = this[5]))
+          onScan(ChannelInvite(keys = Channel.Keys(this[0], this[1], this[2]), tokenId = this[3], balance = this[4].toBigDecimal(), address = this[5], maximaPK = null))
         }
         qrScanner!!.stop()
         showFundScanner = false

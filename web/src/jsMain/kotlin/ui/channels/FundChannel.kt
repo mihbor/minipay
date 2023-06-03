@@ -37,7 +37,7 @@ fun FundChannel(
   var triggerTxStatus by remember { mutableStateOf("") }
   var settlementTxStatus by remember { mutableStateOf("") }
 
-  var showFundScanner by remember { mutableStateOf(false) }
+  var showFundScannerOption by remember { mutableStateOf(true) }
   var progressStep: Int by remember { mutableStateOf(0) }
   
   var channel by remember { mutableStateOf<Channel?>(null) }
@@ -55,7 +55,7 @@ fun FundChannel(
     if (
       window.confirm("Fund new channel with ${myAmount.toPlainString()} ${balances[invite.tokenId]?.tokenName ?: "[${invite.tokenId}]"}?")
     ) scope.launch {
-      logic.fundChannel(myKeys, invite.keys, myAddress, invite.address, myAmount, invite.balance, invite.tokenId, timeLock) { event, newChannel ->
+      logic.fundChannel(invite, myKeys, myAddress, myAmount, timeLock) { event, newChannel ->
         progressStep++
         when (event) {
           FundChannelEvent.FUNDING_TX_CREATED -> fundingTxStatus = "Funding transaction created"
@@ -86,7 +86,7 @@ fun FundChannel(
   }
 
   fun fundChannelQR() {
-    showFundScanner = false
+    showFundScannerOption = false
 //    qrScanner?.stop()
     fundChannel()
   }
@@ -191,5 +191,5 @@ fun FundChannel(
       Text("Initiate!")
     }
   }
-  if (showFundScanner) FundChannelQR(progressStep == 0, setInvite)
+  if (showFundScannerOption) FundChannelQR(progressStep == 0, setInvite)
 }

@@ -17,7 +17,8 @@ data class Channel(
   val timeLock: Int,
   val eltooAddress: String,
   val multiSigAddress: String,
-  val updatedAt: Instant
+  val updatedAt: Instant,
+  val maximaPK: String? = null
 ) {
   data class Side(
     val address: String,
@@ -35,14 +36,16 @@ data class ChannelInvite(
   val tokenId: String,
   val address: String,
   val balance: BigDecimal,
-  val keys: Channel.Keys
+  val keys: Channel.Keys,
+  val maximaPK: String?
 ) {
   companion object{
     val EMPTY = ChannelInvite(
       tokenId = "0x00",
       address = "",
       balance = BigDecimal.ZERO,
-      Channel.Keys("", "", "")
+      Channel.Keys("", "", ""),
+      null
     )
   }
 }

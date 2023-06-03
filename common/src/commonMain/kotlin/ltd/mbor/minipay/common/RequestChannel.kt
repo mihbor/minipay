@@ -58,7 +58,20 @@ suspend fun ChannelService.requestChannel(
     Pair(mds.signAndExportTx(fundingTxId, "auto"), emptyList())
   }
   
-  val channel = storage.insertChannel(tokenId, myAmount, theirAmount, myKeys, theirKeys, signedTriggerTx, signedSettlementTx, timeLock, multisigScriptAddress, eltooScriptAddress, myAddress, theirAddress)
+  val channel = storage.insertChannel(
+    tokenId = tokenId,
+    myBalance = myAmount,
+    theirBalance = theirAmount,
+    myKeys = myKeys,
+    theirKeys = theirKeys,
+    signedTriggerTx = signedTriggerTx,
+    signedSettlementTx = signedSettlementTx,
+    timeLock = timeLock,
+    multisigScriptAddress = multisigScriptAddress,
+    eltooScriptAddress = eltooScriptAddress,
+    myAddress = myAddress,
+    theirAddress = theirAddress
+  )
   onEvent(CHANNEL_PERSISTED, channel)
 
   val (exportedCoins, scripts) = exportedCoinsAndScripts.unzip()

@@ -56,7 +56,6 @@ suspend fun initMDS(prefs: Prefs) {
         channels.forEach(Channel::subscribe)
         inited = true
       }
-
       "NEWBALANCE" -> {
         val newBalances = MDS.getBalances(confirmations = 0).associateBy { it.tokenId }
         balances.clear()
@@ -65,7 +64,6 @@ suspend fun initMDS(prefs: Prefs) {
         tokens.clear()
         tokens.putAll(newTokens)
       }
-
       "NEWBLOCK" -> {
         blockNumber = msg.jsonObject["data"]!!.jsonObject["txpow"]!!.jsonObject["header"]!!.jsonString("block").toInt()
         if (multisigScriptAddress.isNotEmpty()) {
@@ -84,7 +82,6 @@ suspend fun initMDS(prefs: Prefs) {
           }
         }
       }
-
       "MAXIMA" -> if (msg.jsonObject["data"]!!.jsonString("application") == APP) {
         onMessage(msg.jsonObject["data"]!!)
       }

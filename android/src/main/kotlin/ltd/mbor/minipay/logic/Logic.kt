@@ -16,6 +16,7 @@ import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.storage.createDB
 import ltd.mbor.minipay.common.storage.getChannels
 import ltd.mbor.minipay.common.storage.setChannelOpen
+import ltd.mbor.minipay.common.transport.APP
 import ltd.mbor.minipay.logic.*
 
 var inited by mutableStateOf(false)
@@ -72,6 +73,9 @@ suspend fun initMDS(uid: String, host: String, port: Int, context: Context) {
         if (eltooScriptAddress.isNotEmpty()) {
           eltooScriptCoins.put(eltooScriptAddress, MDS.getCoins(address = eltooScriptAddress))
         }
+      }
+      "MAXIMA" -> if (msg.jsonObject["data"]!!.jsonString("application") == APP) {
+        onMessage(msg.jsonObject["data"]!!)
       }
     }
   }

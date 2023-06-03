@@ -8,23 +8,21 @@ import ltd.mbor.minimak.newScript
 import ltd.mbor.minipay.common.*
 import ltd.mbor.minipay.common.FundChannelEvent.*
 import ltd.mbor.minipay.common.model.Channel
+import ltd.mbor.minipay.common.model.ChannelInvite
 
 suspend fun fundChannel(
+  invite: ChannelInvite,
   myKeys: Channel.Keys,
-  theirKeys: Channel.Keys,
   myAddress: String,
-  theirAddress: String,
   myAmount: BigDecimal,
-  theirAmount: BigDecimal,
-  tokenId: String,
   timeLock: Int,
   onEvent: (FundChannelEvent, Channel?) -> Unit = { _, _ -> }
 ) {
-  multisigScriptAddress = MDS.newScript(triggerScript(myKeys.trigger, theirKeys.trigger)).address
-  eltooScriptAddress = MDS.newScript(eltooScript(timeLock, myKeys.update, theirKeys.update, myKeys.settle, theirKeys.settle)).address
+  multisigScriptAddress = MDS.newScript(triggerScript(myKeys.trigger, invite.keys.trigger)).address
+  eltooScriptAddress = MDS.newScript(eltooScript(timeLock, myKeys.update, invite.keys.update, myKeys.settle, invite.keys.settle)).address
   onEvent(SCRIPTS_DEPLOYED, null)
 
-  val channel = channelService.prepareFundChannel(myKeys, theirKeys, myAddress, theirAddress, myAmount, theirAmount, tokenId, timeLock, multisigScriptAddress, eltooScriptAddress, onEvent)
+  val channel = channelService.prepareFundChannel(invite, myKeys, myAddress, myAmount, timeLock, multisigScriptAddress, eltooScriptAddress, onEvent)
   
   channel.subscribe({ it, isAck ->
     onEvent(if (isAck) CHANNEL_UPDATED_ACKED else CHANNEL_UPDATED, it)

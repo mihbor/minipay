@@ -15,7 +15,7 @@ fun InviteReceived(invite: ChannelInvite, dismiss: () -> Unit) {
       dismiss()
     }
   }) {
-    Text("Reject")
+    Text("Dismiss")
   }
   Button({
     onClick {

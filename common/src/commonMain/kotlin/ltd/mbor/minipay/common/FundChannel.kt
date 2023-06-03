@@ -5,43 +5,64 @@ import ltd.mbor.minimak.exportTx
 import ltd.mbor.minimak.inputsWithChange
 import ltd.mbor.minipay.common.FundChannelEvent.*
 import ltd.mbor.minipay.common.model.Channel
+import ltd.mbor.minipay.common.model.ChannelInvite
 
 enum class FundChannelEvent{
-  SCRIPTS_DEPLOYED, FUNDING_TX_CREATED, TRIGGER_TX_SIGNED, SETTLEMENT_TX_SIGNED, CHANNEL_PERSISTED, CHANNEL_PUBLISHED, SIGS_RECEIVED, CHANNEL_FUNDED, CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED
+  SCRIPTS_DEPLOYED,
+  FUNDING_TX_CREATED,
+  TRIGGER_TX_SIGNED,
+  SETTLEMENT_TX_SIGNED,
+  CHANNEL_PERSISTED,
+  CHANNEL_PUBLISHED,
+  SIGS_RECEIVED,
+  CHANNEL_FUNDED,
+  CHANNEL_UPDATED,
+  CHANNEL_UPDATED_ACKED
 }
 
 suspend fun ChannelService.prepareFundChannel(
+  invite: ChannelInvite,
   myKeys: Channel.Keys,
-  theirKeys: Channel.Keys,
   myAddress: String,
-  theirAddress: String,
   myAmount: BigDecimal,
-  theirAmount: BigDecimal,
-  tokenId: String,
   timeLock: Int,
   multisigScriptAddress: String,
   eltooScriptAddress: String,
   event: (FundChannelEvent, Channel?) -> Unit = { _, _ -> }
 ): Channel {
-  val fundingTxId = fundingTx(myAmount, tokenId)
+  val fundingTxId = fundingTx(myAmount, invite.tokenId)
   event(FUNDING_TX_CREATED, null)
   
-  val triggerTxId = mds.signFloatingTx(myKeys.trigger, multisigScriptAddress, tokenId, mapOf(99 to "0"), myAmount+theirAmount to eltooScriptAddress)
+  val triggerTxId = mds.signFloatingTx(myKeys.trigger, multisigScriptAddress, invite.tokenId, mapOf(99 to "0"), myAmount+invite.balance to eltooScriptAddress)
   event(TRIGGER_TX_SIGNED, null)
   
-  val settlementTxId = mds.signFloatingTx(myKeys.settle, eltooScriptAddress, tokenId, mapOf(99 to "0"), myAmount to myAddress, theirAmount to theirAddress)
+  val settlementTxId = mds.signFloatingTx(myKeys.settle, eltooScriptAddress, invite.tokenId, mapOf(99 to "0"), myAmount to myAddress, invite.balance to invite.address)
   event(SETTLEMENT_TX_SIGNED, null)
   
   val signedTriggerTx = mds.exportTx(triggerTxId)
   val signedSettlementTx = mds.exportTx(settlementTxId)
   val unsignedFundingTx = mds.exportTx(fundingTxId)
   
-  val channel = storage.insertChannel(tokenId, myAmount, theirAmount, myKeys, theirKeys, signedTriggerTx, signedSettlementTx, timeLock, multisigScriptAddress, eltooScriptAddress, myAddress, theirAddress)
+  val channel = storage.insertChannel(
+    tokenId = invite.tokenId,
+    myBalance = myAmount,
+    theirBalance = invite.balance,
+    myKeys = myKeys,
+    theirKeys = invite.keys,
+    signedTriggerTx = signedTriggerTx,
+    signedSettlementTx = signedSettlementTx,
+    timeLock = timeLock,
+    multisigScriptAddress = multisigScriptAddress,
+    eltooScriptAddress = eltooScriptAddress,
+    myAddress = myAddress,
+    theirAddress = invite.address,
+    maximaPK = invite.maximaPK
+  )
 
   event(CHANNEL_PERSISTED, channel)
   
   transport.publish(
-    channelKey(theirKeys, tokenId),
+    channelKey(invite.keys, invite.tokenId),
     listOf(timeLock, myKeys.trigger, myKeys.update, myKeys.settle, signedTriggerTx, signedSettlementTx, unsignedFundingTx, myAddress).joinToString(";")
   )
   event(CHANNEL_PUBLISHED, channel)

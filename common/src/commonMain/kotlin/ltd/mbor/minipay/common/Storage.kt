@@ -11,6 +11,7 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.jsonString
+import ltd.mbor.minimak.jsonStringOrNull
 import ltd.mbor.minipay.common.model.Channel
 
 interface ChannelStorage{
@@ -45,12 +46,14 @@ interface ChannelStorage{
     multisigScriptAddress: String,
     eltooScriptAddress: String,
     myAddress: String,
-    theirAddress: String
+    theirAddress: String,
+    maximaPK: String? = null
   ): Channel
 }
 
 object storage: ChannelStorage {
   override suspend fun createDB() {
+    MDS.sql("ALTER TABLE IF EXISTS ADD COLUMN IF NOT EXISTS maxima_pk VARCHAR;")
     MDS.sql(//"""DROP TABLE IF EXISTS channel;
       """CREATE TABLE IF NOT EXISTS channel(
         id UUID NOT NULL PRIMARY KEY,
@@ -74,7 +77,8 @@ object storage: ChannelStorage {
         update_tx VARCHAR,
         settle_tx VARCHAR,
         multisig_address VARCHAR,
-        eltoo_address VARCHAR
+        eltoo_address VARCHAR,
+        maxima_pk VARCHAR
       );""".trimMargin()
     )
   }
@@ -129,7 +133,8 @@ object storage: ChannelStorage {
     multisigScriptAddress: String,
     eltooScriptAddress: String,
     myAddress: String,
-    theirAddress: String
+    theirAddress: String,
+    maximaPK: String?
   ): Channel {
     val id = uuid4()
     val now = Clock.System.now()
@@ -140,14 +145,14 @@ object storage: ChannelStorage {
         other_trigger_key, other_update_key, other_settle_key,
         trigger_tx, update_tx, settle_tx, time_lock,
         multisig_address, eltoo_address, my_address, other_address,
-        created_at, updated_at
+        created_at, updated_at, maxima_pk
       ) VALUES ('$id',
         'OFFERED', 0, '$tokenId', ${myBalance.toPlainString()}, ${theirBalance.toPlainString()},
         '${myKeys.trigger}', '${myKeys.update}', '${myKeys.settle}',
         '${theirKeys.trigger}', '${theirKeys.update}', '${theirKeys.settle}',
         '$signedTriggerTx', '', '$signedSettlementTx', $timeLock,
         '$multisigScriptAddress', '$eltooScriptAddress', '$myAddress', '$theirAddress',
-        ${now.toEpochMilliseconds()}, ${now.toEpochMilliseconds()}
+        ${now.toEpochMilliseconds()}, ${now.toEpochMilliseconds()}, ${maximaPK?.let { "'$it'" } ?: "NULL" }
       );
     """
     )
@@ -171,7 +176,8 @@ object storage: ChannelStorage {
       timeLock = timeLock,
       eltooAddress = eltooScriptAddress,
       multiSigAddress = multisigScriptAddress,
-      updatedAt = Clock.System.now()
+      updatedAt = Clock.System.now(),
+      maximaPK = maximaPK
     )
   }
 
@@ -255,6 +261,7 @@ private fun JsonObject.toChannel() = Channel(
   timeLock = jsonString("TIME_LOCK").toInt(),
   eltooAddress = jsonString("ELTOO_ADDRESS"),
   multiSigAddress = jsonString("MULTISIG_ADDRESS"),
+  maximaPK = jsonStringOrNull("MAXIMA_PK"),
   updatedAt = Instant.fromEpochMilliseconds(jsonString("UPDATED_AT").toLong())
 )
 
