@@ -36,7 +36,7 @@ class RequestChannelTest {
     val channelService = ChannelService(mds, storage, transport, mutableListOf(), mutableListOf())
     val events = mutableListOf<Pair<RequestChannelEvent, Channel?>>()
     //when
-    val channel = channelService.requestChannel(keys, keys, "my address", "their address", ONE, "0x00", 10, "multisig", "eltoo", "triggerTx", "settlementTx", "fundingTx") { event, channel -> events.add(event to channel) }
+    val channel = channelService.requestedChannelAccepted(keys, keys2, "my address", "their address", ONE, "0x00", 10, "multisig", "eltoo", "triggerTx", "settlementTx", "fundingTx", null) { event, channel -> events.add(event to channel) }
     //then
     assertNotNull(channel)
     assertEquals(1, transport.published.size)
@@ -49,7 +49,7 @@ class RequestChannelTest {
     assertEquals(keys, channel.my.keys)
     assertEquals(ONE, channel.my.balance)
     assertEquals("their address", channel.their.address)
-    assertEquals(keys, channel.their.keys)
+    assertEquals(keys2, channel.their.keys)
     assertEquals(50.toBigDecimal(), channel.their.balance)
     assertEquals(10, channel.timeLock)
     assertEquals("multisig", channel.multiSigAddress)

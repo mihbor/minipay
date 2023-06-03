@@ -60,7 +60,8 @@ object SimulatedStorage: ChannelStorage {
     multisigScriptAddress: String,
     eltooScriptAddress: String,
     myAddress: String,
-    theirAddress: String
+    theirAddress: String,
+    maximaPK: String?
   ) = Channel(
     id = insertChannelId,
     sequenceNumber = 0,
@@ -73,6 +74,7 @@ object SimulatedStorage: ChannelStorage {
     timeLock = timeLock,
     eltooAddress = eltooScriptAddress,
     multiSigAddress = multisigScriptAddress,
-    updatedAt = Clock.System.now()
+    updatedAt = Clock.System.now(),
+    maximaPK = maximaPK
   )
 }

@@ -2,6 +2,7 @@ package ui.channels
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.key
 import kotlinx.coroutines.launch
 import logic.channelService
 import ltd.mbor.minimak.Balance
@@ -50,25 +51,27 @@ fun ChannelListing(
     }
     Tbody {
       channels.forEach { channel ->
-        Tr({
-          style { property("border-top", "1px solid black") }
-        }) {
-          Td{ Text(channel.id.toString()) }
-          Td{ Text(channel.status) }
-          Td{ Text(channel.sequenceNumber.toString()) }
-          Td{
-            TokenIcon(channel.tokenId, balances)
-            Text(balances[channel.tokenId]?.tokenName ?: if(channel.tokenId == "0x00") "Minima" else "[${channel.tokenId.take(8)}...]")
-          }
-          Td{ Text(channel.my.balance.toPlainString()) }
-          Td{ Text(channel.their.balance.toPlainString()) }
-          Td({
-            style {
-              textAlign("left")
-            }
+        key(channel.id) {
+          Tr({
+            style { property("border-top", "1px solid black") }
           }) {
-            ChannelActions(channel, balances, selectChannel) {
-              scope.launch { channelService.reloadChannels(eltooScriptCoins) }
+            Td { Text(channel.id.toString()) }
+            Td { Text(channel.status) }
+            Td { Text(channel.sequenceNumber.toString()) }
+            Td {
+              TokenIcon(channel.tokenId, balances)
+              Text(balances[channel.tokenId]?.tokenName ?: if (channel.tokenId == "0x00") "Minima" else "[${channel.tokenId.take(8)}...]")
+            }
+            Td { Text(channel.my.balance.toPlainString()) }
+            Td { Text(channel.their.balance.toPlainString()) }
+            Td({
+              style {
+                textAlign("left")
+              }
+            }) {
+              ChannelActions(channel, balances, selectChannel) {
+                scope.launch { channelService.reloadChannels(eltooScriptCoins) }
+              }
             }
           }
         }

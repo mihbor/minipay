@@ -6,6 +6,7 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.TEN
 import kotlinx.coroutines.test.runTest
 import ltd.mbor.minipay.common.FundChannelEvent.*
 import ltd.mbor.minipay.common.model.Channel
+import ltd.mbor.minipay.common.model.ChannelInvite
 import ltd.mbor.minipay.common.resources.fundChannel
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -30,13 +31,13 @@ class FundChannelTest {
     val channelService = ChannelService(mds, storage, transport, mutableListOf(), mutableListOf())
     val events = mutableListOf<Pair<FundChannelEvent, Channel?>>()
     //when
-    val channel = channelService.prepareFundChannel(keys, keys, "my address", "their address", ONE, TEN, "0x00", 10, "multisig", "eltoo") { event, channel -> events.add(event to channel) }
+    val channel = channelService.prepareFundChannel(ChannelInvite("0x00", "their address", TEN, keys, null), keys2, "my address", ONE, 10, "multisig", "eltoo") { event, channel -> events.add(event to channel) }
     //then
     assertNotNull(channel)
     assertEquals(1, transport.published.size)
     assertEquals(channelKey(keys, "0x00"), transport.published.first().first)
     assertEquals(
-      listOf(10, keys.trigger, keys.update, keys.settle, fundChannel.exportTriggerTxData, fundChannel.exportSettleTxData, fundChannel.exportFundingTxData, "my address").joinToString(";"),
+      listOf("ACCEPTED", 10, keys2.trigger, keys2.update, keys2.settle, fundChannel.exportTriggerTxData, fundChannel.exportSettleTxData, fundChannel.exportFundingTxData, "my address").joinToString(";"),
       transport.published.first().second
     )
     val eventsIterator = events.iterator()
@@ -46,7 +47,7 @@ class FundChannelTest {
     assertEquals(CHANNEL_PERSISTED to channel, eventsIterator.next())
     assertEquals(CHANNEL_PUBLISHED to channel, eventsIterator.next())
     assertEquals("my address", channel.my.address)
-    assertEquals(keys, channel.my.keys)
+    assertEquals(keys2, channel.my.keys)
     assertEquals(ONE, channel.my.balance)
     assertEquals("their address", channel.their.address)
     assertEquals(keys, channel.their.keys)

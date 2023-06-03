@@ -1,5 +1,8 @@
 package ltd.mbor.minipay.logic
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.newScript
@@ -7,6 +10,9 @@ import ltd.mbor.minipay.common.*
 import ltd.mbor.minipay.common.FundChannelEvent.*
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.model.ChannelInvite
+
+var channelToFund by mutableStateOf<Channel?>(null)
+var onFundChannel: (FundChannelEvent, Channel?) -> Unit = { _, _ -> }
 
 suspend fun fundChannel(
   invite: ChannelInvite,
@@ -21,21 +27,29 @@ suspend fun fundChannel(
   onEvent(SCRIPTS_DEPLOYED, null)
 
   val channel = channelService.prepareFundChannel(invite, myKeys, myAddress, myAmount, timeLock, multisigScriptAddress, eltooScriptAddress, onEvent)
+  onFundChannel = onEvent
 
-  channel.subscribe({ it, isAck ->
+  if (invite.maximaPK == null) channel.subscribe({ it, isAck ->
     onEvent(if (isAck) CHANNEL_UPDATED_ACKED else CHANNEL_UPDATED, it)
   }) {
-    if (it.first() == "CONFIRMED") {
-      val (_, triggerTx, settlementTx, fundingTx) = it
-      val (theirInputCoins, theirInputScripts) = it.subList(3, it.size)
-        .let { it.takeUnless { it.isEmpty() }?.chunked(it.size / 2) ?: listOf(emptyList(), emptyList()) }
-      onEvent(SIGS_RECEIVED, channel)
-      with(channelService) {
-        channel.commitFund(triggerTx, settlementTx, fundingTx, theirInputCoins, theirInputScripts).also {
-          onEvent(CHANNEL_FUNDED, it)
-          channels.put(it)
-        }
-      }
+    if (it.first() == "CONFIRMED") it.drop(1).let {
+      fundChannelConfirmed(it, channel)
+    }
+  }
+}
+
+suspend fun fundChannelConfirmed(
+  it: List<String>,
+  channel: Channel,
+) {
+  val (triggerTx, settlementTx, fundingTx) = it
+  val (theirInputCoins, theirInputScripts) = it.drop(3)
+    .let { it.takeUnless { it.isEmpty() }?.chunked(it.size / 2) ?: listOf(emptyList(), emptyList()) }
+  onFundChannel(SIGS_RECEIVED, channel)
+  with(channelService) {
+    channel.commitFund(triggerTx, settlementTx, fundingTx, theirInputCoins, theirInputScripts).also {
+      onFundChannel(CHANNEL_FUNDED, it)
+      channels.put(it)
     }
   }
 }

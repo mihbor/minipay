@@ -53,7 +53,7 @@ interface ChannelStorage{
 
 object storage: ChannelStorage {
   override suspend fun createDB() {
-    MDS.sql("ALTER TABLE IF EXISTS ADD COLUMN IF NOT EXISTS maxima_pk VARCHAR;")
+    MDS.sql("ALTER TABLE IF EXISTS channel ADD COLUMN IF NOT EXISTS maxima_pk VARCHAR;")
     MDS.sql(//"""DROP TABLE IF EXISTS channel;
       """CREATE TABLE IF NOT EXISTS channel(
         id UUID NOT NULL PRIMARY KEY,

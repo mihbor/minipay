@@ -9,6 +9,7 @@ import ltd.mbor.minimak.Transaction
 import ltd.mbor.minipay.common.model.Channel
 
 val keys = Channel.Keys("trigger", "update", "settle")
+val keys2 = Channel.Keys("trigger2", "update2", "settle2")
 val offeredChannel = (Channel(uuid4(), 0, "OFFERED", "0x00", Channel.Side("abc", BigDecimal.ONE, keys), Channel.Side("def", BigDecimal.ONE, keys), "triggerTx", "updateTx", "settleTx", 10, "eltoo", "multisig", Clock.System.now()))
 val openChannel = (Channel(uuid4(), 0, "OPEN", "0x00", Channel.Side("abc", BigDecimal.ONE, keys), Channel.Side("def", BigDecimal.ONE, keys), "triggerTx", "updateTx", "settleTx", 10, "eltoo", "multisig", Clock.System.now()))
 val triggeredChannel = (Channel(uuid4(), 0, "TRIGGERED", "0x00", Channel.Side("abc", BigDecimal.ONE, keys), Channel.Side("def", BigDecimal.ONE, keys), "triggerTx", "updateTx", "settleTx", 10, "eltoo", "multisig", Clock.System.now()))

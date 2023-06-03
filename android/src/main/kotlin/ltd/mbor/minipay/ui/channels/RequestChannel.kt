@@ -19,6 +19,7 @@ import ltd.mbor.minipay.MainActivity
 import ltd.mbor.minipay.common.RequestChannelEvent.*
 import ltd.mbor.minipay.common.channelKey
 import ltd.mbor.minipay.common.model.Channel
+import ltd.mbor.minipay.common.model.ChannelInvite
 import ltd.mbor.minipay.logic.eltooScriptAddress
 import ltd.mbor.minipay.logic.multisigScriptAddress
 import ltd.mbor.minipay.logic.multisigScriptBalances
@@ -63,7 +64,7 @@ fun RequestChannel(
   fun requestChannel() {
     bitmap = encodeAsBitmap(channelKey(myKeys, tokenId) + ";" + amount.toPlainString() + ";" + myAddress).asImageBitmap()
 
-    requestChannel(myAddress, myKeys, tokenId, amount, maximaContact) { event, newChannel ->
+    requestChannel(ChannelInvite(tokenId, myAddress, amount, myKeys, null), maximaContact) { event, newChannel ->
       progressStep++
       when (event) {
         SIGS_RECEIVED -> {

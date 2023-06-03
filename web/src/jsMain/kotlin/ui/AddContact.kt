@@ -14,7 +14,7 @@ import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.dom.TextArea
 
 @Composable
-fun AddContact() {
+fun AddContact(refreshContacts: suspend () -> Unit) {
   var show by remember { mutableStateOf(false) }
   var contact by remember { mutableStateOf("") }
   var inProgress by remember { mutableStateOf(false) }
@@ -38,6 +38,7 @@ fun AddContact() {
           }
           inProgress = false
           show = false
+          refreshContacts()
         }
       }
     }) {

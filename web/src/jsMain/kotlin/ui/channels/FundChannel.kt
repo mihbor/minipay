@@ -5,6 +5,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.browser.window
 import kotlinx.coroutines.launch
+import logic.channelToFund
 import logic.eltooScriptAddress
 import logic.multisigScriptAddress
 import logic.multisigScriptBalances
@@ -40,8 +41,6 @@ fun FundChannel(
   var showFundScannerOption by remember { mutableStateOf(true) }
   var progressStep: Int by remember { mutableStateOf(0) }
   
-  var channel by remember { mutableStateOf<Channel?>(null) }
-  
   LaunchedEffect("fundChannel") {
     fundingTxStatus = ""
     triggerTxStatus = ""
@@ -64,8 +63,8 @@ fun FundChannel(
           FundChannelEvent.CHANNEL_PUBLISHED -> {
             triggerTxStatus += ", sent"
             settlementTxStatus += ", sent"
-            channel = newChannel
-            console.log("channelId", channel!!.id)
+            channelToFund = newChannel
+            console.log("channelId: ${channelToFund!!.id}")
           }
 
           FundChannelEvent.SIGS_RECEIVED -> {
@@ -75,7 +74,7 @@ fun FundChannel(
 
           FundChannelEvent.CHANNEL_FUNDED -> fundingTxStatus += ", signed and posted!"
           FundChannelEvent.CHANNEL_UPDATED, FundChannelEvent.CHANNEL_UPDATED_ACKED -> {
-            channel = newChannel
+            channelToFund = newChannel
             progressStep--
           }
 
@@ -164,9 +163,9 @@ fun FundChannel(
     Text(it)
     Br()
   }
-  channel?.let {
+  channelToFund?.let {
     ChannelView(it, balances) {
-      channel = it
+      channelToFund = it
     }
   }
   if (listOf(myKeys.trigger, myKeys.update, myKeys.settle, invite.keys.trigger, invite.keys.update, invite.keys.settle, invite.address).all(String::isNotEmpty)

@@ -15,6 +15,7 @@ import ltd.mbor.minimak.Token
 import ltd.mbor.minipay.common.RequestChannelEvent.*
 import ltd.mbor.minipay.common.channelKey
 import ltd.mbor.minipay.common.model.Channel
+import ltd.mbor.minipay.common.model.ChannelInvite
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.display
@@ -59,7 +60,7 @@ fun RequestChannel(
   }
 
   fun requestChannel(maximaContact: Contact?) {
-    requestChannel(myAddress, myKeys, tokenId, myAmount, maximaContact) { event, newChannel ->
+    requestChannel(ChannelInvite(tokenId, myAddress, myAmount, myKeys, null), maximaContact) { event, newChannel ->
       progressStep++
       when (event) {
         SIGS_RECEIVED -> {
@@ -114,6 +115,7 @@ fun RequestChannel(
     Br()
   }
   if (triggerTxStatus.isEmpty()) {
+    Text("My contribution:")
     DecimalNumberInput(myAmount, min = BigDecimal.ZERO, disabled = showQR) {
       it?.let { myAmount = it }
     }

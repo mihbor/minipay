@@ -20,10 +20,7 @@ import ltd.mbor.minipay.common.FundChannelEvent.*
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.model.ChannelInvite
 import ltd.mbor.minipay.common.scope
-import ltd.mbor.minipay.logic.eltooScriptAddress
-import ltd.mbor.minipay.logic.fundChannel
-import ltd.mbor.minipay.logic.multisigScriptAddress
-import ltd.mbor.minipay.logic.multisigScriptBalances
+import ltd.mbor.minipay.logic.*
 import ltd.mbor.minipay.ui.DecimalNumberField
 import ltd.mbor.minipay.ui.TokenSelect
 import ltd.mbor.minipay.ui.preview.previewBalances
@@ -52,8 +49,6 @@ fun FundChannel(
 
   var showFundScannerOption by remember { mutableStateOf(true) }
   var progressStep: Int by remember { mutableStateOf(0) }
-
-  var channel by remember { mutableStateOf<Channel?>(null) }
 
   LaunchedEffect("fundChannel") {
     fundingTxStatus = ""
@@ -116,9 +111,9 @@ fun FundChannel(
     settlementTxStatus.takeUnless { it.isEmpty() }?.let {
       Text(it)
     }
-    channel?.let {
+    channelToFund?.let {
       ChannelView(it, balances, activity) {
-        channel = it
+        channelToFund = it
       }
     }
     if (listOf(myKeys.trigger, myKeys.update, myKeys.settle, invite.keys.trigger, invite.keys.update, invite.keys.settle, invite.address).all(String::isNotEmpty)
@@ -151,8 +146,8 @@ fun FundChannel(
                 CHANNEL_PUBLISHED -> {
                   triggerTxStatus += ", sent"
                   settlementTxStatus += ", sent"
-                  channel = newChannel
-                  log("channelId: ${channel!!.id}")
+                  channelToFund = newChannel
+                  log("channelId: ${channelToFund!!.id}")
                 }
                 SIGS_RECEIVED -> {
                   triggerTxStatus += " and received back."
@@ -160,7 +155,7 @@ fun FundChannel(
                 }
                 CHANNEL_FUNDED -> fundingTxStatus += ", signed and posted!"
                 CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED -> {
-                  channel = newChannel
+                  channelToFund = newChannel
                   progressStep--
                 }
                 else -> {}

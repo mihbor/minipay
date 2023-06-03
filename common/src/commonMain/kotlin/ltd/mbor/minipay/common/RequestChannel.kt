@@ -5,12 +5,13 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import ltd.mbor.minimak.*
 import ltd.mbor.minipay.common.RequestChannelEvent.*
 import ltd.mbor.minipay.common.model.Channel
+import ltd.mbor.minipay.common.transport.MaximaTransport
 
 enum class RequestChannelEvent{
   SCRIPTS_DEPLOYED, SIGS_RECEIVED, TRIGGER_TX_SIGNED, SETTLEMENT_TX_SIGNED, CHANNEL_PERSISTED, CHANNEL_PUBLISHED, CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED
 }
 
-suspend fun ChannelService.requestChannel(
+suspend fun ChannelService.requestedChannelAccepted(
   myKeys: Channel.Keys,
   theirKeys: Channel.Keys,
   myAddress: String,
@@ -23,6 +24,7 @@ suspend fun ChannelService.requestChannel(
   triggerTx: String,
   settlementTx: String,
   fundingTx: String,
+  maximaPK: String?,
   onEvent: (RequestChannelEvent, Channel?) -> Unit = { _, _ -> }
 ): Channel {
   
@@ -75,6 +77,7 @@ suspend fun ChannelService.requestChannel(
   onEvent(CHANNEL_PERSISTED, channel)
 
   val (exportedCoins, scripts) = exportedCoinsAndScripts.unzip()
+  val transport = maximaPK?.let(::MaximaTransport) ?: this.transport
   transport.publish(
     channelKey(theirKeys, tokenId),
     (listOf("CONFIRMED", signedTriggerTx, signedSettlementTx, signedFundingTx) + exportedCoins + scripts).joinToString(";")

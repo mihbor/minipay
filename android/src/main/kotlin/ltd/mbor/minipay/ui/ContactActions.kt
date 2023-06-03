@@ -7,7 +7,8 @@ import ltd.mbor.minimak.Contact
 
 @Composable
 fun ContactActions(contact: Contact, selectContact: (Contact) -> Unit) {
-  Button({ selectContact(contact) }, enabled = contact.sameChain) {
-    Text(if (contact.sameChain) "Create Channel" else "Not same chain!")
+  Button({ selectContact(contact) }/*, enabled = contact.sameChain*/) {
+    Text("Create Channel")
+//    Text(if (contact.sameChain) "Create Channel" else "Not same chain!")
   }
 }

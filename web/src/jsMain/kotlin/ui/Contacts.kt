@@ -1,19 +1,37 @@
 package ui
 
 import androidx.compose.runtime.*
+import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Contact
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.getContacts
+import ltd.mbor.minipay.common.scope
 import org.jetbrains.compose.web.css.textAlign
 import org.jetbrains.compose.web.dom.*
 
 @Composable
 fun Contacts(selectContact: (Contact) -> Unit) {
   val contacts = remember { mutableStateListOf<Contact>() }
+  suspend fun refreshContacts() {
+    val newContacts = MDS.getContacts()
+    contacts.clear()
+    contacts.addAll(newContacts)
+  }
   LaunchedEffect("contacts") {
     contacts.addAll(MDS.getContacts())
   }
-  AddContact()
+  Button({
+    onClick {
+      scope.launch {
+        refreshContacts()
+      }
+    }
+  }) {
+    Text("Refresh")
+  }
+  AddContact{
+    refreshContacts()
+  }
   if (contacts.isEmpty()) Text("No contacts yet")
   else Table({
     style {
