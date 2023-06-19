@@ -27,6 +27,10 @@ object SimulatedStorage: ChannelStorage {
   override suspend fun getChannel(eltooAddress: String): Channel? {
     TODO("Not yet implemented")
   }
+
+  override suspend fun getChannel(myKeys: Channel.Keys): Channel? {
+    TODO("Not yet implemented")
+  }
   
   override suspend fun getChannels(status: String?): List<Channel> {
     return channels

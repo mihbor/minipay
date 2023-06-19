@@ -49,7 +49,7 @@ suspend fun initMDS(uid: String, host: String, port: Int, context: Context) {
         tokens.putAll(MDS.getTokens().associateBy { it.tokenId })
         createDB()
         channels.addAll(getChannels(status = "OPEN"))
-        channels.forEach(Channel::subscribe)
+        channels.filter { it.maximaPK == null }.forEach(Channel::subscribe)
         inited = true
       }
       "NEWBALANCE" -> {

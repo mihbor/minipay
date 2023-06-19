@@ -72,7 +72,8 @@ suspend fun ChannelService.requestedChannelAccepted(
     multisigScriptAddress = multisigScriptAddress,
     eltooScriptAddress = eltooScriptAddress,
     myAddress = myAddress,
-    theirAddress = theirAddress
+    theirAddress = theirAddress,
+    maximaPK = maximaPK
   )
   onEvent(CHANNEL_PERSISTED, channel)
 

@@ -11,6 +11,7 @@ import ltd.mbor.minipay.common.model.ChannelInvite
 import ltd.mbor.minipay.common.model.ChannelInviteReceived
 import ltd.mbor.minipay.common.model.Transport.MAXIMA
 import ltd.mbor.minipay.common.scope
+import ltd.mbor.minipay.common.storage
 import ltd.mbor.minipay.view
 
 fun onMessage(msg: JsonElement) {
@@ -22,9 +23,9 @@ fun onMessage(msg: JsonElement) {
     val event = it.first()
     log("event: $event")
     it.drop(1).apply {
+      val (trigger, update, settle, token) = key.split(";")
       when (event) {
         "INVITE" -> {
-          val (trigger, update, settle, token) = key.split(";")
           events += ChannelInviteReceived(
             ChannelInvite(keys = Channel.Keys(trigger, update, settle), tokenId = token, balance = this[0].toBigDecimal(), address = this[1], maximaPK = senderPK),
             transport = MAXIMA
@@ -36,6 +37,13 @@ fun onMessage(msg: JsonElement) {
         }
         "CONFIRMED" -> scope.launch{
           fundChannelConfirmed(this@apply, checkNotNull(channelToFund))
+        }
+        else -> scope.launch {
+          storage.getChannel(Channel.Keys(trigger, update, settle))?.let { channel ->
+            channelService.processMessage(payload, { _, _ -> }, {}, { channel.id }) {
+              view = "Channel Events"
+            }
+          } ?: log("Channel not found for keys: $key")
         }
       }
     }

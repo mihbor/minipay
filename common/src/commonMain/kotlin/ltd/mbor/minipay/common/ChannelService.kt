@@ -11,6 +11,7 @@ import ltd.mbor.minimak.*
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.model.ChannelEvent
 import ltd.mbor.minipay.common.model.PaymentRequestSent
+import ltd.mbor.minipay.common.transport.MaximaTransport
 import ltd.mbor.minipay.common.transport.Transport
 
 class ChannelService(
@@ -67,6 +68,7 @@ class ChannelService(
     val signedUpdateTx = if (isAck) updateTxText else mds.signAndExportTx(updateTxnId, my.keys.update)
     val signedSettleTx = if (isAck) settleTxText else mds.signAndExportTx(settleTxnId, my.keys.settle)
     if (!isAck) {
+      val transport = maximaPK?.let(::MaximaTransport) ?: transport
       transport.publish(channelKey(their.keys, tokenId), listOf("TXN_UPDATE_ACK", signedUpdateTx, signedSettleTx).joinToString(";"))
     }
     return update(signedUpdateTx, signedSettleTx, settleTx, onSuccess)
@@ -143,6 +145,7 @@ class ChannelService(
     }
     val settleTxn = MDS.cmd(settletxncreator)!!.jsonArray.last().jsonObject["response"]!!.jsonString("data")
 
+    val transport = maximaPK?.let(::MaximaTransport) ?: transport
     transport.publish(
       channelKey(their.keys, tokenId),
       listOf(
@@ -161,6 +164,7 @@ class ChannelService(
 
   suspend fun Channel.acceptRequestAndReply(updateTxId: Int, settleTxId: Int, sequenceNumber: Int, channelBalance: Pair<BigDecimal, BigDecimal>) {
     acceptRequest(updateTxId, settleTxId, sequenceNumber, channelBalance).let { (updateTx, settleTx) ->
+      val transport = maximaPK?.let(::MaximaTransport) ?: transport
       transport.publish(channelKey(their.keys, tokenId), "TXN_UPDATE_ACK;$updateTx;$settleTx")
     }
   }

@@ -17,6 +17,7 @@ import ltd.mbor.minipay.common.model.Channel
 interface ChannelStorage{
   suspend fun createDB()
   suspend fun getChannel(eltooAddress: String): Channel?
+  suspend fun getChannel(myKeys: Channel.Keys): Channel?
   suspend fun getChannels(status: String? = null): List<Channel>
   suspend fun updateChannelStatus(channel: Channel, status: String): Channel
   suspend fun setChannelOpen(multisigAddress: String)
@@ -87,6 +88,13 @@ object storage: ChannelStorage {
     val sql = MDS.sql("SELECT * FROM channel WHERE eltoo_address = '$eltooAddress';")?.jsonObject
     val rows = sql?.get("rows")?.jsonArray ?: emptyList()
     
+    return rows.firstOrNull()?.jsonObject?.toChannel()
+  }
+
+  override suspend fun getChannel(myKeys: Channel.Keys): Channel? {
+    val sql = MDS.sql("SELECT * FROM channel WHERE my_trigger_key = '${myKeys.trigger}' AND my_update_key = '${myKeys.update}' AND my_settle_key = '${myKeys.settle}';")?.jsonObject
+    val rows = sql?.get("rows")?.jsonArray ?: emptyList()
+
     return rows.firstOrNull()?.jsonObject?.toChannel()
   }
 
