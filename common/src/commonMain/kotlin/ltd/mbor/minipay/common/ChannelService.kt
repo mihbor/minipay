@@ -181,7 +181,7 @@ class ChannelService(
     mds.importTx(newTxId(), settlementTx)
     val fundingTxId = newTxId()
     mds.importTx(fundingTxId, fundingTx).outputs
-    theirInputCoins.forEach { mds.importCoin(it) }
+    theirInputCoins.forEach { mds.importCoinSafely(it) }
     theirInputScripts.forEach { mds.newScript(it) }
 
     val txncreator = buildString {
@@ -196,6 +196,16 @@ class ChannelService(
     return if (status.toBoolean()) {
       storage.updateChannel(this, triggerTx, settlementTx)
     } else this
+  }
+}
+
+suspend fun MdsApi.importCoinSafely(data: String) {
+  try {
+    importCoin(data)
+  } catch (e: MinimaException) {
+    if (e.message == "Attempting to add relevant coin we already have") {
+      log("Attempted to add relevant coin we already have. Ignoring.")
+    } else throw e
   }
 }
 

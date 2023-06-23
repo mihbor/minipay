@@ -12,7 +12,7 @@ plugins {
 
 allprojects {
   group = "ltd.mbor"
-  version = "0.3.2-SNAPSHOT"
+  version = "0.3.2"
 
   repositories {
     google()
@@ -48,6 +48,6 @@ tasks.register<Copy>("copyApk") {
 }
 
 tasks.register("minidappWithApk") {
-  dependsOn("copyApk", ":web:minidappDistribution")
+  dependsOn("copyApk", ":web:minidappDistribution", ":common:test")
 }
 
