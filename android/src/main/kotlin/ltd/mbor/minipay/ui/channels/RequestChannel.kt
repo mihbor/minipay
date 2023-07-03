@@ -20,10 +20,7 @@ import ltd.mbor.minipay.common.RequestChannelEvent.*
 import ltd.mbor.minipay.common.channelKey
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.model.ChannelInvite
-import ltd.mbor.minipay.logic.eltooScriptAddress
-import ltd.mbor.minipay.logic.multisigScriptAddress
-import ltd.mbor.minipay.logic.multisigScriptBalances
-import ltd.mbor.minipay.logic.requestChannel
+import ltd.mbor.minipay.logic.*
 import ltd.mbor.minipay.ui.DecimalNumberField
 import ltd.mbor.minipay.ui.TokenSelect
 import ltd.mbor.minipay.ui.encodeAsBitmap
@@ -51,8 +48,6 @@ fun RequestChannel(
 
   var progressStep: Int by remember { mutableStateOf(0) }
 
-  var channel by remember { mutableStateOf<Channel?>(null) }
-
   LaunchedEffect("requestChannel") {
     triggerTxStatus = ""
     settlementTxStatus = ""
@@ -75,12 +70,12 @@ fun RequestChannel(
         TRIGGER_TX_SIGNED -> triggerTxStatus += " and signed"
         SETTLEMENT_TX_SIGNED -> settlementTxStatus += " and signed"
         CHANNEL_PUBLISHED -> {
-          channel = newChannel
+          requestedChannel = newChannel
           triggerTxStatus += " and sent back."
           settlementTxStatus += " and sent back."
         }
         CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED -> {
-          channel = newChannel
+          requestedChannel = newChannel
           progressStep--
         }
         else -> {}
@@ -124,9 +119,9 @@ fun RequestChannel(
   settlementTxStatus.takeUnless { it.isEmpty() }?.let {
     Text(it)
   }
-  channel?.let {
-    ChannelView(it, balances, activity) {
-      channel = it
+  requestedChannel?.let { channel ->
+    ChannelView(channels.find{ it.id == channel.id } ?: channel, balances, activity) {
+      requestedChannel = it
     }
   }
   if(showQR) bitmap?.let{ Image(bitmap = it, contentDescription = "Scan this QR code") }

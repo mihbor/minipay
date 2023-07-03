@@ -1,5 +1,8 @@
 package ltd.mbor.minipay.logic
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.benasher44.uuid.Uuid
 import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Contact
@@ -12,6 +15,7 @@ import ltd.mbor.minipay.common.model.ChannelInvite
 import ltd.mbor.minipay.common.transport.MaximaTransport
 
 var inviteSent: ChannelInvite? = null
+var requestedChannel by mutableStateOf<Channel?>(null)
 var onChannelRequested: (RequestChannelEvent, Channel?) -> Unit = { _, _ -> }
 
 fun requestChannel(

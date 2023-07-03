@@ -51,7 +51,7 @@ fun FundChannel(
     if (
       window.confirm("Fund new channel with ${myAmount.toPlainString()} ${balances[invite.tokenId]?.tokenName ?: "[${invite.tokenId}]"}?")
     ) scope.launch {
-      logic.fundChannel(invite, myKeys, myAddress, myAmount, timeLock) { event, newChannel ->
+      fundChannel(invite, myKeys, myAddress, myAmount, timeLock) { event, newChannel ->
         progressStep++
         when (event) {
           FundChannelEvent.FUNDING_TX_CREATED -> fundingTxStatus = "Funding transaction created"
@@ -160,8 +160,8 @@ fun FundChannel(
     Text(it)
     Br()
   }
-  channelToFund?.let {
-    ChannelView(it, balances) {
+  channelToFund?.let { channel ->
+    ChannelView(channels.find{ it.id == channel.id } ?: channel, balances) {
       channelToFund = it
     }
   }
@@ -179,7 +179,7 @@ fun FundChannel(
       }
     }
     Button({
-      if (myAmount <= 0) disabled()
+      if (myAmount < ZERO || myAmount + invite.balance <= ZERO) disabled()
       onClick {
         fundChannelQR()
       }

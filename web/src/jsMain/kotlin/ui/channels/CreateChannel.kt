@@ -2,6 +2,8 @@ package ui.channels
 
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateMap
+import logic.channelToFund
+import logic.requestedChannel
 import ltd.mbor.minimak.*
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.model.ChannelInvite
@@ -27,10 +29,18 @@ fun CreateChannel(
 ) {
   var isInviting by remember { mutableStateOf(invite == EMPTY) }
   var useMaxima by remember { mutableStateOf(maximaContact != null || invite != EMPTY) }
-  var myKeys by remember { mutableStateOf(Channel.Keys("", "", "")) }
+  var myKeys by remember { mutableStateOf(Channel.Keys.EMPTY) }
   var myAddress by remember { mutableStateOf("") }
 
   LaunchedEffect("createChannel") {
+    channelToFund?.takeIf { it.status == "OPEN" }?.let {
+      log("channelToFund is open")
+      channelToFund = null
+    }
+    requestedChannel?.takeIf { it.status == "OPEN" }?.let {
+      log("requestedChannel is open")
+      requestedChannel = null
+    }
     MDS.newKeys(3).apply {
       myKeys = Channel.Keys(this[0], this[1], this[2])
     }

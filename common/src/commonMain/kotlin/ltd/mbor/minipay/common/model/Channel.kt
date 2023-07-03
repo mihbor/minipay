@@ -29,7 +29,11 @@ data class Channel(
     val trigger: String,
     val update: String,
     val settle: String
-  )
+  ) {
+    companion object {
+      val EMPTY = Keys("", "", "")
+    }
+  }
 }
 
 data class ChannelInvite(

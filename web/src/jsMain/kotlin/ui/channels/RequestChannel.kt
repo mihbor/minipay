@@ -2,13 +2,10 @@ package ui.channels
 
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateMap
-import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.browser.document
 import kotlinx.browser.window
-import logic.eltooScriptAddress
-import logic.multisigScriptAddress
-import logic.multisigScriptBalances
-import logic.requestChannel
+import logic.*
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Contact
 import ltd.mbor.minimak.Token
@@ -40,7 +37,7 @@ fun RequestChannel(
   useMaxima: Boolean,
   maximaContact: Contact?,
 ) {
-  var myAmount by remember { mutableStateOf(BigDecimal.ZERO) }
+  var myAmount by remember { mutableStateOf(ZERO) }
   var tokenId by remember { mutableStateOf("0x00") }
 
   var showQR by remember { mutableStateOf(false) }
@@ -48,8 +45,6 @@ fun RequestChannel(
   var settlementTxStatus by remember { mutableStateOf("") }
   
   var progressStep: Int by remember { mutableStateOf(0) }
-  
-  var channel by remember { mutableStateOf<Channel?>(null) }
   
   LaunchedEffect("requestChannel") {
     triggerTxStatus = ""
@@ -72,13 +67,13 @@ fun RequestChannel(
         TRIGGER_TX_SIGNED -> triggerTxStatus += " and signed"
         SETTLEMENT_TX_SIGNED -> settlementTxStatus += " and signed"
         CHANNEL_PUBLISHED -> {
-          channel = newChannel
+          requestedChannel = newChannel
           triggerTxStatus += " and sent back."
           settlementTxStatus += " and sent back."
         }
 
         CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED -> {
-          channel = newChannel
+          requestedChannel = newChannel
           progressStep--
         }
 
@@ -116,7 +111,7 @@ fun RequestChannel(
   }
   if (triggerTxStatus.isEmpty()) {
     Text("My contribution:")
-    DecimalNumberInput(myAmount, min = BigDecimal.ZERO, disabled = showQR) {
+    DecimalNumberInput(myAmount, min = ZERO, disabled = showQR) {
       it?.let { myAmount = it }
     }
     TokenSelect(tokenId, balances, tokens, disabled = showQR) {
@@ -124,7 +119,7 @@ fun RequestChannel(
     }
     Br()
     if (!showQR) Button({
-      if (myAmount < 0 || listOf(myKeys.trigger, myKeys.update, myKeys.settle).any{ it.isBlank() }) disabled()
+      if (myAmount < ZERO || listOf(myKeys.trigger, myKeys.update, myKeys.settle).any{ it.isBlank() }) disabled()
       if (useMaxima && maximaContact == null) disabled()
       onClick {
         if (window.confirm("Fund new channel with ${myAmount.toPlainString()} ${balances[tokenId]?.tokenName ?: "[$tokenId]"}?")) requestChannel()
@@ -147,9 +142,9 @@ fun RequestChannel(
     Text(it)
     Br()
   }
-  channel?.let {
-    ChannelView(it, balances) {
-      channel = it
+  requestedChannel?.let { channel ->
+    ChannelView(channels.find{ it.id == channel.id } ?: channel, balances) {
+      requestedChannel = it
     }
   }
   Br()

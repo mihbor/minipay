@@ -18,6 +18,8 @@ import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.model.ChannelInvite
 import ltd.mbor.minipay.common.model.ChannelInvite.Companion.EMPTY
 import ltd.mbor.minipay.common.newKeys
+import ltd.mbor.minipay.logic.channelToFund
+import ltd.mbor.minipay.logic.requestedChannel
 import ltd.mbor.minipay.ui.ContactSelect
 import ltd.mbor.minipay.ui.CopyToClipboard
 import ltd.mbor.minipay.ui.preview.alice
@@ -43,6 +45,12 @@ fun CreateChannel(
   var myAddress by remember { mutableStateOf("") }
 
   LaunchedEffect("createChannel") {
+    channelToFund?.takeIf { it.status == "OPEN" }?.let {
+      channelToFund = null
+    }
+    requestedChannel?.takeIf { it.status == "OPEN" }?.let {
+      requestedChannel = null
+    }
     MDS.newKeys(3).apply {
       myKeys = Channel.Keys(this[0], this[1], this[2])
     }

@@ -111,8 +111,8 @@ fun FundChannel(
     settlementTxStatus.takeUnless { it.isEmpty() }?.let {
       Text(it)
     }
-    channelToFund?.let {
-      ChannelView(it, balances, activity) {
+    channelToFund?.let { channel ->
+      ChannelView(channels.find{ it.id == channel.id } ?: channel, balances, activity) {
         channelToFund = it
       }
     }
