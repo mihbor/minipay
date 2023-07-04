@@ -1,7 +1,7 @@
 package ui.channels
 
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateMap
+import com.benasher44.uuid.Uuid
 import logic.channelToFund
 import logic.requestedChannel
 import ltd.mbor.minimak.*
@@ -20,8 +20,9 @@ import ui.CopyToClipboard
 
 @Composable
 fun CreateChannel(
-  balances: SnapshotStateMap<String, Balance>,
-  tokens: SnapshotStateMap<String, Token>,
+  channels: Map<Uuid, Channel>,
+  balances: Map<String, Balance>,
+  tokens: Map<String, Token>,
   invite: ChannelInvite,
   setInvite: (ChannelInvite) -> Unit,
   maximaContact: Contact?,
@@ -33,11 +34,11 @@ fun CreateChannel(
   var myAddress by remember { mutableStateOf("") }
 
   LaunchedEffect("createChannel") {
-    channelToFund?.takeIf { it.status == "OPEN" }?.let {
+    (channels[channelToFund?.id] ?: channelToFund)?.takeIf { it.status == "OPEN" }?.let {
       log("channelToFund is open")
       channelToFund = null
     }
-    requestedChannel?.takeIf { it.status == "OPEN" }?.let {
+    (channels[requestedChannel?.id] ?: requestedChannel)?.takeIf { it.status == "OPEN" }?.let {
       log("requestedChannel is open")
       requestedChannel = null
     }

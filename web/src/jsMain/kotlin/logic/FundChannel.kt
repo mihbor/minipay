@@ -8,10 +8,13 @@ import kotlinx.browser.window
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.MinimaException
 import ltd.mbor.minimak.newScript
-import ltd.mbor.minipay.common.*
+import ltd.mbor.minipay.common.FundChannelEvent
 import ltd.mbor.minipay.common.FundChannelEvent.*
+import ltd.mbor.minipay.common.eltooScript
 import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.model.ChannelInvite
+import ltd.mbor.minipay.common.prepareFundChannel
+import ltd.mbor.minipay.common.triggerScript
 
 var channelToFund by mutableStateOf<Channel?>(null)
 var onFundChannel: (FundChannelEvent, Channel?) -> Unit = { _, _ -> }
@@ -52,7 +55,7 @@ suspend fun fundChannelConfirmed(
     with(channelService) {
       channel.commitFund(triggerTx, settlementTx, fundingTx, theirInputCoins, theirInputScripts, "auto").also {
         onFundChannel(CHANNEL_FUNDED, it)
-        channels.put(it)
+        channels.put(it.id, it)
       }
     }
   } catch (e: MinimaException) {

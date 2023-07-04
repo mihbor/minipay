@@ -10,7 +10,7 @@ import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.model.ChannelEvent
 import view
 
-val channels = mutableStateListOf<Channel>()
+val channels = mutableStateMapOf<Uuid, Channel>()
 var multisigScriptAddress by mutableStateOf("")
 var eltooScriptAddress by mutableStateOf("")
 val multisigScriptBalances = mutableStateListOf<Balance>()

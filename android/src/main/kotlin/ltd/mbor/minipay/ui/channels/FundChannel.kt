@@ -112,7 +112,7 @@ fun FundChannel(
       Text(it)
     }
     channelToFund?.let { channel ->
-      ChannelView(channels.find{ it.id == channel.id } ?: channel, balances, activity) {
+      ChannelView(channels[channel.id] ?: channel, balances, activity) {
         channelToFund = it
       }
     }

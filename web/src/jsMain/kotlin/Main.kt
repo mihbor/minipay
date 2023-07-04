@@ -53,7 +53,7 @@ fun main() {
       "MiniPay" -> Welcome { view = it }
       "Receive" -> Receive(balances, tokens)
       "Send" -> Send(balances)
-      "Create Channel" -> CreateChannel(balances, tokens, channelInvite, { channelInvite = it }, maximaContact) { maximaContact = it }
+      "Create Channel" -> CreateChannel(channels, balances, tokens, channelInvite, { channelInvite = it }, maximaContact) { maximaContact = it }
       "Channels" -> ChannelListing(channels, balances, eltooScriptCoins, ::selectChannel)
       "Channel Events" -> ChannelEvents(events, tokens)
       "Channel Details" -> channel?.let{

@@ -18,7 +18,7 @@ class ChannelService(
   val mds: MdsApi,
   val storage: ChannelStorage,
   val transport: Transport,
-  val channels: MutableList<Channel>,
+  val channels: MutableMap<Uuid, Channel>,
   val events: MutableList<ChannelEvent>
 ) {
   suspend fun reloadChannels(eltooScriptCoins: MutableMap<String, List<Coin>>) {
@@ -44,7 +44,7 @@ class ChannelService(
       }
     }
     channels.clear()
-    channels.addAll(newChannels)
+    channels.putAll(newChannels.associateBy { it.id })
   }
   
   suspend fun Channel.update(updateTxText: String, settleTxText: String, settleTx: Transaction, onSuccess: (Channel) -> Unit): Channel {
@@ -75,8 +75,8 @@ class ChannelService(
   }
 
   suspend fun Channel.processUpdate(isAck: Boolean, updateTxText: String, settleTxText: String): Channel {
-    return processUpdate(isAck, updateTxText, settleTxText)  {
-      channels.put(it)
+    return processUpdate(isAck, updateTxText, settleTxText) { channel ->
+      channels.put(channel.id, channel)
       if (isAck) events.removeIf { it is PaymentRequestSent && it.channel.id == id }
     }
   }
@@ -89,16 +89,16 @@ class ChannelService(
     onEvent: (ChannelEvent) -> Unit
   ) {
     log("tx msg: $msg")
-    fun getChannel() = channels.forId(getChannelId())
+    val channel by lazy { checkNotNull(channels[getChannelId()]) }
     val splits = msg.split(";")
     if (splits[0].startsWith("TXN_UPDATE")) {
       val isAck = splits[0].endsWith("_ACK")
-      getChannel().processUpdate(isAck, updateTxText = splits[1], settleTxText = splits[2]).also {
+      channel.processUpdate(isAck, updateTxText = splits[1], settleTxText = splits[2]).also {
         onUpdate(it, isAck)
       }
     } else if (splits[0] == "TXN_REQUEST") {
       val (_, updateTxText, settleTxText) = splits
-      getChannel().processRequest(updateTxText, settleTxText) {
+      channel.processRequest(updateTxText, settleTxText) {
         events += it
         onEvent(it)
       }
@@ -207,14 +207,6 @@ suspend fun MdsApi.importCoinSafely(data: String) {
       log("Attempted to add relevant coin we already have. Ignoring.")
     } else throw e
   }
-}
-
-fun List<Channel>.forId(id: Uuid) = first { it.id == id }
-
-fun MutableList<Channel>.put(channel: Channel) {
-  val current = firstOrNull{ it.id == channel.id }
-  if (current != null) set(indexOf(current), channel)
-  else add(channel)
 }
 
 fun <T> MutableList<T>.removeIf(predicate: (T) -> Boolean) {

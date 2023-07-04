@@ -1,7 +1,6 @@
 package ui.channels
 
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.browser.document
 import kotlinx.browser.window
@@ -32,8 +31,8 @@ import ui.TokenSelect
 fun RequestChannel(
   myKeys: Channel.Keys,
   myAddress: String,
-  balances: SnapshotStateMap<String, Balance>,
-  tokens: SnapshotStateMap<String, Token>,
+  balances: Map<String, Balance>,
+  tokens: Map<String, Token>,
   useMaxima: Boolean,
   maximaContact: Contact?,
 ) {
@@ -143,7 +142,7 @@ fun RequestChannel(
     Br()
   }
   requestedChannel?.let { channel ->
-    ChannelView(channels.find{ it.id == channel.id } ?: channel, balances) {
+    ChannelView(channels[channel.id] ?: channel, balances) {
       requestedChannel = it
     }
   }

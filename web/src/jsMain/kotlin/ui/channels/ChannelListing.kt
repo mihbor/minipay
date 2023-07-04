@@ -3,6 +3,7 @@ package ui.channels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
+import com.benasher44.uuid.Uuid
 import kotlinx.coroutines.launch
 import logic.channelService
 import ltd.mbor.minimak.Balance
@@ -15,7 +16,7 @@ import ui.TokenIcon
 
 @Composable
 fun ChannelListing(
-  channels: MutableList<Channel>,
+  channels: MutableMap<Uuid, Channel>,
   balances: Map<String, Balance>,
   eltooScriptCoins: MutableMap<String, List<Coin>>,
   selectChannel: (Channel?) -> Unit,
@@ -50,7 +51,7 @@ fun ChannelListing(
       }
     }
     Tbody {
-      channels.forEach { channel ->
+      channels.values.forEach { channel ->
         key(channel.id) {
           Tr({
             style { property("border-top", "1px solid black") }

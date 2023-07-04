@@ -48,8 +48,8 @@ suspend fun initMDS(uid: String, host: String, port: Int, context: Context) {
         balances.putAll(MDS.getBalances(confirmations = 0).associateBy { it.tokenId })
         tokens.putAll(MDS.getTokens().associateBy { it.tokenId })
         createDB()
-        channels.addAll(getChannels())
-        channels.filter { it.maximaPK == null }.forEach(Channel::subscribe)
+        channels.putAll(getChannels().associateBy { it.id })
+        channels.values.filter { it.maximaPK == null }.forEach(Channel::subscribe)
         inited = true
       }
       "NEWBALANCE" -> {
@@ -66,6 +66,7 @@ suspend fun initMDS(uid: String, host: String, port: Int, context: Context) {
           val newBalances = MDS.getBalances(multisigScriptAddress, confirmations = 0)
           if (newBalances.any { it.confirmed > ZERO } && multisigScriptBalances.none { it.confirmed > ZERO }) {
             setChannelOpen(multisigScriptAddress)
+            channelService.reloadChannels(eltooScriptCoins)
           }
           multisigScriptBalances.clear()
           multisigScriptBalances.addAll(newBalances)

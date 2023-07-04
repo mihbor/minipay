@@ -71,6 +71,6 @@ suspend fun requestChannelAccepted(
     maximaPK,
     onChannelRequested
   )
-  channels.put(channel)
+  channels.put(channel.id, channel)
   return channel.id
 }

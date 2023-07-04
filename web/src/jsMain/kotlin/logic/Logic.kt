@@ -52,8 +52,8 @@ suspend fun initMDS(prefs: Prefs) {
         balances.putAll(MDS.getBalances(confirmations = 0).associateBy { it.tokenId })
         tokens.putAll(MDS.getTokens().associateBy { it.tokenId })
         createDB()
-        channels.addAll(getChannels())
-        channels.filter { it.maximaPK == null }.forEach(Channel::subscribe)
+        channels.putAll(getChannels().associateBy { it.id })
+        channels.values.filter { it.maximaPK == null }.forEach(Channel::subscribe)
         inited = true
       }
       "NEWBALANCE" -> {

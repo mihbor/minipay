@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import com.benasher44.uuid.Uuid
 import ltd.mbor.minimak.*
 import ltd.mbor.minipay.MainActivity
 import ltd.mbor.minipay.common.model.Channel
@@ -22,14 +23,12 @@ import ltd.mbor.minipay.logic.channelToFund
 import ltd.mbor.minipay.logic.requestedChannel
 import ltd.mbor.minipay.ui.ContactSelect
 import ltd.mbor.minipay.ui.CopyToClipboard
-import ltd.mbor.minipay.ui.preview.alice
-import ltd.mbor.minipay.ui.preview.previewBalances
-import ltd.mbor.minipay.ui.preview.previewInvite
-import ltd.mbor.minipay.ui.preview.previewTokens
+import ltd.mbor.minipay.ui.preview.*
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
 
 @Composable
 fun CreateChannel(
+  channels: Map<Uuid, Channel>,
   balances: Map<String, Balance>,
   tokens: Map<String, Token>,
   activity: MainActivity?,
@@ -45,10 +44,12 @@ fun CreateChannel(
   var myAddress by remember { mutableStateOf("") }
 
   LaunchedEffect("createChannel") {
-    channelToFund?.takeIf { it.status == "OPEN" }?.let {
+    (channels[channelToFund?.id] ?: channelToFund)?.takeIf { it.status == "OPEN" }?.let {
+      log("channelToFund is open")
       channelToFund = null
     }
-    requestedChannel?.takeIf { it.status == "OPEN" }?.let {
+    (channels[requestedChannel?.id] ?: requestedChannel)?.takeIf { it.status == "OPEN" }?.let {
+      log("requestedChannel is open")
       requestedChannel = null
     }
     MDS.newKeys(3).apply {
@@ -98,20 +99,20 @@ fun CreateChannel(
 @Composable @Preview
 fun PreviewCreateChannel() {
   MiniPayTheme {
-    CreateChannel(previewBalances, previewTokens, null, EMPTY, {}, null, {})
+    CreateChannel(previewChannels, previewBalances, previewTokens, null, EMPTY, {}, null, {})
   }
 }
 
 @Composable @Preview
 fun PreviewCreateChannelWithInvite() {
   MiniPayTheme {
-    CreateChannel(previewBalances, previewTokens, null, previewInvite, {}, null, {})
+    CreateChannel(previewChannels, previewBalances, previewTokens, null, previewInvite, {}, null, {})
   }
 }
 
 @Composable @Preview
 fun PreviewCreateChannelWithContact() {
   MiniPayTheme {
-    CreateChannel(previewBalances, previewTokens, null, EMPTY, {}, alice, {})
+    CreateChannel(previewChannels, previewBalances, previewTokens, null, EMPTY, {}, alice, {})
   }
 }

@@ -97,6 +97,8 @@ val fakeBalances = mapOf(
 
 val fakeEltooCoins = mutableMapOf("0x999" to listOf(Coin(address = "", miniAddress = "", amount = BigDecimal.ONE, coinId = "", storeState = true, tokenId = "0x00", _created = "100", token = null, state = emptyList())))
 
+val previewChannels = listOf(fakeChannelOpen, fakeChannelTriggered).associateBy { it.id }
+
 val previewPrefs = Prefs("uid123", "localhost", 9004)
 
 val previewKeys = Channel.Keys("a", "b", "c")
@@ -158,6 +160,7 @@ val alice = Contact(
     mls = ""
   )
 )
+
 val bob = Contact(
   id = 2,
   publicKey = "0x0123",

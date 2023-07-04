@@ -120,7 +120,7 @@ fun RequestChannel(
     Text(it)
   }
   requestedChannel?.let { channel ->
-    ChannelView(channels.find{ it.id == channel.id } ?: channel, balances, activity) {
+    ChannelView(channels[channel.id] ?: channel, balances, activity) {
       requestedChannel = it
     }
   }

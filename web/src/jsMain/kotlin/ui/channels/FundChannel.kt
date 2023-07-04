@@ -1,7 +1,6 @@
 package ui.channels
 
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import kotlinx.browser.window
 import kotlinx.coroutines.launch
@@ -23,8 +22,8 @@ import ui.TokenSelect
 fun FundChannel(
   myKeys: Channel.Keys,
   myAddress: String,
-  balances: SnapshotStateMap<String, Balance>,
-  tokens: SnapshotStateMap<String, Token>,
+  balances: Map<String, Balance>,
+  tokens: Map<String, Token>,
   invite: ChannelInvite,
   setInvite: (ChannelInvite) -> Unit
 ) {
@@ -161,7 +160,7 @@ fun FundChannel(
     Br()
   }
   channelToFund?.let { channel ->
-    ChannelView(channels.find{ it.id == channel.id } ?: channel, balances) {
+    ChannelView(channels[channel.id] ?: channel, balances) {
       channelToFund = it
     }
   }

@@ -82,7 +82,7 @@ fun MainView(
         "MiniPay" -> Welcome(inited, setView)
         "Receive" -> Receive(balances, tokens, address, setAddress, tokenId, setTokenId, amount, setAmount)
         "Send" -> Send(balances, address, setAddress, tokenId, setTokenId, amount, setAmount)
-        "Create Channel" -> CreateChannel(balances, tokens, activity, channelInvite, setChannelInvite, maximaContact) { maximaContact = it }
+        "Create Channel" -> CreateChannel(channels, balances, tokens, activity, channelInvite, setChannelInvite, maximaContact) { maximaContact = it }
         "Channels" -> ChannelListing(channels, balances, eltooScriptCoins, activity, ::setChannel)
         "Channel Events" -> ChannelEvents(events, tokens, activity)
         "Channel Details" -> channel?.let{

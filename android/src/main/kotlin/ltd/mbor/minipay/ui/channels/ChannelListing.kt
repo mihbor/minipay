@@ -8,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.tooling.preview.Preview
+import com.benasher44.uuid.Uuid
 import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Coin
@@ -22,7 +23,7 @@ import ltd.mbor.minipay.ui.theme.MiniPayTheme
 
 @Composable
 fun ChannelListing(
-  channels: MutableList<Channel>,
+  channels: MutableMap<Uuid, Channel>,
   balances: Map<String, Balance>,
   eltooScriptCoins: MutableMap<String, List<Coin>>,
   activity: MainActivity?,
@@ -54,7 +55,7 @@ fun PreviewChannelListing() {
   MiniPayTheme {
     Column {
       ChannelListing(
-        mutableListOf(fakeChannelOpen, fakeChannelOpen.copy(tokenId = "0x00", status = "TRIGGERED", eltooAddress = "Mx999", sequenceNumber = 3, updateTx = "abc")),
+        listOf(fakeChannelOpen, fakeChannelOpen.copy(tokenId = "0x00", status = "TRIGGERED", eltooAddress = "Mx999", sequenceNumber = 3, updateTx = "abc")).associateBy { it.id }.toMutableMap(),
         fakeBalances,
         fakeEltooCoins,
         null,

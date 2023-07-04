@@ -28,7 +28,7 @@ class FundChannelTest {
       .willReturn(fundChannel.exportFundingTx)
     val storage = SimulatedStorage.insertChannelWillReturn(uuid4())
     val transport = SimulatedTransport()
-    val channelService = ChannelService(mds, storage, transport, mutableListOf(), mutableListOf())
+    val channelService = ChannelService(mds, storage, transport, mutableMapOf(), mutableListOf())
     val events = mutableListOf<Pair<FundChannelEvent, Channel?>>()
     //when
     val channel = channelService.prepareFundChannel(ChannelInvite("0x00", "their address", TEN, keys, null), keys2, "my address", ONE, 10, "multisig", "eltoo") { event, channel -> events.add(event to channel) }
@@ -69,7 +69,7 @@ class FundChannelTest {
       .willReturn(fundChannel.postFundingTx)
     val storage = SimulatedStorage
     val transport = SimulatedTransport()
-    val channelService = ChannelService(mds, storage, transport, mutableListOf(), mutableListOf())
+    val channelService = ChannelService(mds, storage, transport, mutableMapOf(), mutableListOf())
     //when
     val channel = with(channelService) {
       offeredChannel.commitFund("triggerTx", "settlementTx", "fundingTx", listOf(aCoin.coinId), listOf(anAddress.script))

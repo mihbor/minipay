@@ -12,9 +12,9 @@ class ProcessMessageTest {
   @Test
   fun process_update_ack() = runTest {
     //given
-    val channels = mutableListOf(openChannel)
+    val channels = mutableMapOf(openChannel.id to openChannel)
     val mds = SimulatedMDS().willReturn(importTx.createAndImportSignedTx).willReturn(importTx.createAndImportSignedTx)
-    val storage = SimulatedStorage.getChannelsWillReturn(channels)
+    val storage = SimulatedStorage.getChannelsWillReturn(channels.values.toList())
     val channelService = ChannelService(mds, storage, SimulatedTransport(), channels, mutableListOf())
     var channel: Channel? = null
     var isAck: Boolean? = null

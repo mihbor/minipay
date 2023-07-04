@@ -14,6 +14,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.benasher44.uuid.Uuid
 import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minimak.Coin
@@ -31,7 +32,7 @@ import ltd.mbor.minipay.ui.theme.MiniPayTheme
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChannelTable(
-  channels: MutableList<Channel>,
+  channels: MutableMap<Uuid, Channel>,
   balances: Map<String, Balance>,
   eltooScriptCoins: MutableMap<String, List<Coin>>,
   activity: MainActivity?,
@@ -48,7 +49,7 @@ fun ChannelTable(
       Text("Actions", Modifier.width(40.dp))
     }
     Divider()
-    channels.forEach { channel ->
+    channels.values.forEach { channel ->
       key(channel.id) {
         var showActions by remember { mutableStateOf(false) }
         Row {
@@ -85,7 +86,7 @@ fun PreviewChannelTable() {
   MiniPayTheme {
     Column {
       ChannelTable(
-        mutableListOf(fakeChannelOpen, fakeChannelTriggered.copy(tokenId = "0x00")),
+        listOf(fakeChannelOpen, fakeChannelTriggered.copy(tokenId = "0x00")).associateBy { it.id }.toMutableMap(),
         fakeBalances,
         fakeEltooCoins,
         null,
@@ -100,7 +101,7 @@ fun PreviewChannelTableNoBalances() {
   MiniPayTheme {
     Column {
       ChannelTable(
-        mutableListOf(fakeChannelOpen, fakeChannelTriggered.copy(tokenId = "0x00")),
+        listOf(fakeChannelOpen, fakeChannelTriggered.copy(tokenId = "0x00")).associateBy { it.id }.toMutableMap(),
         emptyMap(),
         fakeEltooCoins,
         null,

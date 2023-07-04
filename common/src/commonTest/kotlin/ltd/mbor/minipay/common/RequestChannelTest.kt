@@ -33,7 +33,7 @@ class RequestChannelTest {
       .willReturn(requestChannel.exportFundingCoin)
     val storage = SimulatedStorage.insertChannelWillReturn(uuid4())
     val transport = SimulatedTransport()
-    val channelService = ChannelService(mds, storage, transport, mutableListOf(), mutableListOf())
+    val channelService = ChannelService(mds, storage, transport, mutableMapOf(), mutableListOf())
     val events = mutableListOf<Pair<RequestChannelEvent, Channel?>>()
     //when
     val channel = channelService.requestedChannelAccepted(keys, keys2, "my address", "their address", ONE, "0x00", 10, "multisig", "eltoo", "triggerTx", "settlementTx", "fundingTx", null) { event, channel -> events.add(event to channel) }
