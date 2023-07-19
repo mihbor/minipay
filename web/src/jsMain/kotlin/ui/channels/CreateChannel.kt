@@ -9,14 +9,12 @@ import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.model.ChannelInvite
 import ltd.mbor.minipay.common.model.ChannelInvite.Companion.EMPTY
 import ltd.mbor.minipay.common.newKeys
-import org.jetbrains.compose.web.css.LineStyle.Companion.Inset
-import org.jetbrains.compose.web.css.LineStyle.Companion.Outset
-import org.jetbrains.compose.web.css.border
 import org.jetbrains.compose.web.dom.Br
-import org.jetbrains.compose.web.dom.Button
+import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 import ui.ContactSelect
 import ui.CopyToClipboard
+import ui.Switch
 
 @Composable
 fun CreateChannel(
@@ -62,37 +60,27 @@ fun CreateChannel(
   Br()
   Br()
   Text("Transport:")
-  Button({
+  Span({
     onClick { useMaxima = false }
-    style {
-      border(style = if (useMaxima) Outset else Inset)
-    }
   }){
     Text("Firebase")
   }
-  Button({
+  Switch(checked = useMaxima, onCheckedChange = { useMaxima = it })
+  Span({
     onClick { useMaxima = true }
-    style {
-      border(style = if (useMaxima) Inset else Outset)
-    }
   }){
     Text("Maxima")
   }
   if (useMaxima && isInviting) ContactSelect(maximaContact, selectContact)
   Br()
-  Button({
+  Span({
     onClick { isInviting = true }
-    style {
-      border(style = if (isInviting) Inset else Outset)
-    }
   }){
     Text("Invite")
   }
-  Button({
+  Switch(checked = !isInviting, onCheckedChange = { isInviting = !it })
+  Span({
     onClick { isInviting = false }
-    style {
-      border(style = if (isInviting) Outset else Inset)
-    }
   }){
     Text("Join")
   }
