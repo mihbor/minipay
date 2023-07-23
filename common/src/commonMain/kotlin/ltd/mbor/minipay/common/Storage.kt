@@ -21,6 +21,7 @@ interface ChannelStorage{
   suspend fun getChannels(status: String? = null): List<Channel>
   suspend fun updateChannelStatus(channel: Channel, status: String): Channel
   suspend fun setChannelOpen(multisigAddress: String)
+  suspend fun renameChannel(channel: Channel, name: String): Channel
   suspend fun updateChannel(
     channel: Channel,
     triggerTx: String,
@@ -36,6 +37,7 @@ interface ChannelStorage{
   ): Channel
 
   suspend fun insertChannel(
+    name: String?,
     tokenId: String,
     myBalance: BigDecimal,
     theirBalance: BigDecimal,
@@ -54,10 +56,11 @@ interface ChannelStorage{
 
 object storage: ChannelStorage {
   override suspend fun createDB() {
-    MDS.sql("ALTER TABLE IF EXISTS channel ADD COLUMN IF NOT EXISTS maxima_pk VARCHAR;")
+    MDS.sql("ALTER TABLE IF EXISTS channel ADD COLUMN IF NOT EXISTS name VARCHAR;")
     MDS.sql(//"""DROP TABLE IF EXISTS channel;
       """CREATE TABLE IF NOT EXISTS channel(
         id UUID NOT NULL PRIMARY KEY,
+        name VARCHAR,
         created_at BIGINT NOT NULL,
         updated_at BIGINT NOT NULL,
         status VARCHAR,
@@ -82,6 +85,8 @@ object storage: ChannelStorage {
         maxima_pk VARCHAR
       );""".trimMargin()
     )
+    MDS.sql("UPDATE channel SET name = id WHERE name IS NULL;")
+    MDS.sql("ALTER TABLE channel ALTER COLUMN name VARCHAR NOT NULL;")
   }
 
   override suspend fun getChannel(eltooAddress: String): Channel? {
@@ -99,7 +104,7 @@ object storage: ChannelStorage {
   }
 
   override suspend fun getChannels(status: String?): List<Channel> {
-    val sql = MDS.sql("SELECT * FROM channel WHERE status ${status?.let { " = '$it'" } ?: " <> 'DELETED'"} ORDER BY id DESC;")!!
+    val sql = MDS.sql("SELECT * FROM channel WHERE status ${status?.let { " = '$it'" } ?: " <> 'DELETED'"} ORDER BY name ASC;")!!
     val rows = sql.jsonObject["rows"]?.jsonArray ?: emptyList()
     
     return rows.map { it.jsonObject }.map(JsonObject::toChannel)
@@ -130,6 +135,7 @@ object storage: ChannelStorage {
   }
 
   override suspend fun insertChannel(
+    name: String?,
     tokenId: String,
     myBalance: BigDecimal,
     theirBalance: BigDecimal,
@@ -147,14 +153,14 @@ object storage: ChannelStorage {
     val id = uuid4()
     val now = Clock.System.now()
     MDS.sql(
-      """INSERT INTO channel(id, 
+      """INSERT INTO channel(id, name,
         status, sequence_number, token_id, my_balance, other_balance,
         my_trigger_key, my_update_key, my_settle_key,
         other_trigger_key, other_update_key, other_settle_key,
         trigger_tx, update_tx, settle_tx, time_lock,
         multisig_address, eltoo_address, my_address, other_address,
         created_at, updated_at, maxima_pk
-      ) VALUES ('$id',
+      ) VALUES ('$id', '${name ?: id}',
         'OFFERED', 0, '$tokenId', ${myBalance.toPlainString()}, ${theirBalance.toPlainString()},
         '${myKeys.trigger}', '${myKeys.update}', '${myKeys.settle}',
         '${theirKeys.trigger}', '${theirKeys.update}', '${theirKeys.settle}',
@@ -166,6 +172,7 @@ object storage: ChannelStorage {
     )
     return Channel(
       id = id,
+      name = name ?: id.toString(),
       sequenceNumber = 0,
       status = "OFFERED",
       tokenId = tokenId,
@@ -238,10 +245,18 @@ object storage: ChannelStorage {
       updatedAt = now
     )
   }
+
+  override suspend fun renameChannel(channel: Channel, name: String): Channel {
+    MDS.sql(
+      """UPDATE channel SET name = '$name' WHERE id = '${channel.id}';"""
+    )
+    return channel.copy(name = name)
+  }
 }
 
 private fun JsonObject.toChannel() = Channel(
   id = uuidFrom(jsonString("ID")),
+  name = jsonString("NAME"),
   sequenceNumber = jsonString("SEQUENCE_NUMBER").toInt(),
   status = jsonString("STATUS"),
   tokenId = jsonString("TOKEN_ID"),

@@ -6,6 +6,7 @@ import kotlinx.datetime.Instant
 
 data class Channel(
   val id: Uuid,
+  val name: String,
   val sequenceNumber: Int = 0,
   val status: String,
   val tokenId: String,

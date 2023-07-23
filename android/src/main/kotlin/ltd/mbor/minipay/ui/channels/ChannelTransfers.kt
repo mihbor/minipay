@@ -35,8 +35,7 @@ import ltd.mbor.minipay.view
 
 @Composable
 fun ChannelTransfers(channel: Channel, balances: Map<String, Balance>, activity: MainActivity?) {
-  val fontSize = 10.sp
-  ProvideTextStyle(value = TextStyle(fontSize = fontSize, textAlign = TextAlign.Right)) {
+  ProvideTextStyle(value = TextStyle(fontSize = 10.sp, textAlign = TextAlign.Right)) {
     if (channel.my.balance > ZERO) Row {
       var amount by remember { mutableStateOf(ZERO) }
       var isSending by remember { mutableStateOf(false) }

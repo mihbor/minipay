@@ -1,16 +1,23 @@
 package ltd.mbor.minipay.ui.channels
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Button
 import androidx.compose.material.Divider
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minipay.MainActivity
 import ltd.mbor.minipay.blockNumber
 import ltd.mbor.minipay.common.model.Channel
+import ltd.mbor.minipay.common.rename
+import ltd.mbor.minipay.common.scope
 import ltd.mbor.minipay.logic.eltooScriptCoins
 import ltd.mbor.minipay.ui.CopyToClipboard
 import ltd.mbor.minipay.ui.DeleteChannel
@@ -27,7 +34,32 @@ fun ChannelView(
   activity: MainActivity?,
   updateChannel: (Channel) -> Unit
 ) {
+  var channelName by remember { mutableStateOf(channel.name) }
+  fun renameChannel() {
+    scope.launch {
+      updateChannel(channel.rename(channelName))
+    }
+  }
   Column{
+    Row{
+      Text("Id: ")
+      Text(channel.id.toString())
+    }
+    Divider()
+    Row{
+      OutlinedTextField(
+        channelName,
+        { channelName = it },
+        Modifier.height(50.dp),
+        textStyle = TextStyle(fontSize = 12.sp)
+      )
+      Button(
+        ::renameChannel
+      ) {
+        Text("Re-\nname")
+      }
+    }
+    Divider()
     Row{
       Text("Token: ")
       TokenIcon(channel.tokenId, balances)

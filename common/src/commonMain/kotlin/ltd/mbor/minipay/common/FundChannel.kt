@@ -2,6 +2,7 @@ package ltd.mbor.minipay.common
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import ltd.mbor.minimak.exportTx
+import ltd.mbor.minimak.getContacts
 import ltd.mbor.minimak.inputsWithChange
 import ltd.mbor.minipay.common.FundChannelEvent.*
 import ltd.mbor.minipay.common.model.Channel
@@ -45,6 +46,7 @@ suspend fun ChannelService.prepareFundChannel(
   val unsignedFundingTx = mds.exportTx(fundingTxId)
   
   val channel = storage.insertChannel(
+    name = invite.maximaPK?.let { pk -> mds.getContacts().firstOrNull { it.publicKey == pk }?.extraData?.name },
     tokenId = invite.tokenId,
     myBalance = myAmount,
     theirBalance = invite.balance,

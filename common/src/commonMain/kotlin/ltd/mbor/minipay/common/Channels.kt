@@ -10,6 +10,7 @@ import ltd.mbor.minipay.common.model.Channel
 import ltd.mbor.minipay.common.model.PaymentRequestReceived
 import ltd.mbor.minipay.common.model.Transport.FIREBASE
 import ltd.mbor.minipay.common.storage.getChannels
+import ltd.mbor.minipay.common.storage.renameChannel
 import ltd.mbor.minipay.common.storage.updateChannel
 import ltd.mbor.minipay.common.storage.updateChannelStatus
 
@@ -133,6 +134,10 @@ suspend fun Channel.triggerSettlement(): Channel {
 suspend fun Channel.completeSettlement(): Channel {
   MDS.importAndPost(settlementTx)
   return updateChannelStatus(this, "SETTLED")
+}
+
+suspend fun Channel.rename(name: String): Channel {
+  return renameChannel(this, name)
 }
 
 suspend fun Channel.delete(): Channel {

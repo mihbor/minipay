@@ -1,17 +1,17 @@
 package ui.channels
 
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import kotlinx.coroutines.launch
 import logic.blockNumber
 import logic.eltooScriptCoins
 import ltd.mbor.minimak.Balance
 import ltd.mbor.minipay.common.model.Channel
+import ltd.mbor.minipay.common.rename
+import ltd.mbor.minipay.common.scope
 import org.jetbrains.compose.web.css.margin
 import org.jetbrains.compose.web.css.marginRight
 import org.jetbrains.compose.web.css.px
-import org.jetbrains.compose.web.dom.Br
-import org.jetbrains.compose.web.dom.Div
-import org.jetbrains.compose.web.dom.Span
-import org.jetbrains.compose.web.dom.Text
+import org.jetbrains.compose.web.dom.*
 import ui.CopyToClipboard
 import ui.TokenIcon
 
@@ -21,9 +21,30 @@ fun ChannelView(
   balances: Map<String, Balance>,
   updateChannel: (Channel) -> Unit
 ) {
+  var channelName by remember { mutableStateOf(channel.name) }
   Div({
     style { margin(10.px) }
   }) {
+    Div {
+      Text("ID: ${channel.id}")
+    }
+    Div {
+      Text("Name:")
+      TextInput(channelName) {
+        onInput {
+          channelName = it.value
+        }
+      }
+      Button({
+        onClick {
+          scope.launch {
+            updateChannel(channel.rename(channelName))
+          }
+        }
+      }) {
+        Text("Rename")
+      }
+    }
     Div {
       Text("Token: ")
       TokenIcon(channel.tokenId, balances)

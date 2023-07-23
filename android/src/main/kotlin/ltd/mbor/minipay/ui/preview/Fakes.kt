@@ -14,6 +14,7 @@ import ltd.mbor.minipay.common.model.Transport.*
 
 val fakeChannelOpen = Channel(
   id = uuid4(),
+  name = "open channel",
   sequenceNumber = 0,
   status = "OPEN",
   tokenId = "0x01234567890",
@@ -48,6 +49,7 @@ val fakeChannelTriggered = fakeChannelOpen.copy(status = "TRIGGERED", sequenceNu
 
 val fakeMinimaChannel = Channel(
   id = uuid4(),
+  name = "open channel",
   sequenceNumber = 0,
   status = "OPEN",
   tokenId = "0x00",

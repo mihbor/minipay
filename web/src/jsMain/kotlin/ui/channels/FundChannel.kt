@@ -171,12 +171,14 @@ fun FundChannel(
       it?.let { myAmount = it }
     }
     TokenSelect(invite.tokenId, balances, disabled = true) {}
+    Br()
     Text("Update only time lock (block diff)")
     NumberInput(timeLock, min = 0) {
       onInput {
         timeLock = it.value!!.toInt()
       }
     }
+    Br()
     Button({
       if (myAmount < ZERO || myAmount + invite.balance <= ZERO) disabled()
       onClick {

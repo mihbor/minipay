@@ -10,11 +10,11 @@ import ltd.mbor.minipay.common.model.Channel
 
 val keys = Channel.Keys("trigger", "update", "settle")
 val keys2 = Channel.Keys("trigger2", "update2", "settle2")
-val offeredChannel = (Channel(uuid4(), 0, "OFFERED", "0x00", Channel.Side("abc", BigDecimal.ONE, keys), Channel.Side("def", BigDecimal.ONE, keys), "triggerTx", "updateTx", "settleTx", 10, "eltoo", "multisig", Clock.System.now()))
-val openChannel = (Channel(uuid4(), 0, "OPEN", "0x00", Channel.Side("abc", BigDecimal.ONE, keys), Channel.Side("def", BigDecimal.ONE, keys), "triggerTx", "updateTx", "settleTx", 10, "eltoo", "multisig", Clock.System.now()))
-val triggeredChannel = (Channel(uuid4(), 0, "TRIGGERED", "0x00", Channel.Side("abc", BigDecimal.ONE, keys), Channel.Side("def", BigDecimal.ONE, keys), "triggerTx", "updateTx", "settleTx", 10, "eltoo", "multisig", Clock.System.now()))
-val updatedChannel = (Channel(uuid4(), 0, "UPDATED", "0x00", Channel.Side("abc", BigDecimal.ONE, keys), Channel.Side("def", BigDecimal.ONE, keys), "triggerTx", "updateTx", "settleTx", 10, "eltoo", "multisig", Clock.System.now()))
-val settledChannel = (Channel(uuid4(), 0, "SETTLED", "0x00", Channel.Side("abc", BigDecimal.ONE, keys), Channel.Side("def", BigDecimal.ONE, keys), "triggerTx", "updateTx", "settleTx", 10, "eltoo", "multisig", Clock.System.now()))
+val offeredChannel = (Channel(uuid4(), "offered channel", 0, "OFFERED", "0x00", Channel.Side("abc", BigDecimal.ONE, keys), Channel.Side("def", BigDecimal.ONE, keys), "triggerTx", "updateTx", "settleTx", 10, "eltoo", "multisig", Clock.System.now()))
+val openChannel = (Channel(uuid4(), "open channel", 0, "OPEN", "0x00", Channel.Side("abc", BigDecimal.ONE, keys), Channel.Side("def", BigDecimal.ONE, keys), "triggerTx", "updateTx", "settleTx", 10, "eltoo", "multisig", Clock.System.now()))
+val triggeredChannel = (Channel(uuid4(), "triggered channel", 0, "TRIGGERED", "0x00", Channel.Side("abc", BigDecimal.ONE, keys), Channel.Side("def", BigDecimal.ONE, keys), "triggerTx", "updateTx", "settleTx", 10, "eltoo", "multisig", Clock.System.now()))
+val updatedChannel = (Channel(uuid4(), "updated channel", 0, "UPDATED", "0x00", Channel.Side("abc", BigDecimal.ONE, keys), Channel.Side("def", BigDecimal.ONE, keys), "triggerTx", "updateTx", "settleTx", 10, "eltoo", "multisig", Clock.System.now()))
+val settledChannel = (Channel(uuid4(), "settled channel", 0, "SETTLED", "0x00", Channel.Side("abc", BigDecimal.ONE, keys), Channel.Side("def", BigDecimal.ONE, keys), "triggerTx", "updateTx", "settleTx", 10, "eltoo", "multisig", Clock.System.now()))
 val aCoin = Coin(
   address = "0x01234",
   miniAddress = "MxABCD",

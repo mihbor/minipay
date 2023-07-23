@@ -41,7 +41,7 @@ fun ChannelListing(
   }) {
     Thead {
       Tr {
-        Th { Text("ID") }
+        Th { Text("Name") }
         Th { Text("Status") }
         Th { Text("Sequence number") }
         Th { Text("Token") }
@@ -51,12 +51,12 @@ fun ChannelListing(
       }
     }
     Tbody {
-      channels.values.forEach { channel ->
+      channels.values.sortedBy{ it.name }.forEach { channel ->
         key(channel.id) {
           Tr({
             style { property("border-top", "1px solid black") }
           }) {
-            Td { Text(channel.id.toString()) }
+            Td { Text(channel.name) }
             Td { Text(channel.status) }
             Td { Text(channel.sequenceNumber.toString()) }
             Td {

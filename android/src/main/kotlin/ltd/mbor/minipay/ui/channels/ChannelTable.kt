@@ -40,22 +40,20 @@ fun ChannelTable(
 ) {
   ProvideTextStyle(value = TextStyle(fontSize = 10.sp, textAlign = TextAlign.Right)) {
     Row {
-      Text("ID", Modifier.width(30.dp))
+      Text("Name", Modifier.width(60.dp))
       Text("Status", Modifier.width(60.dp))
-      Text("Seq\nnumber", Modifier.width(50.dp))
       Text("Token", Modifier.width(75.dp))
       Text("My\nbalance", Modifier.width(50.dp))
       Text("Their\nbalance", Modifier.width(50.dp))
       Text("Actions", Modifier.width(40.dp))
     }
     Divider()
-    channels.values.forEach { channel ->
+    channels.values.sortedBy{ it.name }.forEach { channel ->
       key(channel.id) {
         var showActions by remember { mutableStateOf(false) }
         Row {
-          Text(channel.id.toString(), Modifier.width(30.dp))
+          Text(channel.name, Modifier.width(60.dp))
           Text(channel.status, Modifier.width(60.dp))
-          Text(channel.sequenceNumber.toString(), Modifier.width(50.dp))
           Row(Modifier.width(75.dp)) {
             Text(balances[channel.tokenId]?.tokenName ?: if(channel.tokenId == "0x00") "Minima" else "[${channel.tokenId.take(8)}...]", Modifier.width(60.dp))
             TokenIcon(channel.tokenId, balances, size = 15)
@@ -63,14 +61,14 @@ fun ChannelTable(
           Text(channel.my.balance.toPlainString(), Modifier.width(50.dp))
           Text(channel.their.balance.toPlainString(), Modifier.width(50.dp))
           CompositionLocalProvider(
-            LocalMinimumTouchTargetEnforcement provides false,
+            LocalMinimumInteractiveComponentEnforcement provides false,
           ) {
             IconButton(onClick = { showActions = !showActions }, Modifier.width(40.dp)) {
               Icon(Icons.Filled.List, contentDescription = null)
             }
           }
         }
-        if (showActions) Row(Modifier.fillMaxWidth()){
+        if (showActions) Row(Modifier.fillMaxWidth()) {
           ChannelActions(channel, balances, activity, selectChannel) {
             scope.launch { channelService.reloadChannels(eltooScriptCoins) }
           }

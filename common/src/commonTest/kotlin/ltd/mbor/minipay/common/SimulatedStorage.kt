@@ -43,7 +43,11 @@ object SimulatedStorage: ChannelStorage {
   override suspend fun setChannelOpen(multisigAddress: String) {
     TODO("Not yet implemented")
   }
-  
+
+  override suspend fun renameChannel(channel: Channel, name: String): Channel {
+    TODO("Not yet implemented")
+  }
+
   override suspend fun updateChannel(channel: Channel, triggerTx: String, settlementTx: String): Channel {
     return channel.copy(triggerTx = triggerTx, settlementTx = settlementTx)
   }
@@ -53,6 +57,7 @@ object SimulatedStorage: ChannelStorage {
   }
   
   override suspend fun insertChannel(
+    name: String?,
     tokenId: String,
     myBalance: BigDecimal,
     theirBalance: BigDecimal,
@@ -68,6 +73,7 @@ object SimulatedStorage: ChannelStorage {
     maximaPK: String?
   ) = Channel(
     id = insertChannelId,
+    name = name?: insertChannelId.toString(),
     sequenceNumber = 0,
     status = "OFFERED",
     tokenId = tokenId,

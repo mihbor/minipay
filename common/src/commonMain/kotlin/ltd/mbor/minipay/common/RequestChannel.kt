@@ -61,6 +61,7 @@ suspend fun ChannelService.requestedChannelAccepted(
   }
   
   val channel = storage.insertChannel(
+    name = maximaPK?.let { pk -> mds.getContacts().firstOrNull { it.publicKey == pk }?.extraData?.name },
     tokenId = tokenId,
     myBalance = myAmount,
     theirBalance = theirAmount,
