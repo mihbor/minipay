@@ -34,7 +34,7 @@ fun ChannelRequestReceivedNfc(
   val balanceChange = channel.my.balance - channelBalance.first
 
   Column {
-    Text("Request received to send ${balanceChange.toPlainString()} ${tokens[channel.tokenId]?.name ?: "[${channel.tokenId}]"} over channel ${channel.id}")
+    Text("Request received to send ${balanceChange.toPlainString()} ${tokens[channel.tokenId]?.name ?: "[${channel.tokenId}]"} over channel ${channel.name}")
     Button(onClick = {
       accepting = false
       dismiss()

@@ -24,7 +24,7 @@ fun ChannelRequestReceived(
   var preparingResponse by remember { mutableStateOf(false) }
   val balanceChange = channel.my.balance - channelBalance.first
 
-  Text("Request received to send ${balanceChange.toPlainString()} ${tokens[channel.tokenId]?.name ?: "[${channel.tokenId}]"} over channel ${channel.id}")
+  Text("Request received to send ${balanceChange.toPlainString()} ${tokens[channel.tokenId]?.name ?: "[${channel.tokenId}]"} over channel ${channel.name}")
   Button({
     onClick {
       dismiss()
