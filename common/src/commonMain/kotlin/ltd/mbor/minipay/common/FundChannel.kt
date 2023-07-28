@@ -1,6 +1,8 @@
 package ltd.mbor.minipay.common
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
+import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
+import ltd.mbor.minimak.Coin
 import ltd.mbor.minimak.exportTx
 import ltd.mbor.minimak.getContacts
 import ltd.mbor.minimak.inputsWithChange
@@ -75,7 +77,7 @@ suspend fun ChannelService.prepareFundChannel(
 
 suspend fun ChannelService.fundingTx(amount: BigDecimal, tokenId: String): Int {
   val txnId = newTxId()
-  val (inputs, change) = mds.inputsWithChange(tokenId, amount)
+  val (inputs, change) = if (amount > ZERO) mds.inputsWithChange(tokenId, amount) else emptyList<Coin>() to emptyList()
 
   val txncreator = buildString {
     appendLine("txncreate id:$txnId;")
