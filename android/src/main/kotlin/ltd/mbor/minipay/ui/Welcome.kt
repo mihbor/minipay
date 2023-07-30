@@ -8,6 +8,7 @@ import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration.Companion.Underline
@@ -27,7 +28,7 @@ fun Welcome(inited: Boolean, setView: (String) -> Unit) {
           Text("Please go to ")
           ClickableText(
             AnnotatedString("Settings"),
-            style = TextStyle(fontSize = 18.sp, textDecoration = Underline)
+            style = TextStyle(textDecoration = Underline, color = Color.Blue, fontSize = 17.sp)
           ) { setView("Settings") }
         }
         Text("and update the UID")

@@ -15,12 +15,12 @@ import androidx.compose.ui.Modifier
 fun Menu(inited: Boolean, showNavMenu: Boolean, setView: (String) -> Unit, startEmitting: () -> Unit, stopEmitting: () -> Unit, setShowNavMenu: (Boolean) -> Unit) {
 
   @Composable
-  fun MenuItem(view: String, label: String = view) {
+  fun MenuItem(view: String, label: String = view, enabled: Boolean = inited) {
     DropdownMenuItem(onClick = {
       setView(view)
       startEmitting()
       setShowNavMenu(false)
-    }, enabled = inited) {
+    }, enabled = enabled) {
       Text(label)
     }
   }
@@ -41,7 +41,7 @@ fun Menu(inited: Boolean, showNavMenu: Boolean, setView: (String) -> Unit, start
         Divider()
         MenuItem("Contacts")
         Divider()
-        MenuItem("Settings")
+        MenuItem("Settings", enabled = true)
       }
     }
   }
