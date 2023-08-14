@@ -12,6 +12,7 @@ import kotlinx.serialization.json.jsonObject
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.jsonString
 import ltd.mbor.minimak.jsonStringOrNull
+import ltd.mbor.minimak.log
 import ltd.mbor.minipay.common.model.Channel
 
 interface ChannelStorage{
@@ -111,6 +112,7 @@ object storage: ChannelStorage {
   }
 
   override suspend fun updateChannelStatus(channel: Channel, status: String): Channel {
+    log("Setting ${channel.status} channel ${channel.name} to $status")
     val now = Clock.System.now()
     MDS.sql(
       """UPDATE channel SET

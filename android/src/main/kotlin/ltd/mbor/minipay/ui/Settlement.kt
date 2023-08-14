@@ -104,8 +104,7 @@ fun Settlement(
         eltooScriptCoins.firstOrNull()?.let {
           Text("Timelock ${
             (it.created + channel.timeLock - blockNumber).takeIf { it > 0 }?.let { "ends in $it blocks \uD83D\uDD51" } ?: "ended"
-          }"
-          )
+          }")
         }
         if (channel.status == "TRIGGERED" && channel.sequenceNumber > 0) {
           if (channel.updateTx.isNotEmpty()) Button(

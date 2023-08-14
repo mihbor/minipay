@@ -30,17 +30,27 @@ pages:
   stage: build
   script:
     - ./gradlew minidappWithApk
-    - mkdir .public
-    - cp -r web/build/minidapp/*.zip .public
-    - cp -r android/build/outputs/apk/debug/*.apk .public
-    - cd .public/
+    # Get the previous GitLab Pages content
+    - apt-get install -y zip unzip
+    - set +e
+    - curl --fail "$CI_PAGES_URL/content.zip" -o "content.zip"
+    - if [ -e "content.zip" ]; then unzip "content.zip"; rm "content.zip"; else mkdir public; fi
+    - set -e
+    - cp -r web/build/minidapp/*.zip public/
+    - cp -r android/build/outputs/apk/debug/*.apk public/
+    - cd public/
+    - curl --fail https://mihbor.gitlab.io/minipay/minipay-0.3.4.4.mds.zip -o "minipay-0.3.4.4.mds.zip"
+    - curl --fail https://mihbor.gitlab.io/minipay/minipay-0.3.4.4-debug.apk -o "minipay-0.3.4.4-debug.apk"
     - echo "<html><body><h1>MiniPay</h1>" > ./index.html
-    - find *.zip -exec echo "minidapp:<a href='{}'>{}</a><br/>" \; >> ./index.html
-    - find *.apk -exec echo "android:<a href='{}'>{}</a><br/>" \; >> ./index.html
-    - echo "</body></html>" >> ./index.html
+    - echo "<h4>MiniDApp downloads:</h4><ul>" >> ./index.html
+    - find *.mds.zip -exec echo "<li><a href='{}'>{}</a><br/>" \; >> ./index.html
+    - echo "</ul><h4>Android APK downloads:</h4><ul>" >> ./index.html
+    - find *.apk -exec echo "<li><a href='{}'>{}</a><br/>" \; >> ./index.html
+    - echo "</ul></body></html>" >> ./index.html
     - cd ..
-    - rm -rf public
-    - mv .public public
+    # Zip the content and publish the zip again
+    - zip -r "content.zip" "public"
+    - mv "content.zip" "public/"
   artifacts:
     paths:
       - public

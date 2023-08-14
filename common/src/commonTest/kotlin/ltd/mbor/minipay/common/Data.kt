@@ -5,6 +5,7 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.datetime.Clock
 import ltd.mbor.minimak.Address
 import ltd.mbor.minimak.Coin
+import ltd.mbor.minimak.State
 import ltd.mbor.minimak.Transaction
 import ltd.mbor.minipay.common.model.Channel
 
@@ -25,7 +26,7 @@ val aCoin = Coin(
   tokenId = "0x00",
   token = null,
   _created = "123",
-  state = emptyList()
+  state = listOf(State(port = 99, type = 2, data = "0"))
 )
 val aTransaction = Transaction(
   inputs = listOf(aCoin),

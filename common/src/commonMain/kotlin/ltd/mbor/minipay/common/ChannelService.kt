@@ -32,12 +32,15 @@ class ChannelService(
         in setOf("OPEN", "TRIGGERED", "UPDATED") -> {
           val eltooCoins = mds.getCoins(address = channel.eltooAddress)
           eltooScriptCoins[channel.eltooAddress] = eltooCoins
-          if (channel.status == "OPEN" && eltooCoins.isNotEmpty()) storage.updateChannelStatus(channel, "TRIGGERED")
-          else if (channel.status in listOf("TRIGGERED", "UPDATED") && eltooCoins.isEmpty()) {
+          if (channel.status == "OPEN" && eltooCoins.isNotEmpty()) {
+            storage.updateChannelStatus(channel, "TRIGGERED")
+          } else if (channel.status in listOf("TRIGGERED", "UPDATED") && eltooCoins.isEmpty()) {
             val anyTransactionsFromEltoo = mds.getTransactions(channel.eltooAddress)
               ?.any { it.inputs.any { it.address == channel.eltooAddress } } ?: false
             if (anyTransactionsFromEltoo) storage.updateChannelStatus(channel, "SETTLED")
             else channel
+          } else if (channel.status == "TRIGGERED" && eltooCoins.firstOrNull { it.state.first { it.port == 99 }.data.toInt() < channel.sequenceNumber } != null) {
+            channel.postUpdate()
           } else channel
         }
         else -> channel
@@ -48,7 +51,7 @@ class ChannelService(
   }
   
   suspend fun Channel.update(updateTxText: String, settleTxText: String, settleTx: Transaction, onSuccess: (Channel) -> Unit): Channel {
-    val sequenceNumber = settleTx.state.find { it.port == 99 }?.data?.toInt()!!
+    val sequenceNumber = settleTx.state.first { it.port == 99 }.data.toInt()
     val outputs = settleTx.outputs
     val myBalance = outputs.find { it.address == my.address }?.tokenAmount ?: BigDecimal.ZERO
     val theirBalance = outputs.find { it.address == their.address }?.tokenAmount ?: BigDecimal.ZERO

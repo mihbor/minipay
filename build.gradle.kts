@@ -12,7 +12,7 @@ plugins {
 
 allprojects {
   group = "ltd.mbor"
-  version = "0.3.4.4"
+  version = "0.3.5-SNAPSHOT"
 
   repositories {
     google()

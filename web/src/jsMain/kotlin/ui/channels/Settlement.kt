@@ -47,51 +47,50 @@ fun Settlement(channel: Channel, blockNumber: Int, eltooScriptCoins: List<Coin>,
       }
     }
     if (eltooScriptCoins.isNotEmpty()) {
-      eltooScriptCoins.firstOrNull()?.let {
+      eltooScriptCoins.firstOrNull()?.let { coin ->
         Br()
-        TokenIcon(it.tokenId, balances)
+        TokenIcon(coin.tokenId, balances)
         Text("Timelock ${
-          (it.created + channel.timeLock - blockNumber).takeIf { it > 0 }?.let { "ends in $it blocks \uD83D\uDD51" } ?: "ended"
-        }"
-        )
-      }
-      if (channel.status == "TRIGGERED" && channel.sequenceNumber > 0) {
-        Br()
-        if (channel.updateTx.isNotEmpty()) Button({
-          onClick {
-            updatePosting = true
-            scope.launch {
-              try {
-                updateChannel(channel.postUpdate())
-              } catch (e: MinimaException) {
-                e.message?.let(window::alert)
-              }
-              updatePosting = false
-            }
-          }
-          if (updatePosting) disabled()
-        }) {
-          Text("Post latest update")
-        }
-      }
-      if (channel.status in listOf("TRIGGERED", "UPDATED")) {
-        Button({
-          if (settlementCompleting || updatePosting || eltooScriptCoins.any { it.created + channel.timeLock > blockNumber }) disabled()
-          onClick {
-            if (window.confirm("Finalize channel settlement on-chain?")) {
-              settlementCompleting = true
-              scope.launch {
-                try {
-                  updateChannel(channel.completeSettlement())
-                } catch (e: MinimaException) {
-                  e.message?.let(window::alert)
+          (coin.created + channel.timeLock - blockNumber).takeIf { it > 0 }?.let { "ends in $it blocks \uD83D\uDD51" } ?: "ended"
+        }")
+        if (channel.status in listOf("TRIGGERED", "UPDATED")) {
+          if (channel.sequenceNumber > coin.state.first { it.port == 99 }.data.toInt()) {
+            Br()
+            if (channel.updateTx.isNotEmpty()) Button({
+              onClick {
+                updatePosting = true
+                scope.launch {
+                  try {
+                    updateChannel(channel.postUpdate())
+                  } catch (e: MinimaException) {
+                    e.message?.let(window::alert)
+                  }
+                  updatePosting = false
                 }
-                settlementCompleting = false
               }
+              if (updatePosting) disabled()
+            }) {
+              Text("Post latest update")
             }
           }
-        }) {
-          Text("Complete settlement!")
+          Button({
+            if (settlementCompleting || updatePosting || eltooScriptCoins.any { it.created + channel.timeLock > blockNumber }) disabled()
+            onClick {
+              if (window.confirm("Finalize channel settlement on-chain?")) {
+                settlementCompleting = true
+                scope.launch {
+                  try {
+                    updateChannel(channel.completeSettlement())
+                  } catch (e: MinimaException) {
+                    e.message?.let(window::alert)
+                  }
+                  settlementCompleting = false
+                }
+              }
+            }
+          }) {
+            Text("Complete settlement!")
+          }
         }
       }
     }
