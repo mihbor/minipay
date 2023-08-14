@@ -2,6 +2,7 @@ package ltd.mbor.minipay.common
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -31,7 +32,10 @@ fun channelKey(keys: Channel.Keys, tokenId: String) = listOf(keys.trigger, keys.
 
 suspend fun MdsApi.newKeys(count: Int): List<String> {
   val command = List(count) { "keys action:new;" }.joinToString("\n")
-  return cmd(command)!!.jsonArray.map { it.jsonObject["response"]!!.jsonString("publickey") }
+  with (cmd(command)!!) {
+    if (this is JsonArray) return jsonArray.map { it.jsonObject["response"]!!.jsonString("publickey") }
+    else throw MinimaException(jsonStringOrNull("error") ?: ("Unknown error occurred. Status: ${jsonBooleanOrNull("status")}, error: ${jsonStringOrNull("error")}"))
+  }
 }
 
 suspend fun isPaymentChannelAvailable(toAddress: String, tokenId: String, amount: BigDecimal): Boolean {

@@ -2,6 +2,7 @@ package ui.channels
 
 import androidx.compose.runtime.*
 import com.benasher44.uuid.Uuid
+import kotlinx.browser.window
 import logic.channelToFund
 import logic.requestedChannel
 import ltd.mbor.minimak.*
@@ -32,18 +33,22 @@ fun CreateChannel(
   var myAddress by remember { mutableStateOf("") }
 
   LaunchedEffect("createChannel") {
-    (channels[channelToFund?.id] ?: channelToFund)?.takeIf { it.status == "OPEN" }?.let {
-      log("channelToFund is open")
-      channelToFund = null
+    try {
+      (channels[channelToFund?.id] ?: channelToFund)?.takeIf { it.status == "OPEN" }?.let {
+        log("channelToFund is open")
+        channelToFund = null
+      }
+      (channels[requestedChannel?.id] ?: requestedChannel)?.takeIf { it.status == "OPEN" }?.let {
+        log("requestedChannel is open")
+        requestedChannel = null
+      }
+      MDS.newKeys(3).apply {
+        myKeys = Channel.Keys(this[0], this[1], this[2])
+      }
+      myAddress = MDS.getAddress().address
+    } catch(e: MinimaException) {
+      window.alert(e.message ?: "Unknown error")
     }
-    (channels[requestedChannel?.id] ?: requestedChannel)?.takeIf { it.status == "OPEN" }?.let {
-      log("requestedChannel is open")
-      requestedChannel = null
-    }
-    MDS.newKeys(3).apply {
-      myKeys = Channel.Keys(this[0], this[1], this[2])
-    }
-    myAddress = MDS.getAddress().address
   }
 
   Text("Trigger key: ${myKeys.trigger}")

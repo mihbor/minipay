@@ -1,5 +1,6 @@
 package ltd.mbor.minipay.ui.channels
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,6 +10,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
@@ -42,20 +44,25 @@ fun CreateChannel(
   var useMaxima by remember { mutableStateOf(maximaContact != null || invite != EMPTY) }
   var myKeys by remember { mutableStateOf(Channel.Keys("", "", "")) }
   var myAddress by remember { mutableStateOf("") }
+  val context = LocalContext.current
 
   LaunchedEffect("createChannel") {
-    (channels[channelToFund?.id] ?: channelToFund)?.takeIf { it.status == "OPEN" }?.let {
-      log("channelToFund is open")
-      channelToFund = null
+    try {
+      (channels[channelToFund?.id] ?: channelToFund)?.takeIf { it.status == "OPEN" }?.let {
+        log("channelToFund is open")
+        channelToFund = null
+      }
+      (channels[requestedChannel?.id] ?: requestedChannel)?.takeIf { it.status == "OPEN" }?.let {
+        log("requestedChannel is open")
+        requestedChannel = null
+      }
+      MDS.newKeys(3).apply {
+        myKeys = Channel.Keys(this[0], this[1], this[2])
+      }
+      myAddress = MDS.getAddress().address
+    } catch (e: MinimaException) {
+      Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
     }
-    (channels[requestedChannel?.id] ?: requestedChannel)?.takeIf { it.status == "OPEN" }?.let {
-      log("requestedChannel is open")
-      requestedChannel = null
-    }
-    MDS.newKeys(3).apply {
-      myKeys = Channel.Keys(this[0], this[1], this[2])
-    }
-    myAddress = MDS.getAddress().address
   }
 
   LazyColumn {
