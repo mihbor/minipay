@@ -48,7 +48,7 @@ fun main() {
 
   renderComposableInBody {
     Style(StyleSheets)
-    Menu(view) { view = it }
+    Menu(inited, view) { view = it }
     when(view) {
       "MiniPay" -> Welcome { view = it }
       "Receive" -> Receive(balances, tokens)
@@ -74,6 +74,7 @@ fun main() {
           }
         }
       }
+      "Help" -> Help()
     }
   }
 }

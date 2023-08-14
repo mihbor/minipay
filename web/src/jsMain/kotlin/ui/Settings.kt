@@ -10,7 +10,9 @@ import ltd.mbor.minimak.getMaximaInfo
 import ltd.mbor.minimak.setMaximaName
 import ltd.mbor.minipay.common.model.Prefs
 import ltd.mbor.minipay.common.scope
+import org.jetbrains.compose.web.attributes.ATarget
 import org.jetbrains.compose.web.attributes.disabled
+import org.jetbrains.compose.web.attributes.target
 import org.jetbrains.compose.web.css.height
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.width
@@ -62,6 +64,12 @@ fun Settings(prefs: Prefs, setPrefs: (Prefs) -> Unit) {
       width(80.px)
     }
   }
+  Br()
+  Text("Click to test ")
+  A("https://${prefsInput.host}:${prefsInput.port}", { target(ATarget.Blank) } ) {
+    Text("https://${prefsInput.host}:${prefsInput.port}")
+  }
+  Text(" and approve self-signed certificate if needed")
   Br()
   Br()
   Button({

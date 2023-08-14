@@ -9,7 +9,18 @@ fun Welcome(setView: (String) -> Unit) {
     Text("Welcome to MiniPay")
   }
   H2 {
-    Text("Please select an option from the menu ☰")
+    Text("A Minima payments app with L2 channel support and NFC (in the companion Android app)")
+  }
+  H3 {
+    Text("Read more about it in: ")
+    A(href="#", {
+      onClick{
+        setView("Help")
+      }
+    }) { Text("☰Help") }
+  }
+  H2 {
+    Text("Please select an option from the corner menu ☰")
   }
   H3 {
     Text("You can also download a native Android app in: ")
@@ -17,6 +28,6 @@ fun Welcome(setView: (String) -> Unit) {
       onClick{
         setView("Settings")
       }
-    }) { Text("Settings") }
+    }) { Text("☰Settings") }
   }
 }

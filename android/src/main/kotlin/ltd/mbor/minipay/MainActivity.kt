@@ -31,6 +31,7 @@ import kotlinx.coroutines.launch
 import ltd.mbor.minimak.MDS
 import ltd.mbor.minimak.getAddress
 import ltd.mbor.minimak.importTx
+import ltd.mbor.minimak.log
 import ltd.mbor.minipay.common.ChannelService
 import ltd.mbor.minipay.common.model.ChannelInvite
 import ltd.mbor.minipay.common.model.PaymentRequestReceived
@@ -162,7 +163,13 @@ class MainActivity : ComponentActivity(), CardReader.DataCallback {
   private fun emitReceive(address: String? = null) {
     disableReaderMode()
     scope.launch {
-      this@MainActivity.address = address ?: MDS.getAddress().address
+      try {
+        this@MainActivity.address = address ?: MDS.getAddress().address
+      } catch (e: NullPointerException) {
+        Toast.makeText(applicationContext, "Error getting status. Wrong UID?", Toast.LENGTH_LONG).show()
+        log(e.toString())
+        return@launch
+      }
       applicationContext.sendDataToService("$address;$tokenId;${amount.toPlainString()}")
     }
   }

@@ -15,11 +15,11 @@ import androidx.compose.ui.Modifier
 fun Menu(inited: Boolean, showNavMenu: Boolean, setView: (String) -> Unit, startEmitting: () -> Unit, stopEmitting: () -> Unit, setShowNavMenu: (Boolean) -> Unit) {
 
   @Composable
-  fun MenuItem(view: String, label: String = view, enabled: Boolean = inited) {
+  fun MenuItem(view: String, label: String = view, enabled: Boolean = inited, action: () -> Unit = {}) {
     DropdownMenuItem(onClick = {
       setView(view)
-      startEmitting()
       setShowNavMenu(false)
+      action()
     }, enabled = enabled) {
       Text(label)
     }
@@ -32,8 +32,12 @@ fun Menu(inited: Boolean, showNavMenu: Boolean, setView: (String) -> Unit, start
         expanded = showNavMenu,
         onDismissRequest = { setShowNavMenu(false) }
       ) {
-        MenuItem("Receive")
-        MenuItem("Send")
+        MenuItem("Receive") {
+          startEmitting()
+        }
+        MenuItem("Send") {
+          stopEmitting()
+        }
         Divider()
         MenuItem("Create Channel")
         MenuItem("Channels", "Channel Listing")
@@ -42,6 +46,8 @@ fun Menu(inited: Boolean, showNavMenu: Boolean, setView: (String) -> Unit, start
         MenuItem("Contacts")
         Divider()
         MenuItem("Settings", enabled = true)
+        Divider()
+        MenuItem("Help", enabled = true)
       }
     }
   }

@@ -19,20 +19,32 @@ import ltd.mbor.minipay.ui.theme.MiniPayTheme
 
 @Composable
 fun Welcome(inited: Boolean, setView: (String) -> Unit) {
-  Text("Welcome to MiniPay", modifier = Modifier.padding(20.dp), fontSize = 20.sp)
+  Text("Welcome to MiniPay", modifier = Modifier.padding(20.dp), fontSize = 24.sp)
+  Text("A Minima payments app with L2 channel support and NFC", modifier = Modifier.padding(20.dp), fontSize = 20.sp)
   ProvideTextStyle(value = TextStyle(fontSize = 16.sp)) {
     Column(Modifier.padding(20.dp)) {
-      if (inited) Text("Please select an option from the menu ☰")
+      Row {
+        Text("Read more about it in: ")
+        ClickableText(
+          AnnotatedString("☰Help"),
+          style = TextStyle(textDecoration = Underline, color = Color.Blue, fontSize = 17.sp)
+        ) { setView("Help") }
+      }
+    }
+  }
+  ProvideTextStyle(value = TextStyle(fontSize = 16.sp)) {
+    Column(Modifier.padding(20.dp)) {
+      if (inited) Text("Please select an option from the corner menu ☰")
       else {
         Row {
           Text("Please go to ")
           ClickableText(
-            AnnotatedString("Settings"),
+            AnnotatedString("☰Settings"),
             style = TextStyle(textDecoration = Underline, color = Color.Blue, fontSize = 17.sp)
           ) { setView("Settings") }
         }
-        Text("and update the UID")
-        Text("to initialize your Minima connection")
+        Text("and set the UID to initialize")
+        Text("your Minima connection")
       }
     }
   }

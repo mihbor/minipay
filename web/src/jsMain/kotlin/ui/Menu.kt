@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import kotlinx.browser.document
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.css.Color.black
+import org.jetbrains.compose.web.css.Color.gray
 import org.jetbrains.compose.web.css.Color.white
 import org.jetbrains.compose.web.css.LineStyle.Companion.Solid
 import org.jetbrains.compose.web.dom.*
@@ -18,7 +19,7 @@ tailrec fun Element?.itOrAncestorMatches(predicate: (HTMLElement) -> Boolean): B
 }
 
 @Composable
-fun Menu(view: String, setView: (String) -> Unit) {
+fun Menu(inited: Boolean, view: String, setView: (String) -> Unit) {
   var showMenu by remember { mutableStateOf(false) }
   val dismissMenu: (Event) -> Unit = { event ->
     if(!(event.target as? HTMLElement).itOrAncestorMatches { it.id == "menu" }) {
@@ -27,12 +28,18 @@ fun Menu(view: String, setView: (String) -> Unit) {
   }
 
   @Composable
-  fun MenuItem(view: String, label: String = view) {
+  fun MenuItem(view: String, label: String = view, enabled: Boolean = inited) {
     Div({
-      classes(StyleSheets.clickable)
-      onClick {
-        setView(view)
-        showMenu = false
+      if (enabled) {
+        classes(StyleSheets.clickable)
+        onClick {
+          setView(view)
+          showMenu = false
+        }
+      } else {
+        style {
+          color(gray)
+        }
       }
     }) {
       Text(label)
@@ -89,7 +96,9 @@ fun Menu(view: String, setView: (String) -> Unit) {
       Hr()
       MenuItem("Contacts")
       Hr()
-      MenuItem("Settings")
+      MenuItem("Settings", enabled = true)
+      Hr()
+      MenuItem("Help", enabled = true)
     }
   }
 }

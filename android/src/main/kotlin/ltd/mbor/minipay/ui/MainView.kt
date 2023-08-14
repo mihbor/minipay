@@ -93,6 +93,7 @@ fun MainView(
           setView("Create Channel")
         }
         "Settings" -> Settings(prefs, setPrefs)
+        "Help" -> Help()
       }
     }
   }
