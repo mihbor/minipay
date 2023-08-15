@@ -91,6 +91,7 @@ fun RequestChannel(
     Text("Keep this screen open until you see channel balance. This may take a few minutes")
   }
   if (triggerTxStatus.isEmpty()) {
+    Text("My contribution:")
     DecimalNumberField(amount, min = ZERO, enabled = !showQR) {
       it?.let { amount = it }
     }

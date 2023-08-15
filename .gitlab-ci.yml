@@ -39,8 +39,6 @@ pages:
     - cp -r web/build/minidapp/*.zip public/
     - cp -r android/build/outputs/apk/debug/*.apk public/
     - cd public/
-    - curl --fail https://mihbor.gitlab.io/minipay/minipay-0.3.4.4.mds.zip -o "minipay-0.3.4.4.mds.zip"
-    - curl --fail https://mihbor.gitlab.io/minipay/minipay-0.3.4.4-debug.apk -o "minipay-0.3.4.4-debug.apk"
     - echo "<html><body><h1>MiniPay</h1>" > ./index.html
     - echo "<h4>MiniDApp downloads:</h4><ul>" >> ./index.html
     - find *.mds.zip -exec echo "<li><a href='{}'>{}</a><br/>" \; >> ./index.html

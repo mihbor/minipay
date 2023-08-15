@@ -13,7 +13,7 @@ import ltd.mbor.minipay.ui.preview.fakeChannelOpen
 import ltd.mbor.minipay.ui.theme.MiniPayTheme
 
 @Composable
-fun DeleteChannel(channel: Channel, onDelete: (Channel) -> Unit) {
+fun DeleteChannel(channel: Channel, onDelete: (Channel?) -> Unit) {
   var deleteDisabled by remember { mutableStateOf(false) }
   var confirmDialogOpen by remember { mutableStateOf(false) }
   Button(enabled = !deleteDisabled, onClick = {
@@ -43,7 +43,7 @@ fun DeleteChannel(channel: Channel, onDelete: (Channel) -> Unit) {
             scope.launch {
               confirmDialogOpen = false
               channel.delete()
-              onDelete(channel)
+              onDelete(null)
             }
           }) {
           Text("Delete")

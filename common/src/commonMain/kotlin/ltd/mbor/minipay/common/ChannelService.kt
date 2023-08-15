@@ -5,7 +5,8 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
-import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
 import ltd.mbor.minimak.*
 import ltd.mbor.minipay.common.model.Channel
@@ -32,15 +33,15 @@ class ChannelService(
         in setOf("OPEN", "TRIGGERED", "UPDATED") -> {
           val eltooCoins = mds.getCoins(address = channel.eltooAddress)
           eltooScriptCoins[channel.eltooAddress] = eltooCoins
-          if (channel.status == "OPEN" && eltooCoins.isNotEmpty()) {
+          if (channel.status == "OPEN" && eltooCoins.isNotEmpty()) { //counterparty triggered settlement
             storage.updateChannelStatus(channel, "TRIGGERED")
           } else if (channel.status in listOf("TRIGGERED", "UPDATED") && eltooCoins.isEmpty()) {
             val anyTransactionsFromEltoo = mds.getTransactions(channel.eltooAddress)
               ?.any { it.inputs.any { it.address == channel.eltooAddress } } ?: false
-            if (anyTransactionsFromEltoo) storage.updateChannelStatus(channel, "SETTLED")
+            if (anyTransactionsFromEltoo) storage.updateChannelStatus(channel, "SETTLED") //settled already?
             else channel
           } else if (channel.status == "TRIGGERED" && eltooCoins.firstOrNull { it.state.first { it.port == 99 }.data.toInt() < channel.sequenceNumber } != null) {
-            channel.postUpdate()
+            channel.postUpdate() // the sequence number isn't the latest, post latest update
           } else channel
         }
         else -> channel
@@ -135,7 +136,7 @@ class ChannelService(
       appendLine("txnsign id:$updateTxnId publickey:${my.keys.update};")
       append("txnexport id:$updateTxnId;")
     }
-    val updateTxn = MDS.cmd(updatetxncreator)!!.jsonArray.last().jsonObject["response"]!!.jsonString("data")
+    val updateTxn = MDS.cmd(updatetxncreator)!!.jsonArrayOrThrow.last().jsonObject["response"]!!.jsonString("data")
     val settleTxnId = newTxId()
     val settletxncreator = buildString {
       appendLine("txncreate id:$settleTxnId;")
@@ -146,7 +147,7 @@ class ChannelService(
       appendLine("txnsign id:$settleTxnId publickey:${my.keys.settle};")
       append("txnexport id:$settleTxnId;")
     }
-    val settleTxn = MDS.cmd(settletxncreator)!!.jsonArray.last().jsonObject["response"]!!.jsonString("data")
+    val settleTxn = MDS.cmd(settletxncreator)!!.jsonArrayOrThrow.last().jsonObject["response"]!!.jsonString("data")
 
     val transport = maximaPK?.let(::MaximaTransport) ?: transport
     transport.publish(
@@ -192,7 +193,7 @@ class ChannelService(
       appendLine("txnpost id :$fundingTxId auto:true;")
       append("txndelete id :$fundingTxId;")
     }
-    val result = mds.cmd(txncreator)!!.jsonArray
+    val result = mds.cmd(txncreator)!!.jsonArrayOrThrow
     val status = result.first{ it.jsonString("command") == "txnpost" }.jsonString("status")
     log("txnpost status: $status")
 
@@ -215,3 +216,5 @@ suspend fun MdsApi.importCoinSafely(data: String) {
 fun <T> MutableList<T>.removeIf(predicate: (T) -> Boolean) {
   removeAll(filter(predicate))
 }
+
+val JsonElement.jsonArrayOrThrow: JsonArray get() = this as? JsonArray ?: throw MinimaException(jsonStringOrNull("error") ?: "Unknown error")

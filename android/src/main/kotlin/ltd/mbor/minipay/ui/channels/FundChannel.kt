@@ -1,11 +1,14 @@
 package ltd.mbor.minipay.ui.channels
 
+import android.widget.Toast
+import android.widget.Toast.LENGTH_LONG
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
@@ -13,6 +16,7 @@ import com.ionspin.kotlin.bignum.decimal.BigDecimal.Companion.ZERO
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlinx.coroutines.launch
 import ltd.mbor.minimak.Balance
+import ltd.mbor.minimak.MinimaException
 import ltd.mbor.minimak.Token
 import ltd.mbor.minimak.log
 import ltd.mbor.minipay.MainActivity
@@ -49,6 +53,8 @@ fun FundChannel(
 
   var showFundScannerOption by remember { mutableStateOf(true) }
   var progressStep: Int by remember { mutableStateOf(0) }
+
+  val context = LocalContext.current
 
   LaunchedEffect("fundChannel") {
     fundingTxStatus = ""
@@ -119,7 +125,7 @@ fun FundChannel(
     if (listOf(myKeys.trigger, myKeys.update, myKeys.settle, invite.keys.trigger, invite.keys.update, invite.keys.settle, invite.address).all(String::isNotEmpty)
       && fundingTxStatus.isEmpty()
     ) {
-      Text("My contribution to channel:")
+      Text("My contribution:")
       Row {
         DecimalNumberField(myAmount, min = ZERO, modifier = Modifier.fillMaxWidth(0.5f)) {
           it?.let { myAmount = it }
@@ -137,29 +143,36 @@ fun FundChannel(
         onClick = {
           showFundScannerOption = false
           scope.launch {
-            fundChannel(invite, myKeys, myAddress,  myAmount, timeLock) { event, newChannel ->
-              progressStep++
-              when (event) {
-                FUNDING_TX_CREATED -> fundingTxStatus = "Funding transaction created"
-                TRIGGER_TX_SIGNED -> triggerTxStatus = "Trigger transaction created and signed"
-                SETTLEMENT_TX_SIGNED -> settlementTxStatus = "Settlement transaction created and signed"
-                CHANNEL_PUBLISHED -> {
-                  triggerTxStatus += ", sent"
-                  settlementTxStatus += ", sent"
-                  channelToFund = newChannel
-                  log("channelId: ${channelToFund!!.id}")
+            try {
+              fundChannel(invite, myKeys, myAddress, myAmount, timeLock) { event, newChannel ->
+                progressStep++
+                when (event) {
+                  FUNDING_TX_CREATED -> fundingTxStatus = "Funding transaction created"
+                  TRIGGER_TX_SIGNED -> triggerTxStatus = "Trigger transaction created and signed"
+                  SETTLEMENT_TX_SIGNED -> settlementTxStatus = "Settlement transaction created and signed"
+                  CHANNEL_PUBLISHED -> {
+                    triggerTxStatus += ", sent"
+                    settlementTxStatus += ", sent"
+                    channelToFund = newChannel
+                    log("channelId: ${channelToFund!!.id}")
+                  }
+
+                  SIGS_RECEIVED -> {
+                    triggerTxStatus += " and received back."
+                    settlementTxStatus += " and received back."
+                  }
+
+                  CHANNEL_FUNDED -> fundingTxStatus += ", signed and posted!"
+                  CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED -> {
+                    channelToFund = newChannel
+                    progressStep--
+                  }
+
+                  else -> {}
                 }
-                SIGS_RECEIVED -> {
-                  triggerTxStatus += " and received back."
-                  settlementTxStatus += " and received back."
-                }
-                CHANNEL_FUNDED -> fundingTxStatus += ", signed and posted!"
-                CHANNEL_UPDATED, CHANNEL_UPDATED_ACKED -> {
-                  channelToFund = newChannel
-                  progressStep--
-                }
-                else -> {}
               }
+            } catch (e: MinimaException) {
+              Toast.makeText(context, e.message, LENGTH_LONG).show()
             }
           }
         }
