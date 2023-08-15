@@ -19,7 +19,7 @@ import ui.TokenIcon
 fun ChannelView(
   channel: Channel,
   balances: Map<String, Balance>,
-  updateChannel: (Channel) -> Unit
+  updateChannel: (Channel?) -> Unit
 ) {
   var channelName by remember { mutableStateOf(channel.name) }
   Div({

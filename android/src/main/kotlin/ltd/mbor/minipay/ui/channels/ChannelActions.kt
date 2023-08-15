@@ -24,7 +24,7 @@ fun ChannelActions(
   balances: Map<String, Balance>,
   activity: MainActivity?,
   selectChannel: (Channel) -> Unit,
-  updateChannel: (Channel) -> Unit
+  updateChannel: (Channel?) -> Unit
 ) {
   Column(Modifier.fillMaxWidth()) {
     if (channel.status == "OPEN") {

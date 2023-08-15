@@ -11,7 +11,7 @@ import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Text
 
 @Composable
-fun DeleteChannel(channel: Channel, onDelete: (Channel) -> Unit) {
+fun DeleteChannel(channel: Channel, onDelete: (Channel?) -> Unit) {
   var disabled by remember { mutableStateOf(false) }
   Button({
     if (disabled) disabled()
@@ -19,7 +19,7 @@ fun DeleteChannel(channel: Channel, onDelete: (Channel) -> Unit) {
       if (window.confirm("Delete ${channel.status} channel ${channel.id}?")) scope.launch {
         disabled = true
         channel.delete()
-        onDelete(channel)
+        onDelete(null)
       }
     }
   }) {

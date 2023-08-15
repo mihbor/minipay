@@ -54,7 +54,7 @@ fun Settlement(channel: Channel, blockNumber: Int, eltooScriptCoins: List<Coin>,
           (coin.created + channel.timeLock - blockNumber).takeIf { it > 0 }?.let { "ends in $it blocks \uD83D\uDD51" } ?: "ended"
         }")
         if (channel.status in listOf("TRIGGERED", "UPDATED")) {
-          if (channel.sequenceNumber > coin.state.first { it.port == 99 }.data.toInt()) {
+          if (channel.sequenceNumber > coin.state.first { it.port == 99 }.data.toInt()) { // sequence number isn't the latest, can post update
             Br()
             if (channel.updateTx.isNotEmpty()) Button({
               onClick {

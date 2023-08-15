@@ -32,7 +32,7 @@ fun ChannelView(
   channel: Channel,
   balances: Map<String, Balance>,
   activity: MainActivity?,
-  updateChannel: (Channel) -> Unit
+  updateChannel: (Channel?) -> Unit
 ) {
   var channelName by remember { mutableStateOf(channel.name) }
   fun renameChannel() {

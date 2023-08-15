@@ -14,7 +14,7 @@ fun ChannelActions(
   channel: Channel,
   balances: Map<String, Balance>,
   selectChannel: (Channel) -> Unit,
-  updateChannel: (Channel) -> Unit
+  updateChannel: (Channel?) -> Unit
 ) {
   if (channel.status == "OPEN") {
     ChannelTransfers(channel, balances)

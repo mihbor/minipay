@@ -167,6 +167,7 @@ fun FundChannel(
   if (listOf(myKeys.trigger, myKeys.update, myKeys.settle, invite.keys.trigger, invite.keys.update, invite.keys.settle, invite.address).all(String::isNotEmpty)
     && fundingTxStatus.isEmpty()
   ) {
+    Text("My contribution:")
     DecimalNumberInput(myAmount, min = ZERO) {
       it?.let { myAmount = it }
     }
