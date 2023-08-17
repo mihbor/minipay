@@ -8,7 +8,7 @@ variables:
 before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle
   - apt-get --quiet update --yes
-  - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
+  - apt-get --quiet install --yes wget tar zip unzip lib32stdc++6 lib32z1
   - mkdir -p android-sdk-linux/cmdline-tools
   - export ANDROID_SDK_ROOT=$PWD/android-sdk-linux
   - cd android-sdk-linux/cmdline-tools
@@ -20,7 +20,7 @@ before_script:
   - echo y | version/bin/sdkmanager "platform-tools" >/dev/null
   - echo y | version/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}" >/dev/null
   - export PATH=$PATH:$ANDROID_SDK_ROOT/platform-tools/
-  # temporarily disable checking for EPIPE error and use yes to accept all licenses
+  # temporarily disable checking for EPIPE error and use yes to accept all licences
   - set +o pipefail
   - yes | version/bin/sdkmanager --licenses
   - set -o pipefail
@@ -31,11 +31,11 @@ pages:
   script:
     - ./gradlew minidappWithApk
     # Get the previous GitLab Pages content
-    - apt-get install -y zip unzip
     - set +e
     - curl --fail "$CI_PAGES_URL/content.zip" -o "content.zip"
     - if [ -e "content.zip" ]; then unzip "content.zip"; rm "content.zip"; else mkdir public; fi
     - set -e
+    - rm public/*-SNAPSHOT*
     - cp -r web/build/minidapp/*.zip public/
     - cp -r android/build/outputs/apk/debug/*.apk public/
     - cd public/
