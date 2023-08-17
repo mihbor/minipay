@@ -16,5 +16,15 @@ fun Help() {
     Li { Text("Pay and request payments using NFC over existing L2 channel even while offline (in the companion Android app)") }
   }
   H3 { Text("Instructions") }
+  H4 { Text("Receive") }
+  Text("Here you can see and copy one of you Minima addresses to provide to someone who you want to send you tokens.")
+  Br()
+  Text("You can also see a QA code which can be scanned from another device that will populate the send screen" +
+    " with your address, token and amount (if selected)")
+  Br()
+  Text("The 'Receive on NFC' link will open the companion Android app (if installed) in the receive mode, which emits the above data over NFC" +
+    " allowing another Android device with MiniPay installed to open the pre-populated 'Send' screen" +
+    " by simply bringing the devices into contactless (NFC) range.")
+  H4{ Text("Send") }
   Text("Work in progress...")
 }
