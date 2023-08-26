@@ -19,7 +19,7 @@ kotlin {
     val jsMain by getting {
       dependencies {
         implementation(project(":common"))
-        implementation(compose.web.core)
+        implementation(compose.html.core)
         implementation(compose.runtime)
   
         implementation(npm("qrcode", "1.5.1"))
@@ -34,9 +34,6 @@ tasks.register<Copy>("updateDappVersion") {
   into(layout.buildDirectory.dir("processedResources/js/main/"))
   filter { line -> line.replace("\"version\": \".*\"".toRegex(), "\"version\": \"$version\"") }
 }
-
-tasks["jsProductionExecutableCompileSync"].dependsOn("updateDappVersion")
-tasks["jsBrowserProductionExecutableDistributeResources"].dependsOn("updateDappVersion")
 
 tasks.register<Zip>("minidappDistribution") {
   dependsOn("jsBrowserDistribution", "updateDappVersion")

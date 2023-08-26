@@ -29,7 +29,6 @@ allprojects {
   koverMerged {
     enable()
   }
-  
   tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions {
       jvmTarget = "11"

@@ -33,7 +33,7 @@ fun main() {
   var prefs by mutableStateOf(Prefs(
     uid = getParams("uid") ?: localStorage["uid"] ?: "",
     host = localStorage["host"]?.takeUnless { it.isBlank() } ?: window.location.hostname,
-    port = localStorage["port"]?.toIntOrNull() ?: ((window.location.port.toIntOrNull() ?: 9003) + 1)
+    port = getParams("port")?.toInt() ?: localStorage["port"]?.toIntOrNull() ?: ((window.location.port.toIntOrNull() ?: 9003) + 1)
   ))
   scope.launch {
     initMDS(prefs)
