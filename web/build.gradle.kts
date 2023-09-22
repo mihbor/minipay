@@ -31,12 +31,14 @@ kotlin {
 
 tasks.register<Copy>("updateDappVersion") {
   from("src/jsMain/resources/dapp.conf")
-  into(layout.buildDirectory.dir("processedResources/js/main/"))
+  into(layout.buildDirectory.dir("distributions/"))
   filter { line -> line.replace("\"version\": \".*\"".toRegex(), "\"version\": \"$version\"") }
 }
 
+tasks["jsBrowserDistribution"].dependsOn("updateDappVersion")
+
 tasks.register<Zip>("minidappDistribution") {
-  dependsOn("jsBrowserDistribution", "updateDappVersion")
+  dependsOn("jsBrowserDistribution")
   archiveFileName.set("${rootProject.name}-${project.version}.mds.zip")
   destinationDirectory.set(layout.buildDirectory.dir("minidapp"))
   from(layout.buildDirectory.dir("distributions"))

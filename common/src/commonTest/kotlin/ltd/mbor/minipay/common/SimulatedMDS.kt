@@ -14,6 +14,8 @@ class SimulatedMDS: MdsApi {
   var iterator = payloads.iterator()
   var capturedCommands = mutableListOf<String>()
   var capturedQueries = mutableListOf<String>()
+  var capturedGets = mutableListOf<String>()
+  var capturedPosts = mutableListOf<Pair<String, String>>()
   
   fun willReturn(payload: String?): SimulatedMDS {
     payloads += payload?.let(json::parseToJsonElement)
@@ -48,7 +50,17 @@ class SimulatedMDS: MdsApi {
     capturedCommands += command
     return iterator.next()
   }
-  
+
+  override suspend fun get(url: String): JsonElement? {
+    capturedGets += url
+    return iterator.next()
+  }
+
+  override suspend fun post(url: String, data: String): JsonElement? {
+    capturedPosts += url to data
+    return iterator.next()
+  }
+
   override suspend fun sql(query: String): JsonElement? {
     capturedQueries += query
     return iterator.next()

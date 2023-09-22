@@ -15,6 +15,7 @@ allprojects {
   version = "0.3.6-SNAPSHOT"
 
   repositories {
+    mavenLocal()
     google()
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
@@ -50,3 +51,6 @@ tasks.register("minidappWithApk") {
   dependsOn("copyApk", ":web:minidappDistribution", ":common:test")
 }
 
+configurations.all {
+  resolutionStrategy.cacheChangingModulesFor(1, "hours")
+}
